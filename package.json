@@ -1,0 +1,12 @@
+{
+  "name": "portfolio-case-regression",
+  "private": true,
+  "scripts": {
+    "test": "node scripts/test_case_media.cjs",
+    "test:universe": "node scripts/test_universe.cjs",
+    "test:motion": "node scripts/test_motion.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.65.1"
+  }
+}

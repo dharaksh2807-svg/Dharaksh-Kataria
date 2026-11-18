@@ -1,0 +1,41 @@
+/* V7 — readable-size companion and recognition list refinement. Keep V6 palette and layouts. */
+.kio-shell.kio-balanced{width:180px;height:234px;right:clamp(12px,1.4vw,28px);bottom:max(12px,env(safe-area-inset-bottom));z-index:83;transition:opacity .28s ease,visibility .28s ease,transform .28s ease}
+.kio-balanced .kio-launch{width:178px;height:229px}
+.kio-balanced .kio-person{width:160px;height:185px}
+.kio-balanced .kio-aura{left:15px;right:9px;top:5px;height:165px}
+.kio-balanced .kio-launch-label{min-height:46px;left:5px;right:5px;border-radius:9px}
+.kio-balanced .kio-launch-label strong{font-size:11px}
+.kio-balanced .kio-launch-label small{font-size:9px;display:block}
+.kio-balanced .kio-online-dot{right:4px;top:14px}
+.kio-balanced .kio-panel{right:190px;bottom:26px;width:min(356px,calc(100vw - 240px));max-height:min(665px,calc(100dvh - 44px))}
+.kio-balanced .kio-hint{right:10px;bottom:215px}
+.kio-shell.kio-balanced.kio-content-active:not(.kio-open){opacity:0;visibility:hidden;pointer-events:none;transform:translateY(10px)}
+/* An explicit compact choice remains available for smaller screens and dense reading. */
+.kio-preference-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.kio-preference-row button{padding:10px 5px;min-height:44px;font-size:8.5px;line-height:1.3}
+.kio-size-note{font-size:10px}
+@media(max-width:760px){
+  .kio-shell.kio-balanced{width:143px;height:191px;right:10px;bottom:max(9px,env(safe-area-inset-bottom))}
+  .kio-balanced .kio-launch{width:142px;height:190px}
+  .kio-balanced .kio-person{width:133px;height:155px}
+  .kio-balanced .kio-aura{left:8px;right:8px;height:137px}
+  .kio-balanced .kio-launch-label{min-height:38px;bottom:0;left:3px;right:3px}
+  .kio-balanced .kio-launch-label strong{font-size:9px}
+  .kio-balanced .kio-launch-label small{font-size:7.5px}
+  .kio-balanced .kio-panel{position:fixed;right:10px;bottom:calc(max(9px,env(safe-area-inset-bottom)) + 197px);width:min(350px,calc(100vw - 20px));max-height:calc(100dvh - 219px)}
+  .kio-balanced .kio-hint{bottom:178px;right:0;max-width:200px;min-width:190px}
+}
+@media(max-width:390px){
+  .kio-shell.kio-balanced{width:128px;height:177px;right:6px}
+  .kio-balanced .kio-launch{width:127px;height:175px}
+  .kio-balanced .kio-person{width:120px;height:146px}
+  .kio-balanced .kio-panel{right:6px;width:calc(100vw - 12px);bottom:calc(max(9px,env(safe-area-inset-bottom)) + 184px);max-height:calc(100dvh - 201px)}
+  .kio-balanced .kio-hint{bottom:165px}
+}
+@media(max-height:640px) and (min-width:761px){
+  .kio-shell.kio-balanced{height:185px;width:142px}
+  .kio-balanced .kio-launch{height:184px;width:140px}
+  .kio-balanced .kio-person{width:130px;height:143px}
+  .kio-balanced .kio-panel{right:150px;bottom:8px;max-height:calc(100dvh - 24px)}
+}
+@media(prefers-reduced-motion:reduce){.kio-shell.kio-balanced{transition:none}}

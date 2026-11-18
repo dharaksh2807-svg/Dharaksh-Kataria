@@ -1,0 +1,83 @@
+/* V8 — signature Engineering Universe, cinematic continuity, accessible motion. */
+@view-transition {navigation:auto}
+:root {--v8-ink:#111b18;--v8-paper:#ecebe3;--v8-copper:#ce8a6a;--v8-moss:#97b69f}
+.world-section{position:relative;background:#111e1a;color:#e9eee5;overflow:hidden;padding:clamp(82px,9vw,155px) 0 clamp(44px,6vw,84px);isolation:isolate}
+.world-section:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 60% at 45% 40%,rgba(82,137,105,.17),transparent 80%),repeating-linear-gradient(90deg,transparent 0 91px,rgba(180,207,178,.027) 92px 93px);z-index:-1}
+.world-top{display:grid;grid-template-columns:1.25fr .62fr;align-items:end;gap:clamp(25px,6vw,130px);margin-bottom:46px}
+.world-top .eyebrow{color:#dc9b78;font:11px 'DM Mono',monospace;letter-spacing:.18em}
+.world-top h2{font-size:clamp(44px,5.8vw,88px);font-weight:500;line-height:1.03;letter-spacing:-.062em;margin:20px 0 0}
+.world-top h2 em{font-family:'Instrument Serif',serif;font-weight:400;letter-spacing:-.04em;color:#daa889}
+.world-top p{color:#b4c1b5;font-size:clamp(14px,1.13vw,18px);line-height:1.75;max-width:430px;margin-bottom:5px}
+.world-shell{border:1px solid #385247;background:#13231e;box-shadow:0 42px 90px rgba(3,12,9,.26);border-radius:14px;overflow:hidden}
+.world-toolbar{display:flex;min-height:50px;align-items:center;gap:16px;justify-content:space-between;padding:9px clamp(15px,2.5vw,33px);border-bottom:1px solid #395146;color:#b6c2b6}
+.world-toolbar .mono{font-size:10px;letter-spacing:.13em}
+.world-live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#a9d4ac;box-shadow:0 0 0 4px rgba(169,212,172,.08);margin-right:8px}
+.world-btn{background:transparent;border:1px solid #5c7064;color:#d4e1d3;font:10px 'DM Mono',monospace;letter-spacing:.06em;border-radius:2px;min-height:34px;padding:0 12px;cursor:pointer;transition:background .25s,border-color .25s}
+.world-btn:hover,.world-btn:focus-visible{background:#284339;border-color:#adbfaa}
+.world-canvas-wrap{height:clamp(390px,52vw,730px);position:relative;background:radial-gradient(ellipse at 50% 35%,#2e463d,#0e1c18 82%);overflow:hidden;cursor:grab;touch-action:pan-y;outline-offset:-4px}
+.world-canvas-wrap:active{cursor:grabbing}
+#worldCanvas{width:100%;height:100%;display:block}
+.world-canvas-wrap:after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 170px rgba(4,14,11,.58);pointer-events:none}
+.world-labels{position:absolute;inset:0;pointer-events:none;z-index:2}
+.world-marker{pointer-events:auto;position:absolute;transform:translate(-50%,-100%);color:#e5e7d9;background:rgba(9,25,20,.88);border:1px solid rgba(182,215,186,.45);border-radius:3px;font:9px 'DM Mono',monospace;padding:10px 12px;letter-spacing:.085em;cursor:pointer;white-space:nowrap;box-shadow:0 8px 22px rgba(0,0,0,.3);transition:background .25s,transform .25s,border-color .25s}
+.world-marker:after{content:"";position:absolute;left:50%;top:100%;width:1px;height:22px;background:#b8bfb3;opacity:.5}
+.world-marker:hover,.world-marker.is-active{background:#cb8b69;color:#15231b;border-color:#edc7ad;transform:translate(-50%,-100%) scale(1.065)}
+.world-marker i{width:6px;height:6px;display:inline-block;border-radius:50%;background:#c99676;margin-right:7px}
+.world-marker.is-active i{background:#1e3830}
+.world-hud{position:absolute;color:#b5c9b9;pointer-events:none;opacity:.85;z-index:3;font-size:9px;letter-spacing:.13em}
+.world-hud-top{top:22px;left:22px}.world-hud-bottom{left:22px;bottom:20px}
+.world-sound,.world-haptic{position:absolute;z-index:4;top:20px;right:20px;border:1px solid #72907f;border-radius:3px;background:rgba(10,29,22,.81);color:#e2e7df;min-height:34px;padding:0 12px;cursor:pointer;font:9px 'DM Mono',monospace;letter-spacing:.08em}
+.world-haptic{top:63px}.world-sound[aria-pressed=true],.world-haptic[aria-pressed=true]{color:#ffd5b8;border-color:#db9777}
+.world-fallback{position:absolute;left:50%;bottom:17%;transform:translateX(-50%);max-width:400px;padding:20px;background:#12231d;border:1px solid #567363;text-align:center;color:#cddacf;z-index:5;font-size:13px}
+.world-lower{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(255px,.72fr);border-top:1px solid #355043}
+.world-district-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.world-sector{border:0;border-right:1px solid #344a40;border-bottom:1px solid #344a40;color:#e2e9df;background:transparent;padding:24px clamp(13px,2.4vw,32px);text-align:left;cursor:pointer;display:grid;gap:8px;min-height:137px;transition:background .35s,transform .28s}
+.world-sector span{font:9px 'DM Mono',monospace;color:#dda584;letter-spacing:.13em}
+.world-sector strong{font-size:clamp(13px,1.35vw,18px);font-weight:500;line-height:1.3}
+.world-sector small{font:9px 'DM Mono',monospace;color:#9cb8a3}
+.world-sector:hover,.world-sector.is-active{background:linear-gradient(125deg,rgba(146,176,147,.12),rgba(204,131,98,.08))}
+.world-sector:active{transform:scale(.985)}
+.world-inspector{padding:clamp(24px,3vw,42px);display:flex;flex-direction:column;align-items:flex-start;justify-content:center;background:#172a23}
+.world-inspector .mono{color:#dca17f;font-size:10px;letter-spacing:.13em}
+.world-inspector h3{font-size:clamp(22px,2.3vw,34px);font-weight:500;line-height:1.1;letter-spacing:-.04em;margin:16px 0}
+.world-inspector p{font-size:14px;line-height:1.7;color:#b6c7b9;margin:0 0 23px}
+.world-inspector a{font:10px 'DM Mono',monospace;letter-spacing:.08em;color:#f6d5bf;border-bottom:1px solid #ce9776;padding-bottom:9px}
+.world-inspector a span{margin-left:9px}
+.world-footer{display:flex;justify-content:space-between;gap:20px;padding-top:18px;color:#879b8c;font-size:9px;letter-spacing:.11em}
+/* The character is intentionally readable but dismissible. Content always takes precedence. */
+.kio-shell.kio-balanced{width:216px;height:280px;right:14px;bottom:max(12px,env(safe-area-inset-bottom));filter:drop-shadow(0 15px 15px rgba(9,24,19,.18))}
+.kio-balanced .kio-launch{width:214px;height:275px}
+.kio-balanced .kio-person{width:190px;height:228px}
+.kio-balanced .kio-aura{height:210px;left:14px;right:10px}
+.kio-balanced .kio-launch-label{min-height:45px}
+.kio-balanced .kio-panel{right:226px;bottom:26px;width:min(365px,calc(100vw - 280px))}
+.kio-balanced .kio-hint{bottom:253px}
+.kio-shell[data-mood=pointing] .kio-hand{animation:v8-point .75s ease-in-out 2;transform-origin:194px 192px}
+.kio-shell[data-mood=celebrate] .kio-figure{animation:v8-kio-hop .56s ease-in-out 3}
+@keyframes v8-point{50%{transform:translate(5px,-9px) rotate(10deg)}}
+@keyframes v8-kio-hop{50%{transform:translateY(-10px)}}
+/* Scroll-reveal choreography, CSS transform/opacity only. */
+.v8-reveal{opacity:0;transform:translate3d(0,36px,0);filter:blur(4px);transition:opacity .9s cubic-bezier(.22,.68,0,1),transform .9s cubic-bezier(.22,.68,0,1),filter .9s ease}
+.v8-reveal.in-view{opacity:1;transform:translateZ(0);filter:blur(0)}
+body.v8-leaving main{opacity:.82;filter:blur(4px);transform:scale(.997);transition:opacity .24s,filter .24s,transform .24s}
+body.v8-leaving:after{content:"";position:fixed;inset:0;z-index:600;background:#12231d;animation:v8-veil .32s ease forwards;pointer-events:none}
+@keyframes v8-veil{from{clip-path:inset(100% 0 0)}to{clip-path:inset(0)}}
+.project-card .project-visual{view-transition-name:var(--v8-vt-name)}
+::view-transition-old(root){animation:.28s ease both v8-fade-out}
+::view-transition-new(root){animation:.42s ease both v8-fade-in}
+@keyframes v8-fade-out{to{opacity:.65;filter:blur(7px)}}
+@keyframes v8-fade-in{from{opacity:.2;filter:blur(10px)}to{opacity:1;filter:blur(0)}}
+@media(max-width:1100px){.world-top{grid-template-columns:1fr 1fr}.world-hud-bottom{display:none}.world-marker{font-size:8px;padding:9px}}
+@media(max-width:850px){.world-top{grid-template-columns:1fr;gap:10px}.world-top h2{font-size:clamp(45px,8vw,66px)}.world-top p{max-width:580px}.world-lower{grid-template-columns:1fr}.world-inspector{min-height:175px}.world-canvas-wrap{height:470px}.world-footer{flex-direction:column;gap:5px}.world-toolbar .world-state{display:none}}
+@media(max-width:760px){.kio-shell.kio-balanced{width:164px;height:225px;right:8px}.kio-balanced .kio-launch{width:162px;height:221px}.kio-balanced .kio-person{width:150px;height:181px}.kio-balanced .kio-aura{height:165px}.kio-balanced .kio-panel{right:8px;bottom:calc(max(9px,env(safe-area-inset-bottom)) + 232px);width:min(360px,calc(100vw - 16px));max-height:calc(100dvh - 260px)}.kio-balanced .kio-hint{bottom:206px}.world-section{padding-top:80px}.world-district-list{grid-template-columns:1fr 1fr}.world-sector{min-height:119px;padding:16px 13px}.world-sector strong{font-size:14px}.world-canvas-wrap{height:420px}.world-hud-top{top:12px;left:11px;font-size:8px}.world-sound,.world-haptic{right:9px;top:10px;font-size:8px}.world-haptic{top:49px}.world-marker span{font-size:8px}.world-labels{font-size:8px}.world-top{margin-bottom:23px}}
+@media(max-width:420px){.kio-shell.kio-balanced{width:148px;height:205px;right:5px}.kio-balanced .kio-launch{width:146px;height:201px}.kio-balanced .kio-person{width:138px;height:164px}.kio-balanced .kio-hint{bottom:191px}.kio-balanced .kio-panel{right:5px;width:calc(100vw - 10px);bottom:215px;max-height:calc(100dvh - 231px)}.world-canvas-wrap{height:365px}.world-toolbar{padding-inline:10px}.world-toolbar .mono{font-size:8px}.world-marker{padding:7px 8px}.world-marker i{width:4px;height:4px}.world-hud-top{display:none}.world-sector{min-height:111px}.world-district-list{gap:0}.world-inspector{padding:24px}}
+@media(max-height:660px) and (min-width:761px){.kio-shell.kio-balanced{width:165px;height:205px}.kio-balanced .kio-launch{width:164px;height:203px}.kio-balanced .kio-person{width:146px;height:160px}.kio-balanced .kio-panel{right:177px}}
+@media(prefers-reduced-motion:reduce){.v8-reveal{opacity:1;transform:none;filter:none;transition:none}.kio-shell[data-mood] .kio-hand,.kio-shell[data-mood] .kio-figure{animation:none}body.v8-leaving main,body.v8-leaving:after{transition:none;animation:none}}
+/* The existing four-island scene remains one continuous, scrollable space. */
+.world-bypass,.world-project-links{display:flex;gap:16px;flex-wrap:wrap;margin-block:24px}.world-bypass a,.world-project-links a{color:#f0c1a5;font:12px 'DM Mono',monospace;text-decoration:underline;text-underline-offset:5px;line-height:1.8}.world-instructions{color:#adbfaf;font-size:13px;line-height:1.8;margin-bottom:24px}.world-project-links{scroll-margin-top:105px}.world-project-links a{flex:1 1 220px;border:1px solid #526d5d;padding:15px}.world-toolbar{flex-wrap:wrap;gap:10px}.world-toolbar .world-state{margin-left:auto}.world-canvas-wrap{touch-action:none}.world-canvas-wrap canvas[hidden]{display:none!important}.world-software-canvas{position:absolute;inset:0;width:100%;height:100%}.world-zoom{position:absolute;right:14px;bottom:14px;display:flex;gap:7px;z-index:4}.world-zoom button{min-width:44px;min-height:44px;font-size:20px;background:#152b22}.world-object-state{font:12px 'DM Mono',monospace!important;line-height:1.65!important;margin-bottom:16px!important}.world-inspector #worldObjectAction{margin-bottom:22px;min-height:44px}.world-inspector{min-width:0}.world-btn:disabled{opacity:.55;cursor:default}.world-marker{min-height:40px}.world-marker:focus-visible,.world-bypass a:focus-visible,.world-project-links a:focus-visible{outline:3px solid #e8b08b;outline-offset:4px}
+@media(min-width:851px) and (min-height:800px){.world-scroll-track{height:300svh}.world-shell{position:sticky;top:90px}.world-canvas-wrap{height:clamp(250px,calc(100svh - 490px),580px)}.world-sector{min-height:112px;padding:16px 24px}.world-lower{grid-template-columns:minmax(0,1.4fr) minmax(300px,1fr)}.world-inspector{padding:20px 26px}.world-inspector h3{font-size:26px;margin:10px 0}.world-inspector p{font-size:13px;margin-bottom:12px}.world-inspector #worldObjectAction{margin-bottom:12px}.world-hud-bottom{max-width:65%;line-height:1.8}}
+@media(max-width:650px){.world-toolbar .mono{flex:1 1 100%}.world-toolbar .world-state{display:none}.world-project-links a{flex-basis:100%}.world-inspector{min-height:300px}.world-bypass a{font-size:11px}.world-zoom{right:9px;bottom:9px}}
+@media(prefers-reduced-motion:reduce){.world-scroll-track{height:auto}.world-shell{position:relative;top:auto}}
+html.motion-off .world-scroll-track{height:auto}html.motion-off .world-shell{position:relative;top:auto}
+/* Clip the section background without creating a sticky-scroll container. */
+.world-section{overflow:clip}

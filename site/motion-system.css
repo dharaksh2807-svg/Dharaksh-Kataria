@@ -1,0 +1,259 @@
+/* Editorial motion uses the same timing, distance and easing across routes. */
+:root {
+  --motion-fast: 160ms;
+  --motion-enter: 560ms;
+  --motion-ease: cubic-bezier(0.22, 0.7, 0.2, 1);
+  --motion-distance: 32px;
+}
+html {
+  scroll-behavior: smooth;
+}
+.motion-ready [data-motion] {
+  opacity: 0;
+  filter: blur(3px);
+  transform: translate3d(0, 22px, 0);
+  transition:
+    opacity var(--motion-enter) var(--motion-ease),
+    transform var(--motion-enter) var(--motion-ease),
+    filter var(--motion-enter) var(--motion-ease);
+}
+.motion-ready [data-motion="slide-left"] {
+  transform: translate3d(calc(-1 * var(--motion-distance)), 0, 0);
+}
+.motion-ready [data-motion="slide-right"] {
+  transform: translate3d(var(--motion-distance), 0, 0);
+}
+.motion-ready [data-motion="zoom"] {
+  transform: scale(0.97);
+}
+.motion-ready [data-motion="blur"] {
+  transform: scale(0.985);
+  filter: blur(5px);
+}
+.motion-ready [data-motion].motion-visible,
+.motion-ready [data-motion]:focus-within {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+.motion-path {
+  animation: none !important;
+  stroke-dasharray: var(--path-length) !important;
+  stroke-dashoffset: calc(
+    var(--path-length) * (1 - var(--path-progress, 1))
+  ) !important;
+  transition: stroke-dashoffset var(--motion-fast) linear;
+}
+#heroArt {
+  translate: 0 var(--cinema-depth, 0px);
+}
+.project-card .project-visual {
+  view-transition-name: var(--v8-vt-name);
+}
+.project-card .project-title {
+  view-transition-name: var(--project-title-name);
+}
+.cp-hero h1 {
+  view-transition-name: var(--project-title-name);
+}
+::view-transition-group(*) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--motion-ease);
+}
+::view-transition-old(root) {
+  animation: motion-out 180ms ease both;
+}
+::view-transition-new(root) {
+  animation: motion-in 280ms var(--motion-ease) both;
+}
+@keyframes motion-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes motion-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.cp-loading {
+  display: none;
+}
+.intro-curtain {
+  display: none !important;
+}
+button,
+a,
+[role="button"] {
+  transition-timing-function: var(--motion-ease);
+}
+button:active,
+a:active,
+[role="button"]:active {
+  scale: 0.985;
+}
+html.motion-off {
+  scroll-behavior: auto;
+}
+html.motion-off *,
+html.motion-off *:before,
+html.motion-off *:after {
+  animation: none !important;
+  transition: none !important;
+}
+html.motion-off [data-motion] {
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+html.motion-off #heroArt {
+  translate: none;
+}
+html.motion-off::view-transition-group(*),
+html.motion-off::view-transition-old(*),
+html.motion-off::view-transition-new(*) {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .motion-ready [data-motion] {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+  #heroArt {
+    translate: none;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+/* Kio occupies document space next to the explanation being discussed. */
+#kioGuide.kio-shell {
+  position: relative;
+  inset: auto;
+  width: min(920px, calc(100% - 32px));
+  height: auto;
+  margin: 24px auto;
+  z-index: 4;
+  pointer-events: auto;
+  transform: none;
+  filter: none;
+}
+#kioGuide:not(.kio-open) {
+  display: none;
+}
+#kioGuide.kio-open {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+  opacity: 1;
+  visibility: visible;
+}
+#kioGuide .kio-panel {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  max-height: 600px;
+  animation: none;
+}
+#kioGuide .kio-launch {
+  position: relative;
+  width: 150px;
+  height: 210px;
+  grid-column: 1;
+  grid-row: 1;
+}
+#kioGuide .kio-person {
+  width: 150px;
+  height: 180px;
+}
+#kioGuide .kio-aura {
+  height: 160px;
+}
+#kioGuide .kio-hint {
+  display: none !important;
+}
+#kioGuide .kio-panel {
+  grid-column: 2;
+  grid-row: 1;
+}
+#kioGuide .kio-person,
+#kioGuide .kio-figure,
+#kioGuide .kio-head,
+#kioGuide .kio-arm-right,
+#kioGuide .kio-arm-left,
+#kioGuide .kio-leg-front,
+#kioGuide .kio-leg-back,
+#kioGuide .kio-sparkles,
+#kioGuide .kio-mouth {
+  animation: none;
+}
+#kioGuide .kio-figure {
+  transition: transform 380ms var(--motion-ease);
+}
+#kioGuide[data-mood="pointing"] .kio-hand {
+  animation: none;
+  transform-origin: 194px 192px;
+  transform: rotate(var(--kio-point-angle, -12deg));
+  transition: transform 380ms var(--motion-ease);
+}
+#kioGuide[data-mood="speaking"] .kio-head {
+  animation: kio-nod 5.4s ease-in-out 1;
+}
+#kioGuide.kio-compact {
+  grid-template-columns: 80px minmax(0, 1fr);
+}
+#kioGuide.kio-compact .kio-launch {
+  width: 75px;
+  height: 108px;
+}
+#kioGuide.kio-compact .kio-person {
+  width: 75px;
+  height: 95px;
+}
+@media (max-width: 640px) {
+  #kioGuide.kio-open {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  #kioGuide .kio-panel {
+    grid-column: 1;
+    grid-row: 2;
+    max-height: min(520px, 75dvh);
+  }
+  #kioGuide .kio-launch {
+    width: 80px;
+    height: 110px;
+    justify-self: center;
+  }
+  #kioGuide .kio-person {
+    width: 80px;
+    height: 95px;
+  }
+  #kioGuide .kio-aura {
+    height: 90px;
+  }
+  #kioGuide .kio-launch-label {
+    display: none;
+  }
+  #kioGuide.kio-compact {
+    grid-template-columns: 1fr;
+  }
+}
+/* Inline guidance uses the page scroll so every tour control has its own space. */
+#kioGuide .kio-panel {
+  max-height: none;
+  overflow: visible;
+}

@@ -1,0 +1,217 @@
+window.V8_MEDIA_MAP = {
+  "srmedu": [
+    {
+      "type": "image",
+      "file": "srmedu-capture-01.webp",
+      "alt": "Public subject catalogue, semesters 1\u20133.",
+      "caption": "Public subject catalogue, semesters 1\u20133.",
+      "width": 1280,
+      "height": 800,
+      "source": "https://www.srmedu.in/",
+      "captured": "2026-11-19",
+      "approved": true,
+      "privacyReviewed": true,
+      "sha256": "63e88992fb652c527b337607937530cc7b6ccb707e09ea82647fcaa6846a45f0"
+    },
+    {
+      "type": "image",
+      "file": "srmedu-capture-02.webp",
+      "alt": "Public semesters 4\u20136 and the application\u2019s upcoming-feature notices.",
+      "caption": "Public semesters 4\u20136 and the application\u2019s upcoming-feature notices.",
+      "width": 1280,
+      "height": 800,
+      "source": "https://www.srmedu.in/",
+      "captured": "2026-11-19",
+      "approved": true,
+      "privacyReviewed": true,
+      "sha256": "a17fdf4d57cb7c380c491f442d0c3c8254a8f55b1da6f9f7765f7aeca9fc2e5f"
+    },
+    {
+      "type": "video",
+      "file": "srmedu-walkthrough.mp4",
+      "caption": "Silent public-interface walkthrough. Public-page browsing and visual behavior.",
+      "width": 1280,
+      "height": 800,
+      "source": "https://www.srmedu.in/",
+      "captured": "2026-11-19",
+      "approved": true,
+      "privacyReviewed": true,
+      "sha256": "a578f03d7368a0d3c288380cc7f4bc03a4f6c2c912d03598d70b4a2d6580eac3"
+    }
+  ],
+  "projectmatch": [
+    {
+      "type": "image",
+      "file": "projectmatch-capture-01.webp",
+      "alt": "Public landing page with the application\u2019s illustrative role-listing preview.",
+      "caption": "Public landing page with the application\u2019s illustrative role-listing preview.",
+      "width": 1280,
+      "height": 800,
+      "source": "https://projectmatch-phi.vercel.app/",
+      "captured": "2026-11-19",
+      "approved": true,
+      "privacyReviewed": true,
+      "sha256": "f737dd7184df9943bad30ef4aac1bde8804afd2657ac38e28da7ed69759cb51c"
+    },
+    {
+      "type": "image",
+      "file": "projectmatch-capture-02.webp",
+      "alt": "Public example role and explanation of the matching workflow. The example is labeled illustrative by the application.",
+      "caption": "Public example role and explanation of the matching workflow. The example is labeled illustrative by the application.",
+      "width": 1280,
+      "height": 800,
+      "source": "https://projectmatch-phi.vercel.app/",
+      "captured": "2026-11-19",
+      "approved": true,
+      "privacyReviewed": true,
+      "sha256": "6ac60778e093d0fd08993eea6c1a5c096d5c5f79f1f2209c2bd37d90db57ad11"
+    },
+    {
+      "type": "video",
+      "file": "projectmatch-walkthrough.mp4",
+      "caption": "Silent public-interface walkthrough. Public-page browsing and visual behavior.",
+      "width": 1280,
+      "height": 800,
+      "source": "https://projectmatch-phi.vercel.app/",
+      "captured": "2026-11-19",
+      "approved": true,
+      "privacyReviewed": true,
+      "sha256": "3e74522280c3dfcc55224c08d8885c4250393650abccdadbcd8684c88bde45bc"
+    }
+  ],
+  "oodp": [
+    {
+      "type": "image",
+      "file": "oodp-capture-01.webp",
+      "alt": "Public overview and learning-unit cards.",
+      "caption": "Public overview and learning-unit cards.",
+      "width": 1280,
+      "height": 800,
+      "source": "https://oops-mastery.netlify.app/",
+      "captured": "2026-11-19",
+      "approved": true,
+      "privacyReviewed": true,
+      "sha256": "d86acf779784320ccd24fc186452066f7047c1f3764a029f1f8122b849b9201c"
+    },
+    {
+      "type": "image",
+      "file": "oodp-capture-02.webp",
+      "alt": "Public unit cards, revision and emergency study entry points.",
+      "caption": "Public unit cards, revision and emergency study entry points.",
+      "width": 1280,
+      "height": 800,
+      "source": "https://oops-mastery.netlify.app/",
+      "captured": "2026-11-19",
+      "approved": true,
+      "privacyReviewed": true,
+      "sha256": "09bf268e26b9674bea78f16e3c7f2ddc1b6a6359d5612faf0a6837d9b286fdf8"
+    },
+    {
+      "type": "video",
+      "file": "oodp-walkthrough.mp4",
+      "caption": "Silent public-interface walkthrough. Public-page browsing and visual behavior.",
+      "width": 1280,
+      "height": 800,
+      "source": "https://oops-mastery.netlify.app/",
+      "captured": "2026-11-19",
+      "approved": true,
+      "privacyReviewed": true,
+      "sha256": "36f4e58daee2568ba805e27436293497e34ae1cb700ede05ab2e34f0ed90a7dc"
+    }
+  ],
+  "revalue": [
+    {
+      "type": "image",
+      "file": "revalue-capture-01.webp",
+      "alt": "Public sign-in screen with empty credentials. Authenticated operations require owner-approved captures.",
+      "caption": "Public sign-in screen with empty credentials. Authenticated operations require owner-approved captures.",
+      "width": 1280,
+      "height": 800,
+      "source": "https://revalue-gray.vercel.app/",
+      "captured": "2026-11-19",
+      "approved": true,
+      "privacyReviewed": true,
+      "sha256": "10134ffe9102f54973ca932d730046cd33766a912d18da8bf01b731e4b381d08"
+    }
+  ],
+  "postpro": [
+    {
+      "type": "image",
+      "file": "postpro-capture-01.webp",
+      "alt": "Public translator interface before entering text.",
+      "caption": "Public translator interface before entering text.",
+      "width": 1280,
+      "height": 800,
+      "source": "https://linkedinpostpro.vercel.app/",
+      "captured": "2026-11-19",
+      "approved": true,
+      "privacyReviewed": true,
+      "sha256": "ac5a39e46060f878fa337f6832348145bc1d28c821aac5d00b1a936b47faf993"
+    },
+    {
+      "type": "image",
+      "file": "postpro-capture-02.webp",
+      "alt": "Public translator with a generic sample entered. Generated output remains empty.",
+      "caption": "Public translator with a generic sample entered. Generated output remains empty.",
+      "width": 1280,
+      "height": 800,
+      "source": "https://linkedinpostpro.vercel.app/",
+      "captured": "2026-11-19",
+      "approved": true,
+      "privacyReviewed": true,
+      "sha256": "04a566aa1b5eb4c7c473087dd4030504493bcc33bb85808e32aa724c62a1dfad"
+    },
+    {
+      "type": "video",
+      "file": "postpro-walkthrough.mp4",
+      "caption": "Silent public-interface walkthrough. Generic sample entry only; generated output is empty.",
+      "width": 1280,
+      "height": 800,
+      "source": "https://linkedinpostpro.vercel.app/",
+      "captured": "2026-11-19",
+      "approved": true,
+      "privacyReviewed": true,
+      "sha256": "12988c9bed558a4853de16c164fceb2492fb285fdef757d92dcc62b172f7e71b"
+    }
+  ],
+  "micchami": [
+    {
+      "type": "image",
+      "file": "micchami-capture-01.webp",
+      "alt": "Public greeting after choosing Begin Silently.",
+      "caption": "Public greeting after choosing Begin Silently.",
+      "width": 1280,
+      "height": 800,
+      "source": "https://micchami-dukkadam.vercel.app/",
+      "captured": "2026-11-19",
+      "approved": true,
+      "privacyReviewed": true,
+      "sha256": "2be017ab98870786f4e413ce3308532aaaaa2e79d4872060be78a4c5e8710cb0"
+    },
+    {
+      "type": "image",
+      "file": "micchami-capture-02.webp",
+      "alt": "Public greeting text and visual effects after scrolling.",
+      "caption": "Public greeting text and visual effects after scrolling.",
+      "width": 1280,
+      "height": 800,
+      "source": "https://micchami-dukkadam.vercel.app/",
+      "captured": "2026-11-19",
+      "approved": true,
+      "privacyReviewed": true,
+      "sha256": "435553b0a6b4ba9f573d3d97241d7d065f10b77d152d445e8f3a7b35ef6ac0d2"
+    },
+    {
+      "type": "video",
+      "file": "micchami-walkthrough.mp4",
+      "caption": "Silent public-interface walkthrough. Public-page browsing and visual behavior.",
+      "width": 1280,
+      "height": 800,
+      "source": "https://micchami-dukkadam.vercel.app/",
+      "captured": "2026-11-19",
+      "approved": true,
+      "privacyReviewed": true,
+      "sha256": "18df4d789c2694126d58bb7d38e1ae94e3fbd049d25b1b935369f84b07f54c1e"
+    }
+  ]
+};
