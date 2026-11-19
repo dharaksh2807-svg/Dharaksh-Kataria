@@ -60,8 +60,27 @@ async function main(){
       const bounds=await title.boundingBox();
       check(bounds&&bounds.x>=0&&bounds.x+bounds.width<=1440,'Desktop name clipped');
       await page.screenshot({path:path.join(out,'desktop-opening.png')});
+      const picker=page.locator('#riftModeSelect');
+      check(await picker.isVisible(),'Mobile style switcher not visible');
+      await picker.selectOption('ascension');
+      check((await page.evaluate(()=>window.__riftDirector.getState())).mode==='ascension','Mobile style selection failed');
       const kio=await page.locator('#kioGuide').boundingBox();
       check(kio&&kio.width>=150,'Kio is unexpectedly small on desktop');
+      // All five motion systems must be selectable in the actual homepage.
+      const modes=['director','kinetic','fracture','infinite','ascension'];
+      const modeResults=[];
+      for(const mode of modes){
+        const button=page.locator('.rift-mode[data-rift-mode="'+mode+'"]');
+        check(await button.count()===1,'Missing '+mode+' mode control');
+        await button.click();
+        const state=await page.evaluate(()=>window.__riftDirector.getState());
+        check(state.mode===mode,'Mode '+mode+' did not activate');
+        check((await button.getAttribute('aria-pressed'))==='true','Mode '+mode+' missing pressed status');
+        modeResults.push({mode,webgl:state.webglReady});
+        await page.waitForTimeout(170);
+        await page.screenshot({path:path.join(out,'mode-'+mode+'.png')});
+      }
+      await page.locator('.rift-mode[data-rift-mode="director"]').click();
       const stages=[];
       for(const p of [0,.35,.53,.70,.82,.93,.99]){
         await seek(page,p);
@@ -93,7 +112,7 @@ async function main(){
       check((await page.evaluate(()=>window.__riftDirector.getState())).paused,'Global motion OFF did not pause portal');
       await motion.click();
       const stats=await page.evaluate(()=>window.__riftDirector.getFrameStats());
-      return {titleVisible:true,kioWidth:kio.width,stages,projectLinks:links,reverseRestoresTitle:true,globalMotionControl:true,frameStats:stats};
+      return {titleVisible:true,modeResults,kioWidth:kio.width,stages,projectLinks:links,reverseRestoresTitle:true,globalMotionControl:true,frameStats:stats};
     });
     report.checks.mobile=await withVideo(browser,'mobile-journey',{viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true},async page=>{
       const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);
