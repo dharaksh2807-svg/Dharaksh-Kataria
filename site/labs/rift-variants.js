@@ -40,7 +40,7 @@
   scene.appendChild(assembly);
  }
  const strokes=stage.querySelectorAll('.depth-strokes i');
- strokes.forEach((n,i)=>n.style.setProperty('--i',i));
+ strokes.forEach((n,i)=>n.style.setProperty('--depth-inset',(i*6)+'%'));
  function readScroll(){
   const distance=Math.max(1,intro.offsetHeight-innerHeight);
   scroll=clamp(-intro.getBoundingClientRect().top/distance);
@@ -99,7 +99,7 @@
   offsetY+=(1-entry)*27;
   const titleOut=1-smooth(clamp((p-.28)/.53));
   const titleOpacity=clamp(entry*titleOut);
-  set('--entry',fmt(entry));set('--stage-progress',fmt(p));set('--scroll',fmt(p));
+  set('--entry',fmt(entry));set('--scene-opacity',fmt(.55+entry*.45));set('--entry-blur',fmt((1-entry)*14)+'px');set('--ticks-rotation',fmt(-8+orbital*.44)+'deg');set('--stage-progress',fmt(p));set('--scroll',fmt(p));
   set('--camera-x',fmt(offsetX)+'px');set('--camera-y',fmt(offsetY)+'px');
   set('--art-scale',fmt(artScale));set('--art-rotate',fmt(artRotate)+'deg');
   set('--orbital-rotation',fmt(orbital)+'deg');set('--core-brightness',fmt(coreBrightness));
