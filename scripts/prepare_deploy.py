@@ -2,7 +2,7 @@
 """Prepare canonical/social URLs and a sitemap for an owner-approved real HTTPS origin."""
 from pathlib import Path
 from urllib.parse import urlparse
-from xml.etree.ElementTree import Element, SubElement, ElementTree
+from xml.etree.ElementTree import Element, SubElement, ElementTree, register_namespace
 import argparse
 import re
 
@@ -35,7 +35,7 @@ for file in files:
     urls.append(url)
 
 namespace = "http://www.sitemaps.org/schemas/sitemap/0.9"
-ElementTree.register_namespace("", namespace)
+register_namespace("", namespace)
 root_element = Element("{" + namespace + "}urlset")
 for url in urls:
     item = SubElement(root_element, "{" + namespace + "}url")
