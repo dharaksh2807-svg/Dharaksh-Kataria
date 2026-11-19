@@ -132,3 +132,26 @@
 }
 html.motion-off #kioGuide *,html.motion-off #kioGuide *:before,
 html.motion-off #kioGuide *:after{animation:none!important}
+
+/* Return navigation stays visible throughout long-form case studies. */
+.cp-chapters-back{
+  flex:none;display:inline-flex;align-items:center;min-height:38px;
+  white-space:nowrap;background:#173c2d;color:#f8e6d8!important;
+  border:1px solid #173c2d;border-radius:100px;padding:9px 13px;
+  font:500 10px 'DM Mono',monospace;letter-spacing:.03em;
+}
+.cp-chapters-back:hover{background:#355c45}
+.cp-chapters-back:focus-visible{outline:3px solid #bb7854;outline-offset:3px}
+@media(max-width:760px){
+  .cp-chapters-inner{display:flex;flex-wrap:wrap;gap:6px 12px}
+  .cp-chapters-back{min-height:36px;font-size:9px}
+  .cp-chapters-kicker{margin-left:auto}
+  .cp-chapters-links{flex:1 1 100%;min-width:0}
+}
+@media(max-width:390px){.cp-chapters-kicker{font-size:9px}}
+
+/* Without animation, the initial hidden headline transform must never persist. */
+html.motion-off .hero-line>span{opacity:1!important;transform:none!important;filter:none!important}
+@media(prefers-reduced-motion:reduce){
+ .hero-line>span{opacity:1!important;transform:none!important;filter:none!important}
+}
