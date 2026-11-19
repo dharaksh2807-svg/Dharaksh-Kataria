@@ -131,38 +131,91 @@
     ctx.fillText('CONCEPTUAL NETWORK · ILLUSTRATIVE LINKS',cx-spread*.52,cy+height*.57);
     ctx.restore();
   }
+
+  // A conceptual token lifecycle instrument. Selection is illustrative, never
+  // a measured attention map or a benchmark performance visualization.
   function sceneMemory(t,alpha){
-    if(alpha<=.004)return;ctx.save();ctx.globalAlpha=alpha;
-    const sc=mobile()?.65:1, cx=w*(mobile()?.66:.73),cy=h*(mobile()?.31:.48);
-    glow(cx,cy,Math.min(w,h)*.65,'rgba(95,159,133,.25)',alpha);
-    const cols=25,rows=8,dx=25*sc,dy=24*sc;
-    const local=clamp(prog*3-1);const compress=smooth(local*.8+.15);
-    ctx.save();ctx.translate(cx-(cols*dx)/2,cy-(rows*dy)/2);
-    const boxes=[];
-    for(let row=0;row<rows;row++)for(let col=0;col<cols;col++){
-      const keep=(col<2 || col>20 || (col>=10 && col<=12 && row%2===0));
-      const nx=col*dx+row*4+Math.sin(t*.5+row)*5;
-      const ny=row*dy+(col%2)*4;
-      const squeeze=keep?lerp(1,.78,compress):1;
-      const moved=keep?(col<2?-8:col>20?20:-2)*compress*sc:(row%2?9:-9)*compress*sc;
-      const opacity=keep?lerp(.75,1,compress):lerp(.45,.035,compress);
-      boxes.push({x:nx+moved,y:ny+Math.sin(t*.6+col*.2)*2*sc,o:opacity,keep,w:19*sc*squeeze,h:16*sc});
+    if(alpha<=.004)return;
+    ctx.save();ctx.globalAlpha=alpha;
+    const cx=w*(mobile()?.69:.735),cy=h*(mobile()?.35:.485);
+    const sc=mobile()?.51:Math.min(1.06,w/1350),cols=22,rows=8;
+    const pitch=23*sc,vy=23*sc,width=cols*pitch,height=rows*vy;
+    const left=cx-width*.5+pointerX*10*sc,top=cy-height*.55+pointerY*8*sc;
+    const compress=smooth(clamp(prog*3-1.05));
+    const boxPad=20*sc;
+    // Deep glass backplate, highlighted edges and reference grid.
+    const glass=ctx.createLinearGradient(left,top,left+width,top+height);
+    glass.addColorStop(0,'rgba(31,63,51,.70)');
+    glass.addColorStop(1,'rgba(13,29,25,.84)');
+    ctx.fillStyle=glass;
+    ctx.fillRect(left-boxPad,top-32*sc,width+boxPad*2,height+118*sc);
+    ctx.strokeStyle='rgba(163,204,173,.42)';ctx.lineWidth=1.2;
+    ctx.strokeRect(left-boxPad,top-32*sc,width+boxPad*2,height+118*sc);
+    ctx.fillStyle='#b9d7c0';ctx.textAlign='left';ctx.font=(mobile()?'8':'11')+'px monospace';
+    ctx.fillText('01 / INCOMING CONTEXT',left,top-50*sc);
+    ctx.fillText('02 / RETAINED CACHE',left,top+height+48*sc);
+    ctx.fillStyle='#c9a289';ctx.fillText('ILLUSTRATIVE TOKEN SELECTION',left,top+height+94*sc);
+    // Three incoming token markers travel in staggered lanes into the cache.
+    for(let lane=0;lane<3;lane++){
+      const span=Math.max(1,width*.34),phase=(t*.33+lane*.29)%1;
+      const bx=left+width*.10+phase*span+lane*7*sc;
+      const by=top-25*sc+lane*4*sc;
+      ctx.fillStyle='rgba(229,175,122,.65)';
+      ctx.fillRect(bx,by,12*sc,3*sc);
     }
-    boxes.forEach((b,i)=>{
-      const phase=Math.sin(t*1.8+i*.2);
-      ctx.globalAlpha=alpha*b.o;
-      ctx.fillStyle=b.keep?(phase>.8?'#eab08b':'#8fbea0'):'#526d5d';
-      ctx.fillRect(b.x,b.y,b.w,b.h);
-      if(b.keep){ctx.fillStyle='rgba(246,240,206,.32)';ctx.fillRect(b.x,b.y,b.w,2*sc)}
-    });
-    ctx.globalAlpha=alpha;
-    ctx.strokeStyle='rgba(143,195,156,.38)';ctx.strokeRect(-16,-26,cols*dx+32,rows*dy+52);
-    ctx.fillStyle='#b7cbb9';ctx.font='10px monospace';
-    if(w>760){ctx.fillText('FULL CONTEXT',0,-38);ctx.fillText('RETENTION / BUDGETED',cols*dx-160,rows*dy+48)}
-    ctx.restore();
-    // Curve traces move dynamically across the data field.
-    ctx.strokeStyle='rgba(232,156,108,.45)';ctx.lineWidth=1.5;ctx.beginPath();
-    for(let x=0;x<320*sc;x+=4){const y=Math.sin(x*.028+t*1.2)*23*sc+Math.sin(x*.065-t*.5)*10*sc;const xx=cx-160*sc+x,yy=cy+155*sc+y;if(x===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy)}ctx.stroke();
+    const tileW=pitch*.70,tileH=vy*.64;
+    const keepList=[];
+    for(let row=0;row<rows;row++)for(let col=0;col<cols;col++){
+      const i=row*cols+col;
+      // Fixed synthetic rule: visual example, not a real attention/eviction score.
+      const keep=col<2||col>19||((i*17+row*7)%13)<3;
+      const x=left+col*pitch+(row%2)*2*sc,y=top+row*vy;
+      const activation=.58+.42*Math.sin(t*1.3+col*.21+row*.65);
+      const opacity=keep?.52+.35*activation:lerp(.42,.095,compress);
+      const depth=keep?2.7*sc:0;
+      if(!keep&&compress>.35){
+        const displacement=compress*compress*(14+(i%4)*6)*sc;
+        ctx.fillStyle='rgba(150,116,105,'+(.24*(1-compress))+')';
+        ctx.fillRect(x+displacement,y+displacement*.3,tileW,tileH);
+      }
+      ctx.fillStyle=keep?'rgba(141,198,160,'+opacity+')':'rgba(96,126,113,'+opacity+')';
+      ctx.fillRect(x,y,tileW,tileH);
+      if(keep){
+        ctx.fillStyle='rgba(245,194,151,'+(.35+.45*activation)+')';
+        ctx.fillRect(x,y,tileW,Math.max(1,depth));
+        keepList.push(i);
+      }else if(compress>.18&&((i+Math.floor(t*3))%17===0)){
+        ctx.strokeStyle='rgba(226,127,94,'+(.22+.45*compress)+')';
+        ctx.strokeRect(x-1,y-1,tileW+2,tileH+2);
+      }
+    }
+    // Memory lanes: compressed bank is a meaningful layout transformation.
+    const bankTop=top+height+14*sc;
+    const bankWidth=width*.91;
+    ctx.fillStyle='rgba(9,27,22,.85)';
+    ctx.fillRect(left,bankTop,width,22*sc);
+    ctx.strokeStyle='rgba(143,197,160,.29)';
+    ctx.strokeRect(left,bankTop,width,22*sc);
+    const slots=Math.min(28,keepList.length);
+    for(let i=0;i<slots;i++){
+      const x=left+8*sc+i*(bankWidth/slots),wid=Math.max(2,bankWidth/slots-3*sc);
+      const activated=(i+Math.floor(t*2.1))%9===0;
+      ctx.fillStyle=activated?'rgba(246,183,130,.96)':'rgba(145,194,154,'+lerp(.22,.85,compress)+')';
+      ctx.fillRect(x,bankTop+7*sc,wid,8*sc);
+    }
+    // Distinct lifecycle legend: every color has a documented visual meaning.
+    if(!mobile()){
+      const ly=top+height+68*sc;
+      for(const [i,label,color] of [[0,'INCOMING','#e5af7a'],[1,'RETAINED','#9bcaa9'],[2,'EVICTED','#ad796d']]){
+        const lx=left+i*width*.32;
+        ctx.fillStyle=color;ctx.fillRect(lx,ly-8*sc,9*sc,9*sc);
+        ctx.fillStyle='#bfcdc0';ctx.fillText(label,lx+15*sc,ly);
+      }
+    }
+    // A small steady scan line suggests instrumentation without fake metrics.
+    const scanY=top+((t*.07)%1)*height;
+    ctx.strokeStyle='rgba(228,177,129,.14)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(left,scanY);ctx.lineTo(left+width,scanY);ctx.stroke();
     ctx.restore();
   }
   function sceneMetro(t,alpha){
