@@ -243,3 +243,15 @@ html.motion-off .cursor-halo{display:none!important}
 @media(prefers-reduced-motion:reduce){
  .rift-home .bridge-media img{transform:none!important;transition:none!important}
 }
+
+
+/* Global MOTION OFF is a usability mode, not a frozen 200vh cinematic.
+   Reveal normal content with no empty scroll and no invisible controls. */
+html.motion-off .rift-home .intro{height:auto!important}
+html.motion-off .rift-home .stage{position:relative!important;min-height:100svh}
+html.motion-off .rift-home .title-wrap{opacity:1!important;transform:translate3d(0,-50%,0)!important}
+html.motion-off .rift-home .transition-veil,
+html.motion-off .rift-home .rift-handoff,
+html.motion-off .rift-home .substance-ghost{display:none!important}
+html.motion-off .rift-home .bridge-card{opacity:1!important;transform:none!important}
+html.motion-off .rift-home .rift-mode-switcher{display:none!important}
