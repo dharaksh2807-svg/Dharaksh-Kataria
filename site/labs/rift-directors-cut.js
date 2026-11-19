@@ -116,6 +116,10 @@
     renderer.toneMapping=THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure=1.13;
     renderer.setClearColor(0x000000,0);
+    // Deliberately budget real shadow maps to desktop-quality renderers only.
+    const shadowQuality=innerWidth>=960 && params.get('quality')!=='low';
+    renderer.shadowMap.enabled=shadowQuality;
+    if(shadowQuality)renderer.shadowMap.type=THREE.PCFSoftShadowMap;
     scene=new THREE.Scene();
     scene.fog=new THREE.FogExp2(0x100e0c,.032);
     camera=new THREE.PerspectiveCamera(42,1,.07,100);
@@ -161,7 +165,8 @@
       const frontMat=i===0?original.clone():original;
       if(i===0){frontMat.transparent=true;materials.push(frontMat);}
       const frame=new THREE.Mesh(frameGeometry,[frontMat,dark]);
-      frame.castShadow=false;frame.receiveShadow=false;
+      frame.castShadow=shadowQuality;
+      frame.receiveShadow=shadowQuality;
       layer.add(frame);
       if(i<7){
         const edges=new THREE.LineSegments(edgeGeometry,edgeMaterial);
@@ -242,7 +247,16 @@
 
     lights.ambient=new THREE.AmbientLight(0xb3ad9f,.25);scene.add(lights.ambient);
     lights.key=new THREE.DirectionalLight(0xffe1ba,3.4);
-    lights.key.position.set(3.5,7,8);scene.add(lights.key);
+    lights.key.position.set(3.5,7,8);
+    if(shadowQuality){
+      lights.key.castShadow=true;
+      lights.key.shadow.mapSize.set(1024,1024);
+      Object.assign(lights.key.shadow.camera,{left:-9,right:9,top:9,bottom:-9,near:.8,far:37});
+      lights.key.shadow.camera.updateProjectionMatrix();
+      lights.key.shadow.normalBias=.025;
+      lights.key.shadow.bias=-.0001;
+    }
+    scene.add(lights.key);
     lights.rim=new THREE.DirectionalLight(0xbcc8ce,2.4);
     lights.rim.position.set(-5,-1,5);scene.add(lights.rim);
     lights.sweep=new THREE.PointLight(0xffa267,45,28,2);
