@@ -83,7 +83,7 @@ html.webgl-ready .rift-home .portal-fallback{opacity:0;visibility:hidden}
 .rift-home .bridge-next :is(a,button){padding:12px 17px;border:1px solid #9ba99d;border-radius:30px;background:transparent;font:500 11px var(--font-mono);color:#23372b;transition:background .2s,color .2s,transform .2s}
 .rift-home .bridge-next :first-child{background:#17291f;color:#fff5e8}
 .rift-home .bridge-next :is(a,button):hover{transform:translateY(-3px);background:#c78b65;color:#141b17}
-html.js-active:not(.reduced-motion) .rift-home .bridge-card:not(.is-visible){opacity:.38;transform:translateY(20px)}
+html.js-active:not(.reduced-motion) .rift-home .bridge-card:not(.is-visible){opacity:.82;transform:translateY(12px)}
 html.js-active .rift-home .bridge-card.is-visible{opacity:1}
 .rift-home :is(a,button):focus-visible{outline:2px solid #f0a774;outline-offset:4px}
 .rift-home .bridge-next :is(a,button):focus-visible,.rift-home .bridge-card:focus-visible{outline-color:#a85c38}
