@@ -70,7 +70,8 @@
       vUv=aUv;
       float persp=3.75/(5.25-p.z);
       float aspectFit=max(.95,uAspect);
-      gl_Position=vec4(p.x*persp*.67/aspectFit,p.y*persp*.67,p.z*.15,1.);
+      float size=mix(.59,.68,smoothstep(.75,1.35,uAspect));
+      gl_Position=vec4(p.x*persp*size/aspectFit,p.y*persp*size,p.z*.15,1.);
     }
   `;
   const frag=`#version 300 es
