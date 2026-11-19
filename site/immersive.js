@@ -282,7 +282,7 @@
     }
     // Approaching train: side wall, front fascia, glass, destination and lights.
     // Slow push/pull avoids teleporting an obstacle into the foreground.
-    const z=.55+.07*Math.sin(t*.33),d=road(z),tw=(85+spread*.18)*d*sc,th=(150+spread*.30)*d*sc;
+    const z=.60+.06*Math.sin(t*.33),d=road(z),tw=(140+spread*.22)*Math.sqrt(z)*sc,th=(190+spread*.32)*Math.sqrt(z)*sc;
     const tx=xp(.49,z),ty=yp(z)-th*.30;
     const side=tw*.20;
     ctx.fillStyle='#0d1e1a';
