@@ -22,8 +22,8 @@ await new Promise(resolve=>server.listen(0,"127.0.0.1",resolve));
 const origin="http://127.0.0.1:"+server.address().port;
 const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH||undefined});
 const slugs=["srmedu","projectmatch","kv","metro","oodp","fairshift","regula","alarm","toll","revalue","postpro","micchami"];
-async function pageFor(width=1440) {
-  const page=await browser.newPage({viewport:{width,height:900},reducedMotion:"reduce"});
+async function pageFor(width=1440, motion="reduce") {
+  const page=await browser.newPage({viewport:{width,height:900},reducedMotion:motion});
   page.errors=[];
   page.on("pageerror",e=>page.errors.push(e.message));
   await page.route("**/*",route=>route.request().url().startsWith(origin)?route.continue():route.abort());
@@ -48,6 +48,27 @@ try {
       assert.notEqual(layout.display,"none");
       assert.deepEqual(page.errors,[]);
     }finally{await page.close()}
+  });
+  await test("Kio animates when enabled and respects reduced motion",async()=>{
+    const normal=await pageFor(1440,"no-preference");
+    try {
+      await normal.goto(origin+"/");
+      await normal.waitForSelector("#kioGuide");
+      const live=await normal.locator("#kioGuide .kio-person").evaluate(
+        node=>getComputedStyle(node).animationName
+      );
+      assert.match(live,/kio-float/);
+      assert.equal(await normal.locator("#kioLaunch").isVisible(),true);
+    }finally{await normal.close()}
+    const reduced=await pageFor(1440,"reduce");
+    try{
+      await reduced.goto(origin+"/");
+      await reduced.waitForSelector("#kioGuide");
+      const dormant=await reduced.locator("#kioGuide .kio-person").evaluate(
+        node=>getComputedStyle(node).animationName
+      );
+      assert.equal(dormant,"none");
+    }finally{await reduced.close()}
   });
   await test("World cards open their stories and keep focus controls independent",async()=>{
     const page=await pageFor(390);
