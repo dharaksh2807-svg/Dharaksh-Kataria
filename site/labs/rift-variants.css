@@ -1,0 +1,102 @@
+/* V9.1 THE RIFT — four isolated studies. Deliberately does not touch live site. */
+html[data-variant]{--stage-progress:0;--entry:0;--camera-x:0px;--camera-y:0px;--art-scale:1;--art-rotate:0deg;--title-y:0px;--title-x:0px;--title-scale:1;--title-opacity:1;--core-brightness:1;--ghost-opacity:0;--slit-x:-140%;--ring-hue:0deg;--gate-opacity:1}
+html[data-variant] .stage{min-height:640px;background:radial-gradient(ellipse at 73% 51%,#2d231d 0%,#141715 28%,#060909 69%);contain:paint}
+html[data-variant] .stage::before{z-index:4;background:linear-gradient(90deg,#040707e8 0%,#0407079c 31%,#05080910 62%,#04070736 100%),radial-gradient(ellipse at 74% 52%,transparent 18%,#02040480 95%)}
+html[data-variant] .stage-canvas{opacity:.9;mix-blend-mode:screen;will-change:contents}
+html[data-variant] .scene-art{transform:translate3d(var(--camera-x),var(--camera-y),0) scale(var(--art-scale)) rotateZ(var(--art-rotate));transform-origin:70% 54%;transition:none;animation:none;opacity:calc(.55 + var(--entry) * .45);filter:blur(calc((1 - var(--entry)) * 14px))}
+html[data-variant] .rift-portal{left:52%;top:14%;width:42%;height:73%;transform:perspective(1100px) rotateY(-18deg) rotateX(4deg);transform-style:preserve-3d;filter:drop-shadow(0 18px 55px #0009);transition:none;isolation:isolate}
+html[data-variant] .rift-portal .gate{will-change:transform;transform-origin:50% 50%;box-shadow:0 0 22px #e5b38b2b;backface-visibility:hidden;filter:brightness(var(--gate-light,1)) saturate(.9);opacity:var(--gate-opacity,1)}
+html[data-variant] .rift-portal .gate::after{content:'';position:absolute;inset:0;background:linear-gradient(113deg,transparent 0 35%,#fff1da77 45%,transparent 53% 100%);background-size:280% 100%;background-position:var(--shine,0%) 0;mix-blend-mode:screen;opacity:.45}
+html[data-variant] .rift-core{animation:none;opacity:.88;transform:scale(1.06);filter:blur(25px) brightness(var(--core-brightness))}
+html[data-variant] .rift-light{animation:none;filter:blur(42px);opacity:.75;transform:translateX(var(--light-shift,0px))}
+html[data-variant] .rift-blade.left{transform:translateX(var(--blade-l,0px)) skewY(-11deg)}
+html[data-variant] .rift-blade.right{transform:translateX(var(--blade-r,0px)) skewY(-11deg)}
+html[data-variant] .rift-orbit{transform:rotate(calc(-24deg + var(--orbital-rotation,0deg))) scale(1.24);opacity:var(--orbital-alpha,.75)}
+html[data-variant] .rift-ticks{transform:rotate(calc(-8deg + var(--orbital-rotation,0deg) * .44));opacity:.75}
+html[data-variant] .title-wrap{transform:translate3d(var(--title-x),var(--title-y),0) scale(var(--title-scale));opacity:var(--title-opacity);transform-origin:30% 50%;transition:none}
+html[data-variant] .enter-1,html[data-variant] .enter-2,html[data-variant] .enter-3{animation:none;opacity:1;filter:none;transform:none}
+html[data-variant] .hero-title{filter:drop-shadow(0 9px 22px #0009)}
+html[data-variant] .hero-action{transition:color .22s ease,border-color .22s ease,transform .22s ease;will-change:transform}
+html[data-variant] .hero-action:hover,html[data-variant] .hero-action:focus-visible{color:#ffe1c9;border-color:#ffe1c9}
+html[data-variant] .hero-action svg{transition:transform .25s ease}
+html[data-variant] .float-annotation{font-size:9px;letter-spacing:.13em;white-space:nowrap;opacity:.83}
+html[data-variant] .prototype-label{top:104px}
+html[data-variant] .ghost-substance{position:absolute;z-index:0;left:35%;top:37%;font-size:clamp(128px,20vw,370px);letter-spacing:-.103em;font-weight:700;line-height:.9;color:transparent;-webkit-text-stroke:1px #ffd1a45e;text-shadow:0 0 52px #cf986224;opacity:var(--ghost-opacity);transform:translate3d(var(--ghost-x,0px),var(--ghost-y,0px),0) scale(var(--ghost-scale,1));white-space:nowrap;pointer-events:none;mask-image:linear-gradient(90deg,transparent,#000 23%,#000 70%,transparent);will-change:transform,opacity}
+html[data-variant] .light-shutter{position:absolute;z-index:7;left:var(--slit-x);top:-12%;height:128%;width:4%;transform:skewX(-13deg);background:linear-gradient(90deg,transparent,#ffc39712 17%,#ffe0bbac 41%,#fff3dc 50%,#f2b08537 57%,transparent 90%);filter:blur(6px);mix-blend-mode:screen;opacity:0}
+html[data-variant] .shutter-two{width:1.1%;filter:blur(2px);transform:skewX(-11deg) translateX(21vw)}
+html[data-variant] .depth-strokes{position:absolute;left:43%;top:10%;height:76%;width:52%;z-index:1;transform:perspective(1500px) rotateY(-20deg)}
+html[data-variant] .depth-strokes i{position:absolute;inset:calc(var(--i)*6%);border:1px solid #f5caa122;box-shadow:0 0 15px #f2bc7620,0 0 38px #0008;transform:rotate(calc(var(--orbital-rotation,0deg) * var(--r,1))) scale(calc(1 + var(--stage-progress) * .35))}
+html[data-variant] .depth-strokes i:nth-child(1){--i:0;--r:.15}html[data-variant] .depth-strokes i:nth-child(2){--i:1;--r:.35}html[data-variant] .depth-strokes i:nth-child(3){--i:2;--r:.6}html[data-variant] .depth-strokes i:nth-child(4){--i:3;--r:1}
+html[data-variant] .variant-switcher{position:absolute;z-index:25;bottom:79px;right:clamp(20px,5vw,84px);display:flex;gap:7px;align-items:center;letter-spacing:.1em}
+html[data-variant] .variant-switcher a{padding:8px 9px;color:#ddd0be9e;border:1px solid transparent;border-radius:4px;transition:color .2s,border-color .2s,background .2s;background:#080b0b70;backdrop-filter:blur(8px)}
+html[data-variant] .variant-switcher a:hover,html[data-variant] .variant-switcher a:focus-visible{color:#fff2e3;border-color:#d9a77890}
+html[data-variant] .variant-switcher a[aria-current="page"]{color:#f6c69e;border-color:#d9a7785e;background:#6b3c261f}
+html[data-variant] .rift-bloom{opacity:.67}
+html[data-variant] .section-next{z-index:1}
+html[data-variant] .section-next .next-title{max-width:890px}
+/* KINETIC — concentric independently rotating frames, weight and motion. */
+html[data-variant=kinetic] .rift-portal .gate{filter:brightness(var(--gate-light,1)) saturate(.75) drop-shadow(0 0 6px #f9ca9545)}
+html[data-variant=kinetic] .rift-core{opacity:.65}
+html[data-variant=kinetic] .depth-strokes{opacity:.6}
+html[data-variant=kinetic] .ghost-substance{font-size:clamp(160px,18vw,320px);left:47%;top:47%;-webkit-text-stroke:1px #f4c29a4a}
+/* FRACTURE — four independently displaced machined architectural quarters. */
+html[data-variant=fracture] .rift-portal .gate{filter:brightness(.65);opacity:.62}
+html[data-variant=fracture] .fracture-assembly{position:absolute;left:51%;top:14%;width:43%;height:73%;pointer-events:none;transform:perspective(1000px) rotateY(-18deg) rotateZ(-4deg);filter:drop-shadow(0 0 25px #d5a07855);z-index:5;transform-style:preserve-3d}
+html[data-variant=fracture] .fracture-piece{position:absolute;inset:0;transform-origin:center;will-change:transform;clip-path:var(--piece-clip);background:linear-gradient(114deg,#090d0e 8%,#f0cbad 12%,#272727 15%,#84644b 25%,#0a0c0d 39%,#a57c5a 59%,#131a19 71%,#ffe0bd 80%,#111719 87%);box-shadow:0 0 55px #000c}
+html[data-variant=fracture] .fracture-piece::before{content:'';position:absolute;inset:5.5%;clip-path:polygon(10% 0,90% 0,100% 10%,100% 90%,90% 100%,10% 100%,0 90%,0 10%);background:#050808;box-shadow:inset 0 0 55px #de946b42}
+html[data-variant=fracture] .fracture-assembly .fracture-piece:nth-child(1){--piece-clip:inset(0 50% 50% 0)}
+html[data-variant=fracture] .fracture-assembly .fracture-piece:nth-child(2){--piece-clip:inset(0 0 50% 50%)}
+html[data-variant=fracture] .fracture-assembly .fracture-piece:nth-child(3){--piece-clip:inset(50% 50% 0 0)}
+html[data-variant=fracture] .fracture-assembly .fracture-piece:nth-child(4){--piece-clip:inset(50% 0 0 50%)}
+html[data-variant=fracture] .light-shutter{opacity:.45}
+html[data-variant=fracture] .rift-orbit{opacity:.46}
+html[data-variant=fracture] .ghost-substance{-webkit-text-stroke:1px #e5a37f35}
+/* INFINITE — geometry driven by actual WebGL ray-plane camera intersections. */
+html[data-variant=infinite] .stage-canvas{opacity:1;mix-blend-mode:screen}
+html[data-variant=infinite] .rift-portal{opacity:.42;filter:drop-shadow(0 0 30px #dd916766)}
+html[data-variant=infinite] .rift-portal .gate{filter:brightness(.52)}
+html[data-variant=infinite] .rift-bloom{opacity:.5}
+html[data-variant=infinite] .depth-strokes{opacity:.3}
+html[data-variant=infinite] .rift-blade{opacity:.45}
+html[data-variant=infinite] .rift-orbit{opacity:.38}
+html[data-variant=infinite] .ghost-substance{opacity:0!important}
+/* ASCENSION — atmospheric monumental word and choreographed light typography. */
+html[data-variant=ascension] .rift-portal{left:53%;opacity:.87}
+html[data-variant=ascension] .rift-portal .gate{filter:brightness(var(--gate-light,1)) saturate(.65)}
+html[data-variant=ascension] .ghost-substance{left:28%;top:41%;font-size:clamp(180px,21vw,370px);letter-spacing:-.095em;-webkit-text-stroke:1.2px #e6b48a70;text-shadow:0 0 80px #d8875546;opacity:var(--ghost-opacity)}
+html[data-variant=ascension] .light-shutter{opacity:.64}
+html[data-variant=ascension] .rift-light{filter:blur(50px);opacity:.8}
+html[data-variant=ascension] .depth-strokes{opacity:.44}
+/* Responsiveness: the art remains above the text on compact displays. */
+@media (max-width:950px){
+ html[data-variant] .rift-portal{left:43%;width:63%;height:66%;top:11%}
+ html[data-variant=fracture] .fracture-assembly{left:43%;width:63%;height:66%;top:11%}
+ html[data-variant] .depth-strokes{left:35%;width:70%;top:9%;height:67%}
+ html[data-variant] .ghost-substance{font-size:clamp(130px,20vw,250px);left:40%}
+ html[data-variant] .variant-switcher{right:5vw}
+}
+@media (max-width:680px){
+ html[data-variant] .stage{min-height:680px}
+ html[data-variant] .stage::before{background:linear-gradient(180deg,transparent 0%,#04070714 30%,#040707ab 60%,#040707e8 82%),linear-gradient(90deg,#0407075c,transparent 65%)}
+ html[data-variant] .scene-art{transform-origin:56% 25%}
+ html[data-variant] .rift-portal{left:20%;top:4%;width:83%;height:44%;transform:perspective(850px) rotateY(-20deg) rotateX(3deg)}
+ html[data-variant=fracture] .fracture-assembly{left:20%;top:4%;width:83%;height:44%;transform:perspective(850px) rotateY(-20deg) rotateZ(-4deg)}
+ html[data-variant] .depth-strokes{left:18%;top:5%;width:85%;height:44%}
+ html[data-variant] .rift-light{top:4%;left:20%;width:77%;height:42%}
+ html[data-variant] .rift-blade{height:62%;top:-12%;bottom:auto}
+ html[data-variant] .ghost-substance{left:5%;top:22%;font-size:31vw;opacity:calc(var(--ghost-opacity) * .55);-webkit-text-stroke:.8px #f3cfb75e}
+ html[data-variant=ascension] .ghost-substance{left:0;top:21%;font-size:31vw}
+ html[data-variant] .title-wrap{inset:33% 7% 0;width:86%;transform:translate3d(var(--title-x),var(--title-y),0) scale(var(--title-scale));opacity:var(--title-opacity);transform-origin:0 40%}
+ html[data-variant] .hero-title{font-size:clamp(58px,13vw,90px)!important}
+ html[data-variant] .hero-description{max-width:290px;margin-top:20px;margin-bottom:17px}
+ html[data-variant] .variant-switcher{left:18px;right:18px;bottom:77px;gap:2px;justify-content:space-between;font-size:8px;letter-spacing:0}
+ html[data-variant] .variant-switcher a{padding:6px 5px}
+ html[data-variant] .bottom-bar{bottom:17px}
+ html[data-variant] .prototype-label{right:20px;top:85px;font-size:8px}
+ html[data-variant] .side-readout{display:none}
+}
+@media (max-width:380px){html[data-variant] .hero-title{font-size:clamp(53px,13vw,66px)!important}html[data-variant] .variant-switcher{font-size:7px}}
+@media (prefers-reduced-motion:reduce){
+ html[data-variant] *,html[data-variant] *::before,html[data-variant] *::after{animation:none!important;transition:none!important}
+}
+html.motion-off[data-variant] *,html.motion-off[data-variant] *::before,html.motion-off[data-variant] *::after{animation:none!important;transition:none!important}
