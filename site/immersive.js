@@ -218,40 +218,123 @@
     ctx.beginPath();ctx.moveTo(left,scanY);ctx.lineTo(left+width,scanY);ctx.stroke();
     ctx.restore();
   }
+
+  // Cinematic perspective railway: conceptual 2.5D geometry, never game footage.
   function sceneMetro(t,alpha){
-    if(alpha<=.004)return;ctx.save();ctx.globalAlpha=alpha;
-    const cx=w*(mobile()?.67:.73), horizon=h*(mobile()?.28:.42), base=h*(mobile()?.92:1.04);
-    glow(cx,horizon+90,Math.min(w,h)*.6,'rgba(214,122,84,.27)',alpha);
-    // Forward motion: rails and track ties converge to a shared vanishing point.
-    const drift=pointerX*18;
-    ctx.strokeStyle='rgba(224,156,113,.8)';ctx.lineWidth=2.5;
-    for(const x of [-2.2,-1,-.25,.25,1,2.2]){
-      line(cx+drift+x*5,horizon,cx+x*w*.20,base,'rgba(223,153,111,'+(Math.abs(x)===.25?.8:.28)+')',Math.abs(x)===.25?2:1);
+    if(alpha<=.004)return;
+    ctx.save();ctx.globalAlpha=alpha;
+    const sc=mobile()?.72:1,cx=w*(mobile()?.68:.733)+pointerX*12*sc;
+    const horizon=h*(mobile()?.27:.38)+pointerY*5*sc,base=h*1.08;
+    const spread=Math.min(w*.36,h*.70,610)*sc;
+    const road=z=>Math.pow(clamp(z),1.65);
+    const xp=(lane,z)=>cx+lane*spread*road(z);
+    const yp=z=>horizon+(base-horizon)*road(z);
+    const halo=ctx.createRadialGradient(cx,horizon+90*sc,5,cx,horizon+90*sc,spread*1.5);
+    halo.addColorStop(0,'rgba(202,139,94,.29)');
+    halo.addColorStop(.45,'rgba(97,130,103,.12)');
+    halo.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=halo;ctx.fillRect(cx-spread*1.6,horizon-spread,spread*3.2,spread*2.8);
+    // A continuous tunnel volume, with inset portal geometry layered by depth.
+    for(let i=0;i<16;i++){
+      const z=((i/16+t*.13)%1),d=road(z),half=24*sc+spread*.90*d;
+      const roof=horizon-(32*sc+spread*.85*d),floor=horizon+(base-horizon)*d*.68;
+      const light=.05+d*.22;
+      ctx.strokeStyle='rgba(221,161,113,'+light+')';ctx.lineWidth=.8+d*2.1;
+      ctx.beginPath();ctx.moveTo(cx-half,floor);ctx.lineTo(cx-half,roof+half*.18);
+      ctx.lineTo(cx-half*.74,roof);ctx.lineTo(cx+half*.74,roof);
+      ctx.lineTo(cx+half,roof+half*.18);ctx.lineTo(cx+half,floor);ctx.stroke();
+      if(i%3===0){
+        const lx=cx+half*.79,ly=roof+half*.12;
+        const ring=ctx.createRadialGradient(lx,ly,0,lx,ly,12+14*d);
+        ring.addColorStop(0,'rgba(246,200,150,'+(.15+d*.55)+')');
+        ring.addColorStop(1,'rgba(246,200,150,0)');
+        ctx.fillStyle=ring;ctx.fillRect(lx-22,ly-22,44,44);
+      }
     }
-    for(let i=1;i<30;i++){
-      const z=((i/30+(t*.36)%1)%1);
-      const depth=Math.pow(z,2.5),y=lerp(horizon,base,depth);
-      const width=lerp(6,w*.37,depth);
-      line(cx-width,y,cx+width,y,`rgba(155,181,159,${.08+depth*.62})`,.5+depth*1.8);
+    // Longitudinal construction lines give the railway legible three-lane depth.
+    const rails=[-1.0,-.82,-.38,-.22,.22,.38,.82,1.0];
+    for(const lane of rails){
+      const outside=Math.abs(lane)>.9,main=Math.abs(lane)>.75 || Math.abs(lane)<.25;
+      ctx.strokeStyle=main?'rgba(232,171,119,.71)':'rgba(129,170,147,.30)';
+      ctx.lineWidth=outside?2.3:1.7;
+      ctx.beginPath();ctx.moveTo(cx+lane*6,horizon);ctx.lineTo(cx+lane*spread,base);ctx.stroke();
+      ctx.strokeStyle='rgba(244,194,142,.12)';ctx.lineWidth=5;
+      ctx.beginPath();ctx.moveTo(cx+lane*6,horizon);ctx.lineTo(cx+lane*spread,base);ctx.stroke();
     }
-    // Light tunnels, repeated concentric perspective portals.
-    for(let i=1;i<15;i++){
-      const z=((i/15+(t*.17)%1)%1),depth=Math.pow(z,1.8);
-      const size=25+depth*Math.min(w,h)*.54;
-      ctx.strokeStyle=`rgba(212,149,107,${.04+depth*.21})`;ctx.lineWidth=1+depth*1.8;
-      const yy=horizon+(base-horizon)*depth*.23;
-      ctx.beginPath();ctx.moveTo(cx-size,yy+size*.35);ctx.lineTo(cx-size,yy-size*.55);ctx.lineTo(cx-size*.73,yy-size*.8);ctx.lineTo(cx+size*.73,yy-size*.8);ctx.lineTo(cx+size,yy-size*.55);ctx.lineTo(cx+size,yy+size*.35);ctx.stroke();
+    // Moving sleepers accelerate perceptually as they approach the camera.
+    for(let i=0;i<34;i++){
+      const z=((i/34+t*.47)%1),d=road(z),y=yp(z),width=spread*.91*d;
+      ctx.strokeStyle='rgba(165,204,169,'+(.07+d*.62)+')';ctx.lineWidth=.6+d*2.1;
+      ctx.beginPath();ctx.moveTo(cx-width,y);ctx.lineTo(cx+width,y);ctx.stroke();
+      if(d>.50){
+        ctx.strokeStyle='rgba(247,183,126,'+(.1+d*.14)+')';ctx.lineWidth=.7;
+        ctx.beginPath();ctx.moveTo(cx-width*.98,y+3*d);ctx.lineTo(cx+width*.98,y+3*d);ctx.stroke();
+      }
     }
-    // Stylized approaching train: accurate concept art, not playable footage.
-    const zz=(.12+((t*.075)%1)*.88);const depth=Math.pow(zz,1.6);
-    const trainW=(18+180*depth)*(mobile()?.6:1),trainH=(30+155*depth)*(mobile()?.6:1);
-    const tx=cx+trainW*.57,ty=horizon+depth*(base-horizon)*.37;
-    ctx.fillStyle='#192b28';ctx.strokeStyle='rgba(233,168,124,.75)';ctx.lineWidth=1.5;
-    ctx.beginPath();ctx.moveTo(tx-trainW*.5,ty-trainH*.65);ctx.lineTo(tx+trainW*.45,ty-trainH*.65);ctx.lineTo(tx+trainW*.55,ty+trainH*.35);ctx.lineTo(tx-trainW*.57,ty+trainH*.35);ctx.closePath();ctx.fill();ctx.stroke();
-    ctx.fillStyle='rgba(122,166,147,.30)';ctx.fillRect(tx-trainW*.39,ty-trainH*.48,trainW*.73,trainH*.48);
-    for(let j=0;j<3;j++){const lx=tx-trainW*.31+(j*trainW*.29);ctx.fillStyle='#e7ab85';ctx.fillRect(lx,ty+trainH*.16,Math.max(2,trainW*.065),Math.max(3,trainH*.043));glow(lx,ty+trainH*.16,12+10*depth,'rgba(238,157,102,.32)',alpha)}
-    ctx.fillStyle='rgba(177,209,180,.75)';ctx.font='10px monospace';
-    if(w>760){ctx.fillText('PROCEDURAL / INFINITE TRACK',cx-140,horizon-110);ctx.fillText('THREE.JS / WORLD SYSTEMS',cx+90,base-50)}
+    // Subtle route dividers, with positive forward motion.
+    for(const lane of [-.55,.55]){
+      for(let j=0;j<15;j++){
+        const start=(j/15+t*.42)%1,end=Math.min(1,start+.025);
+        ctx.strokeStyle='rgba(221,158,110,'+(.07+road(start)*.42)+')';
+        ctx.lineWidth=1+road(start)*2;
+        ctx.beginPath();ctx.moveTo(xp(lane,start),yp(start));ctx.lineTo(xp(lane,end),yp(end));ctx.stroke();
+      }
+    }
+    // Approaching train: side wall, front fascia, glass, destination and lights.
+    // Slow push/pull avoids teleporting an obstacle into the foreground.
+    const z=.55+.07*Math.sin(t*.33),d=road(z),tw=(85+spread*.18)*d*sc,th=(150+spread*.30)*d*sc;
+    const tx=xp(.49,z),ty=yp(z)-th*.30;
+    const side=tw*.20;
+    ctx.fillStyle='#0d1e1a';
+    ctx.beginPath();ctx.moveTo(tx-tw*.50,ty-th*.6);
+    ctx.lineTo(tx-tw*.50+side,ty-th*.77);
+    ctx.lineTo(tx+tw*.53+side,ty-th*.77);
+    ctx.lineTo(tx+tw*.5,ty-th*.6);
+    ctx.closePath();ctx.fill();
+    ctx.fillStyle='#234138';
+    ctx.beginPath();ctx.moveTo(tx+tw*.50,ty-th*.60);
+    ctx.lineTo(tx+tw*.5+side,ty-th*.75);
+    ctx.lineTo(tx+tw*.5+side,ty+th*.44);
+    ctx.lineTo(tx+tw*.5,ty+th*.6);ctx.closePath();ctx.fill();
+    const front=ctx.createLinearGradient(tx-tw*.5,ty,tx+tw*.5,ty);
+    front.addColorStop(0,'#152c25');front.addColorStop(.55,'#325648');front.addColorStop(1,'#172e27');
+    ctx.fillStyle=front;ctx.strokeStyle='rgba(216,163,114,.85)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(tx-tw*.5,ty-th*.6);
+    ctx.lineTo(tx+tw*.5,ty-th*.6);ctx.lineTo(tx+tw*.5,ty+th*.55);
+    ctx.lineTo(tx-tw*.5,ty+th*.55);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle='#0d2420';ctx.fillRect(tx-tw*.36,ty-th*.40,tw*.72,th*.46);
+    const glass=ctx.createLinearGradient(tx-tw*.3,ty-th*.38,tx+tw*.3,ty);
+    glass.addColorStop(0,'rgba(165,207,187,.40)');
+    glass.addColorStop(.55,'rgba(55,111,101,.14)');
+    glass.addColorStop(1,'rgba(19,43,38,.68)');
+    ctx.fillStyle=glass;ctx.fillRect(tx-tw*.34,ty-th*.38,tw*.68,th*.42);
+    ctx.strokeStyle='rgba(180,213,187,.55)';ctx.lineWidth=1;
+    ctx.strokeRect(tx-tw*.34,ty-th*.38,tw*.68,th*.42);
+    ctx.fillStyle='#d6ab7b';ctx.fillRect(tx-tw*.22,ty-th*.54,tw*.44,Math.max(3,th*.045));
+    ctx.fillStyle='#17271f';ctx.fillRect(tx-tw*.31,ty+th*.19,tw*.62,th*.19);
+    // Twin warm headlights; restrained glow, without flashing.
+    for(const dir of [-1,1]){
+      const lx=tx+dir*tw*.34,ly=ty+th*.39;
+      ctx.fillStyle='#f4dcb2';ctx.fillRect(lx-tw*.052,ly-th*.025,tw*.104,th*.055);
+      const beam=ctx.createRadialGradient(lx,ly,1,lx,ly,16*sc+tw*.16);
+      beam.addColorStop(0,'rgba(249,213,158,.47)');
+      beam.addColorStop(1,'rgba(249,213,158,0)');
+      ctx.fillStyle=beam;ctx.beginPath();ctx.arc(lx,ly,16*sc+tw*.16,0,Math.PI*2);ctx.fill();
+    }
+    ctx.strokeStyle='rgba(234,177,133,.46)';
+    for(let k=0;k<3;k++){const y=ty+th*(.10+k*.045);line(tx-tw*.26,y,tx+tw*.26,y,'rgba(228,183,147,.34)',.7)}
+    // One small track-side signal establishes scale, not a fake game obstacle.
+    const signalX=xp(-.85,.68),signalY=yp(.68)-34*sc;
+    ctx.strokeStyle='rgba(166,200,169,.46)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(signalX,signalY+55*sc);ctx.lineTo(signalX,signalY);ctx.stroke();
+    ctx.fillStyle='#1a302a';ctx.strokeStyle='rgba(215,157,108,.64)';
+    ctx.fillRect(signalX-7*sc,signalY-11*sc,14*sc,25*sc);
+    circ(signalX,signalY-2*sc,2.8*sc,'#e5a57b');
+    ctx.textAlign='left';ctx.font=(mobile()?'8':'10')+'px monospace';
+    ctx.fillStyle='#c7d3c5';
+    ctx.fillText('THREE-LANE PROCEDURAL TRACK',cx-spread*.68,horizon-53*sc);
+    ctx.fillStyle='#e1ab82';
+    ctx.fillText('CONCEPTUAL WORLD · NOT GAMEPLAY FOOTAGE',cx-spread*.68,Math.min(h-44,base-67*sc));
     ctx.restore();
   }
   function paint(now){
