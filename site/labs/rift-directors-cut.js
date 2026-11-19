@@ -380,9 +380,9 @@
     portal.position.x=cx;
     const sweep=t*.34+p*7;
     lights.sweep.position.set(2.0+Math.sin(sweep)*4,1.5+Math.cos(sweep*.74)*2.5,6-p*3);
-    lights.sweep.intensity=35+twist*22+fracture*15;
+    lights.sweep.intensity=(cinematicOpening?43:35)+twist*22+fracture*15;
     lights.key.position.x=3.5+pointerX*.7+Math.sin(sweep*.3)*1.1;
-    lights.core.opacity=.5+fracture*.26+travel*.25;
+    lights.core.opacity=(cinematicOpening?.84:.5)+fracture*.26+travel*.18;
     if(animObjects.wordMat){
       animObjects.wordMat.opacity=.67*range(p,.31,.48)*(1-range(p,.91,.98));
     }
