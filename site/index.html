@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="v7.css">
   <link rel="stylesheet" href="v8.css">
   <link rel="stylesheet" href="motion-system.css">
+  <link rel="stylesheet" href="visual-polish.css">
   <script defer src="projects.js"></script>
   <script defer src="content-extra.js"></script>
   <script defer src="hero.js"></script>
@@ -82,7 +83,8 @@
       <div class="hero-layout wrap">
         <div class="hero-copy">
           <div class="eyebrow hero-eyebrow"><span class="small-cross">✳</span><span>INDEPENDENT DEVELOPER</span><span class="eyebrow-line"></span><span>INDIA · 2026</span></div>
-          <h1 id="heroTitle"><span class="hero-line hero-line-first"><span>Software</span></span><span class="hero-line hero-line-second"><span>with <em>substance.</em></span></span><span class="hero-endmark">*</span></h1>
+          <h1 id="heroTitle" class="hero-name"><span class="hero-line hero-line-first"><span>Dharaksh</span></span><span class="hero-line hero-line-second"><span><em>Kataria.</em></span></span><span class="hero-endmark" aria-hidden="true">*</span></h1>
+          <p class="hero-signature-line">Software with <em>substance.</em></p>
           <p class="hero-lead">Building digital products at the intersection of <strong>engineering, artificial intelligence,</strong> and <strong>human experience.</strong></p>
           <div class="hero-cta-row">
             <a href="#universe" class="round-action main-action" data-magnetic><span class="round-icon">↘</span><span>ENTER THE WORLD</span></a>
@@ -186,7 +188,7 @@
       </div>
       <nav class="world-bypass wrap" aria-label="Engineering Universe alternatives"><a href="#worldProjects">Browse the four project stories ↓</a><a href="#work">Skip the 3D experience ↓</a></nav>
       <p class="world-instructions wrap" id="worldInstructions">Drag with a pointer or touch to orbit. Scroll the page to tour districts. Keys 1–4 focus a district, arrows orbit or zoom, Enter interacts. Use A/D in Creation to switch lanes. Zoom buttons or Alt + wheel adjust distance. Manual input pauses the scroll tour.</p>
-      <noscript><p class="world-instructions wrap">Open a project story directly from the four links below. JavaScript enables the interactive scene.</p><style>.world-scroll-track{height:auto!important}.world-shell{position:relative!important;top:auto!important}.world-canvas-wrap,.world-toolbar,.world-district-list,#worldObjectAction,#worldObjectState{display:none!important}</style></noscript>
+      <noscript><p class="world-instructions wrap">Open a project story directly from the four links below. JavaScript enables the interactive scene.</p><style>.world-scroll-track{height:auto!important}.world-shell{position:relative!important;top:auto!important}.world-canvas-wrap,.world-toolbar,.world-sector,.world-inspector{display:none!important}.world-district-list{display:grid!important}</style></noscript>
       <div class="world-scroll-track" id="worldScrollTrack"><div class="world-shell wrap" id="worldShell">
         <div class="world-toolbar"><span class="mono"><span class="world-live-dot"></span> <span id="worldRenderer" role="status">INITIALIZING 3D</span></span><span class="mono world-state" id="worldState">EXPLORING / FOUR DISTRICTS</span><button id="worldTour" type="button" class="world-btn" aria-pressed="true">SCROLL TOUR ON</button><button id="worldReset" type="button" class="world-btn" aria-label="Reset 3D camera">RESET CAMERA ↺</button></div>
         <div class="world-canvas-wrap" id="worldCanvasWrap" tabindex="0" role="group" aria-label="Interactive Engineering Universe" aria-describedby="worldInstructions">
@@ -198,15 +200,35 @@
           <button id="worldHaptic" type="button" class="world-haptic" aria-pressed="false" aria-label="Enable optional vibration feedback when supported">HAPTICS OFF</button>
           <div class="world-zoom"><button class="world-btn" id="worldZoomIn" type="button" aria-label="Zoom into the world">+</button><button class="world-btn" id="worldZoomOut" type="button" aria-label="Zoom out of the world">−</button></div><div class="world-fallback" id="worldFallback" hidden>3D rendering is unavailable. Select a district below to explore its case study.</div>
         </div>
-        <div class="world-lower"><div class="world-district-list" aria-label="Explore the four engineering districts">
-          <button class="world-sector is-active" type="button" data-world-sector="0"><span>01 / LEARNING</span><strong>Make knowledge accessible</strong><small>SRM Smart Study Hub ↗</small></button>
-          <button class="world-sector" type="button" data-world-sector="1"><span>02 / COLLABORATION</span><strong>Connect people and skills</strong><small>ProjectMatch ↗</small></button>
-          <button class="world-sector" type="button" data-world-sector="2"><span>03 / RESEARCH</span><strong>Think within constraints</strong><small>KV-cache research ↗</small></button>
-          <button class="world-sector" type="button" data-world-sector="3"><span>04 / CREATION</span><strong>Engineer playable worlds</strong><small>Metro Runner 3D ↗</small></button>
-        </div><div class="world-inspector" aria-live="polite"><span class="mono" id="worldInspectorCategory">DISTRICT / 01</span><h3 id="worldInspectorTitle">Learning as a system.</h3><p id="worldInspectorText">Structured academic data, offline access and interactive learning experiences.</p><p id="worldObjectState" class="world-object-state"></p><button class="world-btn" type="button" id="worldObjectAction">NEXT SEMESTER →</button><a href="projects/srmedu.html" id="worldInspectorLink">OPEN PROJECT STORY <span>↗</span></a></div></div>
+        <div class="world-lower"><nav class="world-district-list" id="worldProjects" aria-label="Browse engineering project stories">
+          <div class="world-sector-tile">
+            <a class="world-sector-story" href="projects/srmedu.html" aria-label="Open SRM Smart Study Hub case study">
+              <span>01 / LEARNING</span><strong>Make knowledge accessible</strong><small>OPEN SRM SMART STUDY HUB STORY <span aria-hidden="true">↗</span></small>
+            </a>
+            <button class="world-sector is-active" type="button" data-world-sector="0" aria-label="Focus learning in the interactive 3D scene" aria-pressed="true">FOCUS IN 3D <span aria-hidden="true">◎</span></button>
+          </div>
+          <div class="world-sector-tile">
+            <a class="world-sector-story" href="projects/projectmatch.html" aria-label="Open ProjectMatch case study">
+              <span>02 / COLLABORATION</span><strong>Connect people and skills</strong><small>OPEN PROJECTMATCH STORY <span aria-hidden="true">↗</span></small>
+            </a>
+            <button class="world-sector" type="button" data-world-sector="1" aria-label="Focus collaboration in the interactive 3D scene" aria-pressed="false">FOCUS IN 3D <span aria-hidden="true">◎</span></button>
+          </div>
+          <div class="world-sector-tile">
+            <a class="world-sector-story" href="projects/kv.html" aria-label="Open KV-cache research case study">
+              <span>03 / RESEARCH</span><strong>Think within constraints</strong><small>OPEN KV-CACHE RESEARCH STORY <span aria-hidden="true">↗</span></small>
+            </a>
+            <button class="world-sector" type="button" data-world-sector="2" aria-label="Focus research in the interactive 3D scene" aria-pressed="false">FOCUS IN 3D <span aria-hidden="true">◎</span></button>
+          </div>
+          <div class="world-sector-tile">
+            <a class="world-sector-story" href="projects/metro.html" aria-label="Open Metro Runner 3D case study">
+              <span>04 / CREATION</span><strong>Engineer playable worlds</strong><small>OPEN METRO RUNNER 3D STORY <span aria-hidden="true">↗</span></small>
+            </a>
+            <button class="world-sector" type="button" data-world-sector="3" aria-label="Focus creation in the interactive 3D scene" aria-pressed="false">FOCUS IN 3D <span aria-hidden="true">◎</span></button>
+          </div>
+        </nav><div class="world-inspector" aria-live="polite"><span class="mono" id="worldInspectorCategory">DISTRICT / 01</span><h3 id="worldInspectorTitle">Learning as a system.</h3><p id="worldInspectorText">Structured academic data, offline access and interactive learning experiences.</p><p id="worldObjectState" class="world-object-state"></p><button class="world-btn" type="button" id="worldObjectAction">NEXT SEMESTER →</button><a href="projects/srmedu.html" id="worldInspectorLink">OPEN PROJECT STORY <span>↗</span></a></div></div>
       </div>
       </div>
-      <nav class="world-project-links wrap" id="worldProjects" tabindex="-1" aria-label="Project stories without 3D"><a href="projects/srmedu.html">Learning — SRMedu ↗</a><a href="projects/projectmatch.html">Collaboration — ProjectMatch ↗</a><a href="projects/kv.html">Research — KV-Cache Compression ↗</a><a href="projects/metro.html">Creation — Metro Runner 3D story ↗</a></nav>
+      
       <div class="world-footer wrap"><span class="mono">ORIGINAL REAL-TIME GEOMETRY · OPT-IN AUDIO · NO TRACKING</span><span class="mono">A DIFFERENT WAY IN. STANDARD LINKS ALWAYS AVAILABLE.</span></div>
     </section>
 
