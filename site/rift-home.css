@@ -192,3 +192,35 @@ html.motion-off .cursor-halo{display:none!important}
 .site-header .nav-link:hover::after,.site-header .nav-link:focus-visible::after{transform:scaleX(1);transform-origin:left}
 .site-header :is(.search-trigger,.v6-guide-toggle,.motion-switch):active{transform:translateY(1px) scale(.98)}
 @media(prefers-reduced-motion:reduce){.site-header .nav-link::after{transition:none!important}}
+
+
+/* Five real-time animation directions share the same renderer and geometry.
+   Native picker on mobile avoids five crowded touch targets. */
+.rift-home .rift-mode-switcher{position:absolute;z-index:28;left:clamp(26px,7vw,112px);bottom:81px;display:grid;gap:9px;max-width:min(750px,64vw);color:#f5eee4}
+.rift-home .rift-mode-label{font:500 9px var(--font-mono);letter-spacing:.15em;color:#d6a780}
+.rift-home .rift-mode-label-suffix{color:#b7b3a6}
+.rift-home .rift-mode-buttons{display:flex;gap:5px;flex-wrap:wrap}
+.rift-home .rift-mode{font:500 10px var(--font-mono);letter-spacing:.01em;color:#c6c8be;background:#0a0e0dc9;border:1px solid #8a8b7b74;border-radius:99px;padding:9px 13px;white-space:nowrap;min-height:34px;transition:background .22s,border-color .22s,color .22s,transform .22s}
+.rift-home .rift-mode:is(:hover,:focus-visible){color:#fff9ed;background:#463629;border-color:#b89b7b}
+.rift-home .rift-mode.is-active{color:#201812;background:#e7c49e;border-color:#e7c49e;box-shadow:0 0 22px #f1af7f19}
+.rift-home .rift-mode:active{transform:scale(.96)}
+.rift-home .rift-mode-description{font:400 10px/1.45 var(--font-mono);letter-spacing:.015em;color:#bdb6aa;max-width:660px;min-height:15px}
+.rift-home .rift-mobile-picker{display:none}
+.rift-home .rift-portal-label{position:absolute;right:4%;top:17%;font:500 10px var(--font-mono);color:#e7bc9d}
+.rift-home [data-rift-mode="ascension"] ~ .rift-mode-description{color:#ecc7aa}
+@media(min-width:761px) and (max-height:730px){
+ .rift-home .rift-mode-switcher{bottom:62px}
+ .rift-home .rift-mode-description{display:none}
+ .rift-home .title-wrap{top:47%}
+}
+@media(max-width:760px){
+ .rift-home .rift-mode-switcher{left:6%;right:6%;top:94px;bottom:auto;max-width:none;gap:5px;z-index:28}
+ .rift-home .rift-mode-label{display:none}
+ .rift-home .rift-mode-buttons{display:none}
+ .rift-home .rift-mobile-picker{display:flex;align-items:center;gap:9px;justify-content:flex-start;font:500 9px var(--font-mono);letter-spacing:.13em;color:#e6b58b}
+ .rift-home .rift-mobile-picker select{appearance:auto;width:min(245px,75vw);max-width:100%;background:#101817e8;border:1px solid #c4ad8b80;border-radius:7px;padding:10px 10px;color:#fff1df;font:500 12px var(--font-mono);min-height:44px}
+ .rift-home .rift-mode-description{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+ .rift-home .rift-mode-switcher{display:none}
+}
