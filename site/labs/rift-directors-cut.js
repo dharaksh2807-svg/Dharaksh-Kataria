@@ -349,6 +349,10 @@
       const sc=node.baseScale*squeeze*(1+.028*Math.sin(t*.23+i*.62));
       layer.scale.set(sc,sc,sc);
       layer.position.z=-i*(cinematicOpening?.86:.72) - twist*(i*.13) - p*.32;
+      // Slightly misregister the back layers on the opening shot for a sculptural
+      // architectural silhouette; all offsets converge into the proven timeline.
+      layer.position.x=openingPose*(Math.sin(i*.79)*.075+i*.021);
+      layer.position.y=openingPose*(Math.sin(i*.52)*.075-i*.012);
       if(i===0)node.frontMat.opacity=clamp(1-fracture*.94);
     }
 
