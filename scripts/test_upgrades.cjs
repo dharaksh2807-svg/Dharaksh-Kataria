@@ -34,6 +34,35 @@ async function test(name,fn){
  catch(err){tests.push({name,result:"FAIL",error:err.message});failures.push(name+": "+err.message);console.error("FAIL",name,err.message)}
 }
 try {
+  await test("Homepage displays full name and visible companion",async()=>{
+    const page=await pageFor(1440);
+    try{
+      await page.goto(origin+"/");
+      assert.match(await page.locator("#heroTitle").innerText(),/Dharaksh\s+Kataria\./);
+      assert.equal(await page.locator("#kioLaunch").isVisible(),true);
+      const layout=await page.locator("#kioGuide").evaluate(node=>({
+        position:getComputedStyle(node).position,
+        display:getComputedStyle(node).display
+      }));
+      assert.equal(layout.position,"fixed");
+      assert.notEqual(layout.display,"none");
+      assert.deepEqual(page.errors,[]);
+    }finally{await page.close()}
+  });
+  await test("World cards open their stories and keep focus controls independent",async()=>{
+    const page=await pageFor(390);
+    try{
+      await page.goto(origin+"/");
+      assert.equal(await page.locator("#worldProjects a").count(),4);
+      await page.locator('[data-world-sector="1"]').click();
+      assert.equal(await page.evaluate(()=>portfolioWorld.state.selected),1);
+      await page.locator('#worldProjects .world-sector-story[href="projects/projectmatch.html"]').click();
+      await page.waitForURL("**/projects/projectmatch.html");
+      assert.equal(await page.locator(".cp-chapters-back").count(),1);
+      assert.equal(await page.locator(".cp-chapters-back").getAttribute("href"),"../index.html#universe");
+      assert.deepEqual(page.errors,[]);
+    }finally{await page.close()}
+  });
   for(const slug of slugs) {
     await test("Case chapters "+slug,async()=>{
       const page=await pageFor(390);
