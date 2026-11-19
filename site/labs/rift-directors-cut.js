@@ -17,6 +17,8 @@
   const motionPref = matchMedia('(prefers-reduced-motion: reduce)');
   const params = new URLSearchParams(location.search);
   const motionDisabledByUrl = params.get('motion') === 'off';
+  // Side-by-side inspection: ?opening=original restores the previous opening pose and materials.
+  const cinematicOpening = params.get('opening') !== 'original';
   let reduced = motionPref.matches;
   let paused = reduced || motionDisabledByUrl;
   let inView = true, raf = 0, disposed = false, lastFrame = 0, elapsed = 0;
@@ -66,11 +68,11 @@
 
   function makeFrameGeometry(THREE){
     const outer=octagon(THREE,2.1,2.47,.38);
-    outer.holes.push(octagon(THREE,1.77,2.14,.29,true));
+    outer.holes.push(cinematicOpening ? octagon(THREE,1.87,2.24,.30,true) : octagon(THREE,1.77,2.14,.29,true));
     const geometry=new THREE.ExtrudeGeometry(outer,{
-      depth:.19,steps:1,bevelEnabled:true,bevelSize:.045,bevelThickness:.047,bevelSegments:3,curveSegments:1
+      depth:cinematicOpening?.25:.19,steps:1,bevelEnabled:true,bevelSize:cinematicOpening?.036:.045,bevelThickness:cinematicOpening?.055:.047,bevelSegments:3,curveSegments:1
     });
-    geometry.translate(0,0,-.095);
+    geometry.translate(0,0,cinematicOpening?-.125:-.095);
     geometries.push(geometry);
     return geometry;
   }
@@ -81,7 +83,7 @@
     const ctx=texCanvas.getContext('2d');
     const g=ctx.createLinearGradient(0,0,0,512);
     g.addColorStop(0,'#191b1c');g.addColorStop(.36,'#66574c');
-    g.addColorStop(.55,'#a58b6e');g.addColorStop(.72,'#282d2a');g.addColorStop(1,'#101414');
+    g.addColorStop(.55,cinematicOpening?'#413b36':'#a58b6e');g.addColorStop(.72,'#282d2a');g.addColorStop(1,'#101414');
     ctx.fillStyle=g;ctx.fillRect(0,0,1024,512);
     // Luminous studio strips are reflected by PBR metal rather than rendered as arbitrary glow.
     const panels=[
@@ -114,7 +116,7 @@
     });
     renderer.outputColorSpace=THREE.SRGBColorSpace;
     renderer.toneMapping=THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure=1.13;
+    renderer.toneMappingExposure=cinematicOpening?1.01:1.13;
     renderer.setClearColor(0x000000,0);
     // Deliberately budget real shadow maps to desktop-quality renderers only.
     const shadowQuality=innerWidth>=960 && params.get('quality')!=='low';
@@ -127,21 +129,21 @@
     camera.lookAt(0,0,-10);
 
     scene.environment=studioEnvironment(THREE);
-    scene.environmentIntensity=1.2;
+    scene.environmentIntensity=cinematicOpening?1.38:1.2;
 
     const bronze=new THREE.MeshPhysicalMaterial({
-      color:0xa97650,metalness:.91,roughness:.23,
-      clearcoat:.25,clearcoatRoughness:.2,envMapIntensity:1.7
+      color:cinematicOpening?0x815039:0xa97650,metalness:.94,roughness:cinematicOpening?.17:.23,
+      clearcoat:.25,clearcoatRoughness:.2,envMapIntensity:cinematicOpening?2.0:1.7
     });
     const silver=new THREE.MeshPhysicalMaterial({
-      color:0xd8c4ae,metalness:.89,roughness:.29,
-      clearcoat:.18,clearcoatRoughness:.19,envMapIntensity:1.5
+      color:cinematicOpening?0xb6a28b:0xd8c4ae,metalness:.92,roughness:cinematicOpening?.20:.29,
+      clearcoat:.18,clearcoatRoughness:.19,envMapIntensity:cinematicOpening?1.85:1.5
     });
     const dark=new THREE.MeshPhysicalMaterial({
-      color:0x282522,metalness:.82,roughness:.34,envMapIntensity:1.15
+      color:cinematicOpening?0x25211f:0x282522,metalness:.87,roughness:cinematicOpening?.26:.34,envMapIntensity:cinematicOpening?1.35:1.15
     });
     const edgeMaterial=new THREE.LineBasicMaterial({
-      color:0xffd4a2,transparent:true,opacity:.33,depthWrite:false
+      color:0xffd4a2,transparent:true,opacity:cinematicOpening?.46:.33,depthWrite:false
     });
     materials.push(bronze,silver,dark,edgeMaterial);
     const frameGeometry=makeFrameGeometry(THREE);
@@ -158,13 +160,13 @@
     for(let i=0;i<11;i++){
       const layer=new THREE.Group();
       const s=Math.pow(.94,i);
-      layer.position.z=-i*.72;
+      layer.position.z=-i*(cinematicOpening?.86:.72);
       layer.scale.setScalar(s);
-      const original=(i%4===0?silver:i%3===0?bronze:dark);
+      const original=cinematicOpening?(i%5===0?bronze:i%2===0?silver:dark):(i%4===0?silver:i%3===0?bronze:dark);
       // Front layer uses its own material for the fracture crossfade.
-      const frontMat=i===0?original.clone():original;
+      const frontMat=i===0?(cinematicOpening?dark.clone():original.clone()):original;
       if(i===0){frontMat.transparent=true;materials.push(frontMat);}
-      const frame=new THREE.Mesh(frameGeometry,[frontMat,dark]);
+      const frame=new THREE.Mesh(frameGeometry,[frontMat,cinematicOpening?(i%3===0?silver:bronze):dark]);
       frame.castShadow=shadowQuality;
       frame.receiveShadow=shadowQuality;
       layer.add(frame);
@@ -328,17 +330,25 @@
     const introEase=1-Math.pow(1-clamp(t/1.4),3);
     const drift=Math.sin(t*.34)*.009;
     const slowMove=paused||reduced?0:Math.sin(t*.28)*.035;
+    // The cinematic entrance is a deliberate, asymmetric composition.
+    // Blend back to the previously approved motion sequence by 30% scroll.
+    const openingPose=cinematicOpening?(1-range(p,.035,.30)):0;
+    if(animObjects.group){
+      animObjects.group.rotation.y=-.11-openingPose*.34;
+      animObjects.group.rotation.x=openingPose*.10;
+      animObjects.group.rotation.z=openingPose*.07;
+    }
 
     for(let i=0;i<rings.length;i++){
       const node=rings[i],layer=node.group;
       const spinClockwise=(i*.035 + p*(.12+i*.07) + twist*(i*.082));
-      layer.rotation.z=-spinClockwise + drift*.3;
+      layer.rotation.z=-spinClockwise - openingPose*(.19+.045*Math.sin(i*.82)) + drift*.3;
       layer.rotation.y=-.035 + twist*(i%2?-.17:.13);
       layer.rotation.x=twist*(i*.014)+(i%2?1:-1)*slowMove*.25;
       const squeeze=1-twist*(.13+.02*i);
       const sc=node.baseScale*squeeze*(1+.028*Math.sin(t*.23+i*.62));
       layer.scale.set(sc,sc,sc);
-      layer.position.z=-i*.72 - twist*(i*.13) - p*.32;
+      layer.position.z=-i*(cinematicOpening?.86:.72) - twist*(i*.13) - p*.32;
       if(i===0)node.frontMat.opacity=clamp(1-fracture*.94);
     }
 
@@ -359,11 +369,11 @@
     const cx=2.25;
     const aimX=cx*travel;
     camera.position.set(
-      cx*travel+pointerX*.06*(1-travel),
-      -.05+pointerY*.05*(1-travel)+Math.sin(t*.32)*.018,
+      cx*travel+pointerX*.06*(1-travel)-openingPose*.44,
+      -.05+pointerY*.05*(1-travel)+Math.sin(t*.32)*.018+openingPose*.12,
       10.6-travel*17.5 - (1-introEase)*.7
     );
-    camera.lookAt(aimX,0,-13);
+    camera.lookAt(aimX+openingPose*.14,openingPose*.05,-13);
     camera.rotateZ(-travel*.105 - twist*.014);
     portal.rotation.y=-.05+pointerX*.042*(1-travel)+twist*.045;
     portal.rotation.x=pointerY*.026*(1-travel);
@@ -376,7 +386,7 @@
     if(animObjects.wordMat){
       animObjects.wordMat.opacity=.67*range(p,.31,.48)*(1-range(p,.91,.98));
     }
-    renderer.toneMappingExposure=1.13+range(p,.80,.96)*.24;
+    renderer.toneMappingExposure=(cinematicOpening?(1.01+openingPose*.06):1.13)+range(p,.80,.96)*.24;
   }
 
   function resize(){
