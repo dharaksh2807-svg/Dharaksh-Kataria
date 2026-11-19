@@ -105,3 +105,21 @@ html.motion-off .portal-fallback .rift-light,html.motion-off .portal-fallback .r
  .stage-canvas,.portal-fallback,.title-wrap,.substance-ghost,.light-shafts i,.transition-veil,.bridge-card,.bridge-card::before{transition:none!important;animation:none!important}
  .bridge-card{transform:none!important;opacity:1!important}
 }
+
+/* V9.3 — readable title and an actual content destination during the final shot. */
+.rift-stage .title-wrap{max-width:min(720px,58vw);overflow:visible}
+.rift-stage .hero-title{font-size:clamp(76px,9.1vw,138px);letter-spacing:-.067em;overflow:visible}
+.rift-stage .hero-title>span{display:block;white-space:nowrap;overflow:visible}
+.rift-stage .hero-title .serif{font-size:.94em}
+.rift-handoff{position:absolute;z-index:26;left:7%;right:7%;bottom:clamp(95px,13vh,160px);max-width:700px;opacity:var(--handoff-alpha,0);transform:translateY(var(--handoff-shift,45px));pointer-events:none;color:#1b2420;transition:none;text-shadow:none}
+.rift-handoff h2{font:600 clamp(42px,5.2vw,88px)/1.05 'DM Sans',sans-serif;letter-spacing:-.075em;margin:12px 0}
+.rift-handoff h2 em{font:italic 1.05em 'Instrument Serif',serif;color:#8c4f34}
+.rift-handoff p{font:400 clamp(13px,1.1vw,17px)/1.65 'DM Sans',sans-serif;color:#39483e}
+.rift-handoff-kicker{font:500 10px 'DM Mono',monospace;letter-spacing:.18em;color:#9b674a}
+.rift-handoff-link{display:inline-flex;align-items:center;gap:26px;margin-top:18px;padding:13px 20px;border:1px solid #5c665b;border-radius:30px;color:#172820;font:500 12px 'DM Mono',monospace;background:#fff9ebdd;pointer-events:auto}
+.rift-handoff-link:hover,.rift-handoff-link:focus-visible{background:#14251c;color:#fff;border-color:#14251c}
+.rift-stage .substance-ghost{font-size:clamp(90px,12vw,190px);left:42%;top:40%;letter-spacing:-.09em}
+@media(max-width:1050px){.rift-stage .hero-title{font-size:clamp(64px,9vw,110px)}}
+@media(max-width:760px){.rift-stage .title-wrap{max-width:92%;overflow:visible}.rift-stage .hero-title{font-size:clamp(47px,11.8vw,76px)!important}.rift-stage .hero-title>span{white-space:nowrap}.rift-handoff{bottom:120px;max-width:90%}.rift-handoff h2{font-size:clamp(36px,9vw,56px)}.rift-stage .substance-ghost{font-size:20vw;left:8%}}
+@media(max-width:390px){.rift-stage .hero-title{font-size:clamp(43px,11.4vw,55px)!important}}
+@media(prefers-reduced-motion:reduce){.rift-handoff{opacity:0;pointer-events:none}}
