@@ -47,67 +47,89 @@
       vUv=aUv;
       float persp=3.75/(5.25-p.z);
       float aspectFit=max(.75,uAspect);
-      gl_Position=vec4(p.x*persp*.72/aspectFit,p.y*persp*.72,p.z*.15,1.);
+      gl_Position=vec4(p.x*persp*.84/aspectFit,p.y*persp*.84,p.z*.15,1.);
     }
   `;
   const frag=`#version 300 es
     precision highp float;
-    in vec3 vNormal;
-    in vec3 vPosition;
-    in vec2 vUv;
+    in vec3 vNormal; in vec3 vPosition; in vec2 vUv;
     uniform float uTime;
     out vec4 outColor;
     void main(){
-      vec3 n=normalize(vNormal);
-      vec3 light=normalize(vec3(-.48,.80,1.2));
-      vec3 fillLight=normalize(vec3(.78,-.4,-.2));
-      float lambert=max(dot(n,light),0.);
-      float secondary=max(dot(n,fillLight),0.);
-      float fresnel=pow(1.-abs(dot(n,vec3(0.,0.,1.))),2.1);
-      float fine=sin(vUv.y*30.0 + sin(vUv.x*35.)*.75)*.028;
-      vec3 deep=vec3(.39,.20,.15);
-      vec3 mid=vec3(.79,.37,.25);
-      vec3 bright=vec3(1.0,.73,.51);
-      vec3 color=mix(deep,mid,clamp(.22+lambert*.84,0.,1.));
-      color=mix(color,bright,clamp(pow(lambert,3.4)*.66+secondary*.12,0.,1.));
-      color+=fresnel*vec3(.16,.13,.12);
-      color+=fine;
-      color*=.94 + .055*sin(vUv.x*18.);
-      outColor=vec4(pow(color,vec3(.9)),1.);
-    }
-  `;
+     vec3 n=normalize(vNormal);
+     vec3 key=normalize(vec3(-.48,.76,1.0));
+     vec3 rim=normalize(vec3(.82,-.32,.47));
+     vec3 view=vec3(0.,0.,1.);
+     float diffuse=max(dot(n,key),0.);
+     float opposite=max(dot(n,rim),0.);
+     float edge=pow(1.-abs(dot(n,view)),2.5);
+     float spec=pow(max(dot(n,normalize(key+view)),0.),72.);
+     float coolSpec=pow(max(dot(n,normalize(rim+view)),0.),42.);
+     float sweep=pow(max(0.,cos(vUv.x*6.28318*1.7-uTime*.48)),24.)*.24;
+     float micro=sin(vUv.x*1250.0+vUv.y*16.)*.009;
+     vec3 umber=vec3(.16,.095,.09); vec3 copper=vec3(.59,.27,.20);
+     vec3 champagne=vec3(.95,.72,.51);
+     vec3 metal=mix(umber,copper,clamp(.28+diffuse*.83,0.,1.));
+     metal=mix(metal,champagne,clamp(spec*.72+coolSpec*.27+sweep*.33,0.,.86));
+     metal+=edge*vec3(.25,.17,.12)+opposite*vec3(.10,.13,.11);
+     metal+=micro;
+     outColor=vec4(pow(clamp(metal,0.,1.),vec3(.92)),1.);
+    }`;
   function compile(type,source){let sh=gl.createShader(type);gl.shaderSource(sh,source);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS)){console.warn('Sculpture shader unavailable:',gl.getShaderInfoLog(sh));gl.deleteShader(sh);return null}return sh}
   const v=compile(gl.VERTEX_SHADER,vert),f=compile(gl.FRAGMENT_SHADER,frag);
   if(!v||!f)return;
   const program=gl.createProgram();gl.attachShader(program,v);gl.attachShader(program,f);gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS)){console.warn('Sculpture unavailable:',gl.getProgramInfoLog(program));return}
   gl.deleteShader(v);gl.deleteShader(f);
   const locRot=gl.getUniformLocation(program,'uRotation'),locTime=gl.getUniformLocation(program,'uTime'),locAspect=gl.getUniformLocation(program,'uAspect');
-  const vec=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
+
+  // Distinctive D/K monogram built as five beveled metallic ribbon strokes.
+  const subtract=(a,b)=>a.map((v,i)=>v-b[i]);
   const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
-  const normalize=v=>{let d=Math.hypot(...v)||1;return v.map(n=>n/d)};
-  const center=t=>[(1.85+.58*Math.cos(3*t))*Math.cos(2*t)*.63,(1.85+.58*Math.cos(3*t))*Math.sin(2*t)*.63,.85*Math.sin(3*t)*.75];
-  const around=28,length=360,position=[],normal=[],uv=[],index=[];
-  for(let i=0;i<=length;i++){
-    let t=i/length*Math.PI*2;
-    const c=center(t),tangent=normalize(vec(center(t+.0004),center(t-.0004)));
-    const reference=Math.abs(tangent[2])>.94?[0,1,0]:[0,0,1];
-    const n=normalize(cross(tangent,reference)),b=normalize(cross(tangent,n));
-    for(let j=0;j<=around;j++){
-      const a=j/around*Math.PI*2,ca=Math.cos(a),sa=Math.sin(a);
-      const direction=normalize([n[0]*ca+b[0]*sa,n[1]*ca+b[1]*sa,n[2]*ca+b[2]*sa]);
-      const r=.235 + .026*Math.sin(t*7.0);
-      position.push(c[0]+direction[0]*r,c[1]+direction[1]*r,c[2]+direction[2]*r);
-      normal.push(...direction);uv.push(i/length,j/around);
-      if(i<length && j<around){const base=i*(around+1)+j;index.push(base,base+1,base+around+1,base+1,base+around+2,base+around+1)}
+  const normalize=v=>{const d=Math.hypot(...v)||1;return v.map(x=>x/d)};
+  const bez=(a,b,c,d,t)=>{const q=1-t;return a.map((v,i)=>q*q*q*v+3*q*q*t*b[i]+3*q*t*t*c[i]+t*t*t*d[i])};
+  const A=[-1.65,1.6,.16],B=[-1.65,-1.6,.16];
+  const strokes=[
+    {curves:[[A,[-1.8,.6,.18],[-1.8,-.6,.18],B]],width:.15},
+    {curves:[[A,[-.7,1.99,.3],[.17,1.18,.55],[.05,0,.49]],
+             [[.05,0,.49],[.10,-1.15,.55],[-.75,-1.98,.3],B]],width:.17},
+    {curves:[[[.55,1.65,-.04],[.52,.55,-.04],[.52,-.65,-.04],[.55,-1.65,-.04]]],width:.155},
+    {curves:[[[1.94,1.64,-.04],[1.53,1.12,.03],[1.10,.48,.08],[.56,-.04,.12]]],width:.15},
+    {curves:[[[.56,-.04,.12],[1.02,-.52,.05],[1.52,-1.17,-.04],[1.99,-1.65,-.04]]],width:.15}
+  ];
+  const position=[],normal=[],uv=[],index=[],ring=14;
+  for(const stroke of strokes){
+    const start=position.length/3,samples=stroke.curves.length*72;
+    const path=t=>{
+      const segment=Math.min(stroke.curves.length-1,Math.floor(t*stroke.curves.length));
+      const u=t>=1?1:t*stroke.curves.length-segment;
+      return bez(...stroke.curves[segment],u);
+    };
+    for(let i=0;i<=samples;i++){
+      const t=i/samples,c=path(t),ahead=path(Math.min(1,t+.0007)),behind=path(Math.max(0,t-.0007));
+      const tangent=normalize(subtract(ahead,behind));
+      const side=normalize([-tangent[1],tangent[0],0]);
+      const depth=normalize(cross(tangent,side));
+      const cap=Math.min(1,.65+Math.min(t,1-t)*15);
+      const radius=stroke.width*cap;
+      for(let j=0;j<=ring;j++){
+        const a=j/ring*Math.PI*2,cs=Math.cos(a),sn=Math.sin(a);
+        const n=normalize([side[0]*cs+depth[0]*sn*.7,side[1]*cs+depth[1]*sn*.7,side[2]*cs+depth[2]*sn*.7]);
+        position.push(c[0]+side[0]*radius*cs+depth[0]*radius*.52*sn,
+                      c[1]+side[1]*radius*cs+depth[1]*radius*.52*sn,
+                      c[2]+side[2]*radius*cs+depth[2]*radius*.52*sn);
+        normal.push(...n);uv.push(t,j/ring);
+        if(i<samples&&j<ring){const p=start+i*(ring+1)+j;index.push(p,p+1,p+ring+1,p+1,p+ring+2,p+ring+1)}
+      }
     }
   }
+  if(position.length/3>65535)throw new Error('Sculpture index limit exceeded');
   const vao=gl.createVertexArray();gl.bindVertexArray(vao);
   function attribute(slot,array,size){let buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(array),gl.STATIC_DRAW);gl.enableVertexAttribArray(slot);gl.vertexAttribPointer(slot,size,gl.FLOAT,false,0,0)}
   attribute(0,position,3);attribute(1,normal,3);attribute(2,uv,2);
   let elementBuffer=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,elementBuffer);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(index),gl.STATIC_DRAW);
   gl.bindVertexArray(null);
   gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.disable(gl.CULL_FACE);
-  let width=0,height=0,visible=true,rotX=-.44,rotY=.32,targetX=-.44,targetY=.32;
+  let width=0,height=0,visible=true,rotX=-.11,rotY=.10,targetX=-.11,targetY=.10;
   function resize(){const r=canvas.getBoundingClientRect();if(!r.width||!r.height)return;const dpr=Math.min(devicePixelRatio||1,1.65);const w=Math.round(r.width*dpr),h=Math.round(r.height*dpr);if(w!==width||h!==height){width=w;height=h;canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h)}}
   const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(canvas);resize();
   let scheduled=false;
@@ -115,14 +137,14 @@
   function scheduleFrame(){if(!scheduled && visible && !document.hidden){scheduled=true;requestAnimationFrame(render)}}
   const visibility=new IntersectionObserver(entries=>{visible=entries[0]?.isIntersecting??true;if(visible)scheduleFrame()},{threshold:0});visibility.observe(container);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleFrame()});
-  container.addEventListener('pointermove',(event)=>{if(motionReduced||motionPaused)return;const r=container.getBoundingClientRect();const px=(event.clientX-r.left)/r.width-.5,py=(event.clientY-r.top)/r.height-.5;targetY=.32+px*.60;targetX=-.44-py*.48},{passive:true});
-  container.addEventListener('pointerleave',()=>{targetX=-.44;targetY=.32});
+  container.addEventListener('pointermove',(event)=>{if(motionReduced||motionPaused)return;const r=container.getBoundingClientRect();const px=(event.clientX-r.left)/r.width-.5,py=(event.clientY-r.top)/r.height-.5;targetY=.10+px*.34;targetX=-.11-py*.27},{passive:true});
+  container.addEventListener('pointerleave',()=>{targetX=-.11;targetY=.10});
   function render(now){scheduled=false;if(!visible||document.hidden)return;resize();if(!width)return;
     const time=now*.001;
     rotX+=(targetX-rotX)*.024;
     rotY+=(targetY-rotY)*.024;
     gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-    gl.useProgram(program);gl.uniform2f(locRot,rotX+(motionReduced||motionPaused?0:Math.sin(time*.15)*.05),rotY+(motionReduced||motionPaused?0:time*.07));gl.uniform1f(locTime,time);gl.uniform1f(locAspect,width/height);
+    gl.useProgram(program);gl.uniform2f(locRot,rotX+(motionReduced||motionPaused?0:Math.sin(time*.19)*.065),rotY+(motionReduced||motionPaused?0:Math.sin(time*.23)*.18));gl.uniform1f(locTime,time);gl.uniform1f(locAspect,width/height);
     gl.bindVertexArray(vao);gl.drawElements(gl.TRIANGLES,index.length,gl.UNSIGNED_SHORT,0);
     gl.bindVertexArray(null);
     if(!motionReduced&&!motionPaused)scheduleFrame();
