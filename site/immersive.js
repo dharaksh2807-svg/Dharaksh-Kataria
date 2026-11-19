@@ -121,8 +121,8 @@
   function sceneMemory(t,alpha){
     if(alpha<=.004)return;
     ctx.save();ctx.globalAlpha=alpha;
-    const cx=w*(mobile()?.69:.735),cy=h*(mobile()?.35:.485);
-    const sc=mobile()?.51:Math.min(1.06,w/1350),cols=22,rows=8;
+    const cx=w*(mobile()?.63:.735),cy=h*(mobile()?.35:.485);
+    const sc=mobile()?Math.min(.45,w*.75/(22*23+40)):Math.min(1.06,w/1350),cols=22,rows=8;
     const pitch=23*sc,vy=23*sc,width=cols*pitch,height=rows*vy;
     const left=cx-width*.5+pointerX*10*sc,top=cy-height*.55+pointerY*8*sc;
     const compress=smooth(clamp(prog*3-1.05));
