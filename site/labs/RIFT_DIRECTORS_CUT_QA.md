@@ -10,7 +10,7 @@ The approved Rift layout, typography, copper/champagne palette and links are pre
 
 1. **Real 3D portal:** eleven beveled octagonal architectural frames built using Three.js ExtrudeGeometry with depth and double-sided metal materials.
 2. **Clockwise portal transformation:** every frame rotates clockwise with distinct offsets as scroll increases; opposing Y rotations and per-ring compression create a spatial twist. Idle drift is deliberately restrained.
-3. **Metal material:** MeshPhysicalMaterial and procedural studio environment-map reflections, with moving directional/point lights and atmospheric fog. These are actual PBR calculations, not a claim of photorealistic raytracing or measured GPU quality.
+3. **Metal material:** MeshPhysicalMaterial and procedural studio environment-map reflections, with moving directional/point lights and atmospheric fog. Desktop-sized viewports enable a 1024px soft-shadow map for ring-to-ring shadows; narrower or low-quality views disable it. These are actual PBR calculations, not a claim of raytracing or measured GPU quality.
 4. **Fracture/reassembly:** four independent beveled segment meshes split in X/Y/Z with different turns and rejoin deterministically on the scroll timeline.
 5. **SUBSTANCE typography:** a huge masked HTML typography layer plus a depth-tested 3D text plane inside the portal. The camera advances through that plane near the end of the sequence.
 6. **Real camera fly-through:** the Three.js perspective camera moves along the tunnel, changes its aim, and rolls clockwise; not merely CSS zoom.
@@ -23,7 +23,7 @@ The approved Rift layout, typography, copper/champagne palette and links are pre
 - Cursor trails, particle explosions or automatic full rotations.
 - Autoplay background music.
 - Production project-card transitions (only preview handoff cards are built).
-- Full physically based raytracing, real-time soft shadows, or costly postprocessing chains; none should be claimed.
+- Full raytracing or costly postprocessing chains. Desktop soft-shadow mapping is implemented, but visual quality and device performance remain unverified.
 
 ### Dependencies
 
