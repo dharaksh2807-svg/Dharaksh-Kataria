@@ -159,3 +159,12 @@ html.motion-off .hero-line>span{opacity:1!important;transform:none!important;fil
 #kioGuide:not(.kio-reduced) .kio-head{
   animation:kio-nod 5.4s ease-in-out infinite;
 }
+
+/* Entire district-tile background follows the story link. The intentional 3D-focus
+   button remains separately clickable above that link's transparent hit area. */
+.world-sector-story{cursor:pointer}
+.world-sector-story::after{content:"";position:absolute;inset:0;z-index:1}
+.world-sector-tile .world-sector{position:relative;z-index:2}
+.world-sector-tile:has(.world-sector-story:focus-visible){
+  outline:3px solid #e9b18d;outline-offset:-3px;
+}
