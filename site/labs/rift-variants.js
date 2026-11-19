@@ -133,10 +133,10 @@
  }
  // Shader: real perspective intersections with a sequence of z-displaced portal planes.
  // It is not a Three.js mesh. This is a native WebGL2 perspective shader, with CSS architecture in front.
- const vertex=String.raw\`#version 300 es
+ const vertex=String.raw`#version 300 es
  precision highp float;
- void main(){vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2));gl_Position=vec4(p*2.-1.,0.,1.);}\`;
- const fragment=String.raw\`#version 300 es
+ void main(){vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2));gl_Position=vec4(p*2.-1.,0.,1.);}`;
+ const fragment=String.raw`#version 300 es
  precision highp float;
  uniform vec2 uRes;uniform vec2 uMouse;uniform float uTime;uniform float uScroll;uniform int uMode;
  out vec4 fragColor;
@@ -180,7 +180,7 @@
   col*=.62+.38*vignette;
   col+=(hash(gl_FragCoord.xy+uTime*17.)-.5)*.0035;
   fragColor=vec4(pow(max(col,vec3(0.)),vec3(.92)),1.);
- }\`;
+ }`;
  function compile(type,source){const shader=gl.createShader(type);gl.shaderSource(shader,source);gl.compileShader(shader);if(!gl.getShaderParameter(shader,gl.COMPILE_STATUS)){const e=gl.getShaderInfoLog(shader);gl.deleteShader(shader);throw Error(e);}return shader;}
  function initialize(){
   try{
