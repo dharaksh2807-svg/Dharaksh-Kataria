@@ -14,7 +14,7 @@ html[data-variant] .rift-blade.right{transform:translateX(var(--blade-r,0px)) sk
 html[data-variant] .rift-orbit{transform:rotate(calc(-24deg + var(--orbital-rotation,0deg))) scale(1.24);opacity:var(--orbital-alpha,.75)}
 html[data-variant] .rift-ticks{transform:rotate(var(--ticks-rotation,-8deg));opacity:.75}
 html[data-variant] .title-wrap{transform:translate3d(var(--title-x),var(--title-y),0) scale(var(--title-scale));opacity:var(--title-opacity);transform-origin:30% 50%;transition:none}
-html[data-variant] .enter-1,html[data-variant] .enter-2,html[data-variant] .enter-3{animation:none;opacity:1;filter:none;transform:none}
+html[data-variant] .enter-1,html[data-variant] .enter-2,html[data-variant] .enter-3{animation:none;opacity:var(--reveal-first,1);filter:blur(var(--blur-first,0px));transform:translate3d(0,var(--rise-first,0px),0)}html[data-variant] .enter-2{opacity:var(--reveal-second,1);filter:blur(var(--blur-second,0px));transform:translate3d(0,var(--rise-second,0px),0)}html[data-variant] .enter-3{opacity:var(--reveal-third,1);filter:blur(var(--blur-third,0px));transform:translate3d(0,var(--rise-third,0px),0)}
 html[data-variant] .hero-title{filter:drop-shadow(0 9px 22px #0009)}
 html[data-variant] .hero-action{transition:color .22s ease,border-color .22s ease,transform .22s ease;will-change:transform}
 html[data-variant] .hero-action:hover,html[data-variant] .hero-action:focus-visible{color:#ffe1c9;border-color:#ffe1c9}
