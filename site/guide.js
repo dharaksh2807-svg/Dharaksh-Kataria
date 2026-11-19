@@ -181,6 +181,9 @@
     hint.classList.remove('kio-hint-visible');clearTimeout(hintTimer);refreshPref();
     if(opened){lastFocused=document.activeElement;position();$('#kioClose').focus({preventScroll:true});}
     else {
+      // The launcher is a small floating companion when its panel is closed.
+      // Reparent after closing so it cannot be clipped by section containers.
+      if(host.parentElement!==document.body) document.body.append(host);
       tourActive=false;lock=false;clearTimeout(tourTimer);clearTimeout(gestureTimer);
       document.querySelectorAll('.kio-target').forEach(node=>node.classList.remove('kio-target'));
       host.dataset.mood='idle';
