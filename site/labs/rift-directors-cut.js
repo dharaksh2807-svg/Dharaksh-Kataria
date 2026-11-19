@@ -512,7 +512,7 @@
     if(!paused&&!reduced)elapsed+=dt;
     pointerX+=(targetX-pointerX)*.075;
     pointerY+=(targetY-pointerY)*.075;
-    const p=reduced?0:progress;
+    const p=(reduced||paused)?0:progress;
     const entry=reduced||paused?1:1-Math.pow(1-clamp(elapsed/1300),3);
     updateText(p,entry);
     if(webglReady){
