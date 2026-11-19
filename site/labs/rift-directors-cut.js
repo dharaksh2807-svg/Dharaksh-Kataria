@@ -11,6 +11,8 @@
   const intro = document.querySelector('.intro');
   const canvas = document.getElementById('riftCanvas');
   const motionButton = document.querySelector('.motion-button');
+  const integrated = !!stage?.closest('.rift-home');
+  const handoff = stage?.querySelector('.rift-handoff');
   const readout = document.getElementById('cameraState');
   if (!stage || !intro || !canvas) return;
 
@@ -20,7 +22,8 @@
   // Side-by-side inspection: ?opening=original restores the previous opening pose and materials.
   const cinematicOpening = params.get('opening') !== 'original';
   let reduced = motionPref.matches;
-  let paused = reduced || motionDisabledByUrl;
+  let globalMuted = integrated && html.classList.contains('motion-off');
+  let paused = reduced || motionDisabledByUrl || globalMuted;
   let inView = true, raf = 0, disposed = false, lastFrame = 0, elapsed = 0;
   let progress = 0, pointerX = 0, pointerY = 0, targetX = 0, targetY = 0;
   let renderer = null, scene = null, camera = null, portal = null;
@@ -40,7 +43,8 @@
     motionButton.disabled = reduced;
     motionButton.textContent = reduced ? 'Reduced motion on' : paused ? 'Resume motion' : 'Pause motion';
     motionButton.setAttribute('aria-pressed',String(paused));
-    html.classList.toggle('motion-off',paused);
+    // The integrated homepage shares the existing global MOTION control.
+    if(!integrated)html.classList.toggle('motion-off',paused);
     html.classList.toggle('reduced-motion',reduced);
   }
   syncButton();
@@ -301,7 +305,7 @@
   function updateText(p,entry){
     const transition=range(p,.73,.96);
     // Keep the complete name present through fracture; dim only during the final fly-through.
-    const vanish=1-.76*range(p,.59,.92);
+    const vanish=1-range(p,.70,.92);
     const substanceIn=range(p,.24,.42);
     const substanceOut=1-range(p,.64,.85);
     const reveal=substanceIn*substanceOut;
@@ -316,9 +320,17 @@
     css('--beam-shift',((p-.3)*280 + Math.sin(elapsed*.0005)*9).toFixed(1)+'px');
     css('--wipe',(transition*164).toFixed(1)+'%');
     // The veil now reveals real content; it must never leave a blank cream frame.
-    css('--wipe-opacity',(.76*range(p,.79,.94)).toFixed(3));
+    css('--wipe-opacity',(.92*range(p,.79,.94)).toFixed(3));
     css('--handoff-alpha',range(p,.79,.93).toFixed(3));
     css('--handoff-shift',((1-range(p,.78,.96))*45).toFixed(2)+'px');
+    if(handoff){
+      const active=p>.79&&!reduced;
+      if(handoff.dataset.active!==String(active)){
+        handoff.dataset.active=String(active);
+        handoff.toggleAttribute('inert',!active);
+        handoff.setAttribute('aria-hidden',String(!active));
+      }
+    }
     css('--mx',pointerX.toFixed(3));css('--my',pointerY.toFixed(3));
     css('--portal-fallback-scale',(1+p*2).toFixed(3));
     css('--portal-fallback-spin',(p*12).toFixed(2)+'deg');
@@ -466,13 +478,19 @@
   stage.addEventListener('pointerleave',()=>{targetX=0;targetY=0;});
   motionButton?.addEventListener('click',()=>{
     if(reduced)return;
+    if(integrated&&globalMuted){document.getElementById('motionSwitch')?.click();return;}
     paused=!paused;syncButton();lastFrame=0;schedule();
   });
   function onMedia(e){
     reduced=e.matches;
-    paused=reduced||motionDisabledByUrl;
+    paused=reduced||motionDisabledByUrl||globalMuted;
     syncButton();lastFrame=0;schedule();
   }
+  if(integrated)document.addEventListener('portfolio:motion',e=>{
+    globalMuted=Boolean(e.detail?.muted);
+    paused=globalMuted||reduced||motionDisabledByUrl;
+    syncButton();lastFrame=0;schedule();
+  });
   if(motionPref.addEventListener)motionPref.addEventListener('change',onMedia);
   else motionPref.addListener(onMedia);
 
