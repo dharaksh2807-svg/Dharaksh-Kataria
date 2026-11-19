@@ -30,12 +30,6 @@
   let reducedChapter=null;
   const mobile=()=>w<760;
   const DPR=()=>Math.min(1.65,window.devicePixelRatio||1);
-  const r=(seed)=>{const x=Math.sin(seed*182.753+71.9)*43758.545;return x-Math.floor(x)};
-  const points=[];
-  for(let a=0;a<15;a++)for(let b=0;b<17;b++){
-    const theta=(a/15)*Math.PI*2,phi=(b/17)*Math.PI;
-    points.push({theta,phi,s:r(a*23+b*7),label:a*17+b});
-  }
   function resize(){
     const rect=sticky.getBoundingClientRect();w=Math.max(100,rect.width);h=Math.max(100,rect.height);dpr=DPR();
     canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
@@ -52,18 +46,8 @@
     for(let y=0;y<h;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
     ctx.globalAlpha=1;
   };
-  function glow(x,y,rad,color,alpha=1){
-    const grd=ctx.createRadialGradient(x,y,0,x,y,rad);
-    grd.addColorStop(0,color);grd.addColorStop(.4,color.replace(/\.[0-9]+\)$/,'.05)'));grd.addColorStop(1,'rgba(0,0,0,0)');ctx.globalAlpha=alpha;ctx.fillStyle=grd;ctx.beginPath();ctx.arc(x,y,rad,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
-  }
   function line(x,y,x2,y2,color,width=1){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x2,y2);ctx.stroke()}
   function circ(x,y,rr,color){ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,rr,0,Math.PI*2);ctx.fill()}
-  function project(x,y,z,rx=0){
-    const cy=Math.cos(rx),sy=Math.sin(rx), zz=z*cy-x*sy,xx=x*cy+z*sy;
-    const f=690,scale=f/(f+zz+500);
-    return {x:w*(mobile()?.67:.73)+xx*scale,y:h*(mobile()?.36:.5)+y*scale,s:scale,z:zz};
-  }
-
   // Six semester clusters, 67 deliberately illustrative nodes. The links are
   // conceptual, not assertions about a production database relationship.
   function sceneKnowledge(t,alpha){
