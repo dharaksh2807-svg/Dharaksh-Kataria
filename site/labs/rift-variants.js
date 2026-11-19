@@ -97,7 +97,7 @@
   // Cinematic entrance passes through the same deterministic state as scrolling.
   artScale*=.89+.11*entry;
   offsetY+=(1-entry)*27;
-  const titleOut=1-smooth(clamp((p-.28)/.53));
+  const reveals=[easeOut(clamp((entry-.02)/.75)),easeOut(clamp((entry-.30)/.66)),easeOut(clamp((entry-.52)/.46))];reveals.forEach((value,i)=>{const key=['first','second','third'][i];set('--reveal-'+key,fmt(value));set('--blur-'+key,fmt((1-value)*(i===1?9:6))+'px');set('--rise-'+key,fmt((1-value)*(i===1?50:28))+'px');});const titleOut=1-smooth(clamp((p-.28)/.53));
   const titleOpacity=clamp(entry*titleOut);
   set('--entry',fmt(entry));set('--scene-opacity',fmt(.55+entry*.45));set('--entry-blur',fmt((1-entry)*14)+'px');set('--ticks-rotation',fmt(-8+orbital*.44)+'deg');set('--stage-progress',fmt(p));set('--scroll',fmt(p));
   set('--camera-x',fmt(offsetX)+'px');set('--camera-y',fmt(offsetY)+'px');
