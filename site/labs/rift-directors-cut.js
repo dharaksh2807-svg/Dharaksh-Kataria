@@ -44,7 +44,8 @@
   let renderer = null, scene = null, camera = null, portal = null;
   let rings = [], fracturePieces = [], lights = {}, envRenderTarget = null;
   let materials = [], geometries = [], textures = [], frameIntervals = [], renderedFrames = 0;
-  let webglReady = false;
+  let webglReady = false, adaptiveLow=false, contextLost=false;
+  let slowFrameCount=0, measuredFrameCount=0;
   const clamp = (v, a=0, b=1) => Math.max(a, Math.min(b,v));
   const smooth = v => { const x=clamp(v); return x*x*(3-2*x); };
   const range = (v,a,b) => smooth((v-a)/(b-a));
@@ -168,7 +169,7 @@
     renderer.toneMappingExposure=cinematicOpening?1.01:1.13;
     renderer.setClearColor(0x000000,0);
     // Deliberately budget real shadow maps to desktop-quality renderers only.
-    const shadowQuality=innerWidth>=960 && params.get('quality')!=='low';
+    const shadowQuality=innerWidth>=960 && params.get('quality')!=='low' && !adaptiveLow;
     renderer.shadowMap.enabled=shadowQuality;
     if(shadowQuality)renderer.shadowMap.type=THREE.PCFSoftShadowMap;
     scene=new THREE.Scene();
@@ -463,7 +464,7 @@
     const rect=stage.getBoundingClientRect();
     const width=Math.max(1,Math.round(rect.width));
     const height=Math.max(1,Math.round(rect.height));
-    const low=params.get('quality')==='low';
+    const low=params.get('quality')==='low'||adaptiveLow;
     const maxDpr=low?1:innerWidth<700?1.25:1.5;
     const pixels=Math.min(devicePixelRatio||1,maxDpr,Math.sqrt(2500000/(width*height)));
     renderer.setPixelRatio(Math.max(.65,pixels));
@@ -471,7 +472,7 @@
     camera.aspect=width/height;
     camera.fov=innerWidth<700?51:42;
     camera.updateProjectionMatrix();
-    const useShadows=innerWidth>=960 && params.get('quality')!=='low';
+    const useShadows=innerWidth>=960 && params.get('quality')!=='low' && !adaptiveLow;
     if(renderer.shadowMap.enabled!==useShadows){
       renderer.shadowMap.enabled=useShadows;
       if(lights.key)lights.key.castShadow=useShadows;
@@ -492,6 +493,20 @@
     const dt=lastFrame?Math.min(60,now-lastFrame):16;
     if(lastFrame&&dt>0&&dt<85){
       frameIntervals.push(dt);if(frameIntervals.length>180)frameIntervals.shift();
+      // A low-cost RAF timing heuristic, not a GPU benchmark. Degrade only
+      // after sustained delivery delays, and never oscillate quality.
+      if(!paused&&!reduced&&webglReady&&!adaptiveLow&&elapsed>2000){
+        measuredFrameCount++;
+        if(dt>29)slowFrameCount++;
+        if(measuredFrameCount>=120){
+          if(slowFrameCount>=48){
+            adaptiveLow=true;
+            resize();
+            if(readout)readout.textContent='LIVE 3D / ADAPTIVE QUALITY';
+          }
+          measuredFrameCount=0;slowFrameCount=0;
+        }
+      }
     }
     lastFrame=now;
     if(!paused&&!reduced)elapsed+=dt;
@@ -502,8 +517,15 @@
     updateText(p,entry);
     if(webglReady){
       animate3D(p,reduced?0:elapsed/1000);
-      renderer.render(scene,camera);
-      renderedFrames++;
+      try{
+        renderer.render(scene,camera);
+        renderedFrames++;
+      }catch(error){
+        webglReady=false;
+        html.classList.remove('webgl-ready');
+        if(readout)readout.textContent='CSS FALLBACK / RENDER ERROR';
+        console.warn('Rift render failed; returning to CSS fallback.',error);
+      }
     }
     if(!paused&&!reduced)schedule();
   }
@@ -567,7 +589,7 @@
   });
 
   window.__riftDirector={
-    getState:()=>({webglReady,reduced,paused,mode,scroll:progress,elapsedMs:elapsed,renderedFrames}),
+    getState:()=>({webglReady,reduced,paused,mode,adaptiveLow,contextLost,scroll:progress,elapsedMs:elapsed,renderedFrames}),
     setMode:next=>selectMode(next,true),
     getFrameStats:()=>{
       const a=[...frameIntervals].sort((x,y)=>x-y),mid=a.length? a[Math.floor(a.length/2)]:null;
@@ -593,6 +615,22 @@
     renderer.render(scene,camera);
     html.classList.add('webgl-ready');
     if(readout)readout.textContent='LIVE THREE.JS / PHYSICAL MATERIALS';
+    canvas.addEventListener('webglcontextlost',event=>{
+      event.preventDefault();
+      contextLost=true;webglReady=false;
+      html.classList.remove('webgl-ready');
+      if(readout)readout.textContent='CSS FALLBACK / CONTEXT LOST';
+      cancelAnimationFrame(raf);raf=0;
+    },{passive:false});
+    canvas.addEventListener('webglcontextrestored',()=>{
+      if(disposed)return;
+      contextLost=false;webglReady=true;
+      resize();lastFrame=0;
+      requestAnimationFrame(()=>{
+        if(!disposed&&!contextLost)html.classList.add('webgl-ready');
+        schedule();
+      });
+    });
   }catch(error){
     if(readout)readout.textContent='CSS FALLBACK / WEBGL UNAVAILABLE';
     console.warn('Rift Director Cut: 3D layer unavailable; retaining approved CSS design.',error);
@@ -610,5 +648,13 @@
       renderer=null;
     }
   }
-  window.addEventListener('pagehide',dispose,{once:true});
+  // A BFCache entry is suspended, not destroyed. Retain the renderer so
+  // browser Back can resume without showing a frozen or blank canvas.
+  window.addEventListener('pagehide',event=>{
+    if(event.persisted){cancelAnimationFrame(raf);raf=0;}
+    else dispose();
+  });
+  window.addEventListener('pageshow',event=>{
+    if(event.persisted&&!disposed){lastFrame=0;schedule();}
+  });
 })();
