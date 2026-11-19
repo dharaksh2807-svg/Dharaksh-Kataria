@@ -181,3 +181,14 @@ html.motion-off .cursor-halo{display:none!important}
 .explore-compass .explore-compass-close{border:0;font-size:17px;padding:6px;color:#c7d2c6}
 @media(max-width:760px){.explore-compass{display:none!important}}
 @media(prefers-reduced-motion:reduce){.explore-compass{transition:none!important}}
+
+
+/* Precision feedback: a short tactile press and a directional navigation cue.
+   The existing v4 ripple provides the click wave; no second burst is added. */
+.rift-home :is(.hero-action,.rift-handoff-link,.bridge-next a,.bridge-next button):active{transform:translateY(1px) scale(.975)}
+.rift-home .bridge-card:active{transform:scale(.987)}
+.site-header .nav-link{position:relative}
+.site-header .nav-link::after{content:'';position:absolute;bottom:-9px;left:0;right:0;height:1px;background:#f0b18b;transform:scaleX(0);transform-origin:right;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.site-header .nav-link:hover::after,.site-header .nav-link:focus-visible::after{transform:scaleX(1);transform-origin:left}
+.site-header :is(.search-trigger,.v6-guide-toggle,.motion-switch):active{transform:translateY(1px) scale(.98)}
+@media(prefers-reduced-motion:reduce){.site-header .nav-link::after{transition:none!important}}
