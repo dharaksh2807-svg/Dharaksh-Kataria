@@ -300,21 +300,25 @@
 
   function updateText(p,entry){
     const transition=range(p,.73,.96);
-    const vanish=1-range(p,.21,.49);
+    // Keep the complete name present through fracture; dim only during the final fly-through.
+    const vanish=1-.76*range(p,.59,.92);
     const substanceIn=range(p,.24,.42);
     const substanceOut=1-range(p,.64,.85);
     const reveal=substanceIn*substanceOut;
     css('--rift-scroll',p.toFixed(4));
     css('--scroll',p.toFixed(4));
-    css('--title-y',(-p*(innerWidth<680?95:135) + (1-entry)*35).toFixed(2)+'px');
+    css('--title-y',(-range(p,.56,.96)*(innerWidth<680?35:60) + (1-entry)*12).toFixed(2)+'px');
     css('--title-opacity',clamp(vanish*entry).toFixed(3));
     css('--title-scale',(1-p*.07).toFixed(3));
-    css('--substance-alpha',(.32*reveal).toFixed(3));
-    css('--substance-scale',(1+p*2.85).toFixed(3));
+    css('--substance-alpha',(.18*reveal).toFixed(3));
+    css('--substance-scale',(1+p*.65).toFixed(3));
     css('--substance-shift',(-p*185).toFixed(1)+'px');
     css('--beam-shift',((p-.3)*280 + Math.sin(elapsed*.0005)*9).toFixed(1)+'px');
     css('--wipe',(transition*164).toFixed(1)+'%');
-    css('--wipe-opacity',clamp(range(p,.79,.92)).toFixed(3));
+    // The veil now reveals real content; it must never leave a blank cream frame.
+    css('--wipe-opacity',(.76*range(p,.79,.94)).toFixed(3));
+    css('--handoff-alpha',range(p,.79,.93).toFixed(3));
+    css('--handoff-shift',((1-range(p,.78,.96))*45).toFixed(2)+'px');
     css('--mx',pointerX.toFixed(3));css('--my',pointerY.toFixed(3));
     css('--portal-fallback-scale',(1+p*2).toFixed(3));
     css('--portal-fallback-spin',(p*12).toFixed(2)+'deg');
