@@ -78,7 +78,7 @@ async function main(){
       check(stages[5].handoffOpacity>.80&&!stages[5].handoffHidden,'Final handoff not visible');
       const links=await page.locator('#riftProjects .bridge-card').count();
       check(links===3,'Expected three real project case-study links');
-      await page.locator('#riftProjects').scrollIntoViewIfNeeded();
+      await page.evaluate(()=>document.getElementById('riftProjects').scrollIntoView({behavior:'instant',block:'start'}));
       await page.waitForTimeout(350);
       await page.screenshot({path:path.join(out,'project-handoff.png')});
       const card=await page.locator('#riftProjects .bridge-card').first().boundingBox();
