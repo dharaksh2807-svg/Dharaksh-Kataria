@@ -98,7 +98,7 @@
 #kioGuide.kio-compact:not(.kio-open) .kio-launch{width:86px;height:112px}
 #kioGuide.kio-compact:not(.kio-open) .kio-person{width:78px;height:93px}
 #kioGuide.kio-compact:not(.kio-open) .kio-launch-label{min-height:24px}
-#kioGuide.kio-open:not(.kio-reduced) .kio-person{
+#kioGuide:not(.kio-reduced) .kio-person{
   animation:kio-float 4.4s ease-in-out infinite;
 }
 #kioGuide:not(.kio-reduced) .kio-figure{
@@ -154,4 +154,8 @@ html.motion-off #kioGuide *:after{animation:none!important}
 html.motion-off .hero-line>span{opacity:1!important;transform:none!important;filter:none!important}
 @media(prefers-reduced-motion:reduce){
  .hero-line>span{opacity:1!important;transform:none!important;filter:none!important}
+}
+
+#kioGuide:not(.kio-reduced) .kio-head{
+  animation:kio-nod 5.4s ease-in-out infinite;
 }
