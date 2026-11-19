@@ -499,6 +499,28 @@ document.addEventListener('portfolio:motion',updateMotion);
 announceDistrict(0);setTour(tour);showRenderer();updateMotion();
 window.portfolioWorld={
   focus:select, reset:()=>$('#worldReset').click(),
+  restore(saved) {
+    if (!saved || !Number.isInteger(saved.selected) || saved.selected < 0 || saved.selected > 3) return false;
+    const c = saved.camera;
+    if (!c || !Array.isArray(c.target) || c.target.length !== 3 || !c.target.every(Number.isFinite)) return false;
+    if (![c.yaw,c.pitch,c.radius].every(Number.isFinite)) return false;
+    if (c.radius < 14 || c.radius > 43 || c.pitch < .27 || c.pitch > 1.28 || Math.abs(c.yaw)>100) return false;
+    setTour(false); overview=false;
+    if (Array.isArray(saved.objects) && saved.objects.length === 4) {
+      [6,7,3,3].forEach((limit,i)=>{
+        const v=saved.objects[i];
+        if (Number.isInteger(v) && v >= 0 && v < limit) objects[i]=v;
+      });
+      uploadGeometry();
+    }
+    announceDistrict(saved.selected);
+    target=[...c.target]; goal=[...c.target];
+    yaw=c.yaw; yawGoal=c.yaw;
+    pitch=c.pitch; pitchGoal=c.pitch;
+    radius=c.radius; radiusGoal=c.radius;
+    updateObject();requestFrame();
+    return true;
+  },
   get state(){return {selected:focused,label:sectors[focused].label,gl:useGL,audio:opts.audio,haptic:opts.haptic,motion:opts.motion,tour,dragging:!!pointer,inView,contextLost,objects:[...objects],camera:{target:[...target],goal:[...goal],yaw,pitch,radius,yawGoal,radiusGoal},performance:performanceState()};}
 };
 })();
