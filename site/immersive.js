@@ -29,7 +29,7 @@
   let pointerX=0,pointerY=0,tarX=0,tarY=0,visibility=false;
   let reducedChapter=null;
   const mobile=()=>w<760;
-  const DPR=()=>Math.min(1.65,window.devicePixelRatio||1);
+  const DPR=()=>Math.min(mobile()?1.35:1.65,window.devicePixelRatio||1);
   function resize(){
     const rect=sticky.getBoundingClientRect();w=Math.max(100,rect.width);h=Math.max(100,rect.height);dpr=DPR();
     canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
