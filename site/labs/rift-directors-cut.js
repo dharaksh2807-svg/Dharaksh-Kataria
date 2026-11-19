@@ -21,6 +21,21 @@
   const motionDisabledByUrl = params.get('motion') === 'off';
   // Side-by-side inspection: ?opening=original restores the previous opening pose and materials.
   const cinematicOpening = params.get('opening') !== 'original';
+  const modeNames=['director','kinetic','fracture','infinite','ascension'];
+  const modeExplanations={
+    director:"Balanced portal choreography · cinematic opening, fracture and camera fly-through.",
+    kinetic:"Precision rotation · nested frames accelerate and settle with engineered timing.",
+    fracture:"Architectural transformation · the front structure opens and reassembles.",
+    infinite:"Depth journey · the camera advances through successive concentric portals.",
+    ascension:"Monumental typography · SUBSTANCE emerges with sweeping directional light."
+  };
+  let mode='director';
+  if(integrated){
+    try {
+      const requested=params.get('rift')||localStorage.getItem('dk-rift-mode')||'director';
+      mode=modeNames.includes(requested)?requested:'director';
+    } catch {}
+  }
   let reduced = motionPref.matches;
   let globalMuted = integrated && html.classList.contains('motion-off');
   let paused = reduced || motionDisabledByUrl || globalMuted;
@@ -38,6 +53,33 @@
   const deg = Math.PI / 180;
 
   html.classList.add('js-active');
+  const modeButtons=integrated?[...stage.querySelectorAll('[data-rift-mode]')]:[];
+  const modeDescription=stage.querySelector('#riftModeDescription');
+  function selectMode(next,save=false){
+    if(!modeNames.includes(next))return;
+    mode=next;
+    if(integrated){
+      stage.dataset.riftMode=mode;
+      modeButtons.forEach(button=>{
+        const active=button.dataset.riftMode===mode;
+        button.classList.toggle('is-active',active);
+        button.setAttribute('aria-pressed',String(active));
+      });
+      if(modeDescription)modeDescription.textContent=modeExplanations[mode];
+      if(save)try{localStorage.setItem('dk-rift-mode',mode);}catch{}
+      lastFrame=0;
+      schedule();
+    }
+  }
+  for(const button of modeButtons){
+    button.addEventListener('click',()=>{
+      selectMode(button.dataset.riftMode,true);
+      // Explicit mode selection returns to the scene start only when user
+      // is already deep into its scroll transition.
+      if(progress>.08)window.scrollTo({top:Math.max(0,window.scrollY+stage.getBoundingClientRect().top),behavior:reduced?'instant':'smooth'});
+    });
+  }
+  selectMode(mode);
   function syncButton(){
     if (!motionButton) return;
     motionButton.disabled = reduced;
@@ -306,15 +348,15 @@
     const transition=range(p,.73,.96);
     // Keep the complete name present through fracture; dim only during the final fly-through.
     const vanish=1-range(p,.70,.92);
-    const substanceIn=range(p,.24,.42);
-    const substanceOut=1-range(p,.64,.85);
+    const substanceIn=range(p,mode==='ascension'?.10:.24,mode==='ascension'?.27:.42);
+    const substanceOut=1-range(p,mode==='ascension'?.77:.64,mode==='ascension'?.94:.85);
     const reveal=substanceIn*substanceOut;
     css('--rift-scroll',p.toFixed(4));
     css('--scroll',p.toFixed(4));
     css('--title-y',(-range(p,.56,.96)*(innerWidth<680?35:60) + (1-entry)*12).toFixed(2)+'px');
     css('--title-opacity',clamp(vanish*entry).toFixed(3));
     css('--title-scale',(1-p*.07).toFixed(3));
-    css('--substance-alpha',(.18*reveal).toFixed(3));
+    css('--substance-alpha',((mode==='ascension'?.33:.18)*reveal).toFixed(3));
     css('--substance-scale',(1+p*.65).toFixed(3));
     css('--substance-shift',(-p*185).toFixed(1)+'px');
     css('--beam-shift',((p-.3)*280 + Math.sin(elapsed*.0005)*9).toFixed(1)+'px');
@@ -340,9 +382,11 @@
 
   function animate3D(p,t){
     if(!webglReady||!scene||!camera||!portal)return;
-    const twist=pulse(p,.14,.34,.56);
-    const fracture=pulse(p,.37,.51,.65);
-    const travel=range(p,.60,.96);
+    const twist=pulse(p,.14,.34,.56)*(mode==='kinetic'?1.22:mode==='infinite'?.73:1);
+    const fracture=pulse(p,mode==='fracture'?.26:.37,mode==='fracture'?.48:.51,mode==='fracture'?.77:.65)*(mode==='fracture'?1.35:mode==='kinetic'?.18:mode==='infinite'?.12:1);
+    const travel=range(p,mode==='infinite'?.38:.60,mode==='infinite'?.98:.96);
+    const kinetic=mode==='kinetic'?1:0;
+    const ascension=mode==='ascension'?1:0;
     const introEase=1-Math.pow(1-clamp(t/1.4),3);
     const drift=Math.sin(t*.34)*.009;
     const slowMove=paused||reduced?0:Math.sin(t*.28)*.035;
@@ -357,14 +401,16 @@
 
     for(let i=0;i<rings.length;i++){
       const node=rings[i],layer=node.group;
-      const spinClockwise=(i*.035 + p*(.12+i*.07) + twist*(i*.082));
+      const rotationMultiplier=mode==='kinetic'?2.2:mode==='ascension'?1.3:mode==='infinite'?1.55:1;
+      const lag=mode==='kinetic'?range(p,Math.min(.25,i*.012),Math.min(.88,.51+i*.025)):1;
+      const spinClockwise=i*.035 + p*(.12+i*.07)*rotationMultiplier*lag + twist*(i*.082)*(1+kinetic*.45);
       layer.rotation.z=-spinClockwise - openingPose*(.19+.045*Math.sin(i*.82)) + drift*.3;
-      layer.rotation.y=-.035 + twist*(i%2?-.17:.13);
+      layer.rotation.y=-.035 + twist*(i%2?-.17:.13) + ascension*(i%2?-.09:.07)*range(p,.22,.63);
       layer.rotation.x=twist*(i*.014)+(i%2?1:-1)*slowMove*.25;
       const squeeze=1-twist*(.13+.02*i);
-      const sc=node.baseScale*squeeze*(1+.028*Math.sin(t*.23+i*.62));
+      const sc=node.baseScale*squeeze*(1+.028*Math.sin(t*.23+i*.62))*(1+(mode==='infinite'?.095:0)*range(p,.35,.72));
       layer.scale.set(sc,sc,sc);
-      layer.position.z=-i*(cinematicOpening?.86:.72) - twist*(i*.13) - p*.32;
+      layer.position.z=-i*(cinematicOpening?.86:.72)*(1+(mode==='infinite'?.37:0)*range(p,.30,.77)) - twist*(i*.13) - p*.32;
       // Slightly misregister the back layers on the opening shot for a sculptural
       // architectural silhouette; all offsets converge into the proven timeline.
       layer.position.x=openingPose*(Math.sin(i*.79)*.075+i*.021);
@@ -377,9 +423,9 @@
       const directionX=(i===1?1:i===3?-1:i===0?.28:-.28);
       const directionY=(i===0?1:i===2?-1:i===1?.18:-.18);
       mesh.position.set(
-        base[0]+fracture*directionX*.64,
-        base[1]+fracture*directionY*.59,
-        .35 + fracture*(i%2===0?1.25:-.95)
+        base[0]+fracture*directionX*(mode==='fracture'?1.05:.64),
+        base[1]+fracture*directionY*(mode==='fracture'?.92:.59),
+        .35 + fracture*(i%2===0?1.25:-.95)*(mode==='fracture'?1.45:1)
       );
       mesh.rotation.z=base[2]+fracture*(i%2===0?-.23:.23);
       mesh.rotation.y=fracture*(i%2===0?.21:-.22);
@@ -391,20 +437,20 @@
     camera.position.set(
       cx*travel+pointerX*.06*(1-travel)-openingPose*.44,
       -.05+pointerY*.05*(1-travel)+Math.sin(t*.32)*.018+openingPose*.12,
-      10.6-travel*17.5 - (1-introEase)*.7
+      10.6-travel*(mode==='infinite'?20.9:17.5) - (1-introEase)*.7
     );
     camera.lookAt(aimX+openingPose*.14,openingPose*.05,-13);
-    camera.rotateZ(-travel*.105 - twist*.014);
+    camera.rotateZ(-travel*(mode==='infinite'?.28:mode==='ascension'?.17:.105) - twist*.014);
     portal.rotation.y=-.05+pointerX*.042*(1-travel)+twist*.045;
     portal.rotation.x=pointerY*.026*(1-travel);
     portal.position.x=cx;
     const sweep=t*.34+p*7;
     lights.sweep.position.set(2.0+Math.sin(sweep)*4,1.5+Math.cos(sweep*.74)*2.5,6-p*3);
-    lights.sweep.intensity=(cinematicOpening?43:35)+twist*22+fracture*15;
+    lights.sweep.intensity=(cinematicOpening?43:35)+twist*22+fracture*15+ascension*18*range(p,.12,.75);
     lights.key.position.x=3.5+pointerX*.7+Math.sin(sweep*.3)*1.1;
     lights.core.opacity=(cinematicOpening?.84:.5)+fracture*.26+travel*.18;
     if(animObjects.wordMat){
-      animObjects.wordMat.opacity=.67*range(p,.31,.48)*(1-range(p,.91,.98));
+      animObjects.wordMat.opacity=(mode==='ascension'?.85:.67)*range(p,mode==='ascension'?.18:.31,mode==='ascension'?.38:.48)*(1-range(p,.91,.98));
     }
     renderer.toneMappingExposure=(cinematicOpening?(1.01+openingPose*.06):1.13)+range(p,.80,.96)*.24;
   }
@@ -518,7 +564,8 @@
   });
 
   window.__riftDirector={
-    getState:()=>({webglReady,reduced,paused,scroll:progress,elapsedMs:elapsed,renderedFrames}),
+    getState:()=>({webglReady,reduced,paused,mode,scroll:progress,elapsedMs:elapsed,renderedFrames}),
+    setMode:next=>selectMode(next,true),
     getFrameStats:()=>{
       const a=[...frameIntervals].sort((x,y)=>x-y),mid=a.length? a[Math.floor(a.length/2)]:null;
       return {count:a.length,medianRafMs:mid,p95RafMs:a.length?a[Math.ceil(a.length*.95)-1]:null,
