@@ -198,6 +198,29 @@
       fracturePieces.push({mesh:piece,base:positions[i],material:mat});
     }
 
+    // The word also exists inside real scene depth, so the camera can pass its plane.
+    // The HTML ghost version is an art-direction layer; this plane is depth-tested geometry.
+    const wordCanvas=document.createElement('canvas');
+    wordCanvas.width=2048;wordCanvas.height=256;
+    const wordCtx=wordCanvas.getContext('2d');
+    wordCtx.clearRect(0,0,2048,256);
+    wordCtx.textAlign='center';wordCtx.textBaseline='middle';
+    wordCtx.font='700 210px Arial, sans-serif';
+    wordCtx.strokeStyle='rgba(255,235,204,.68)';wordCtx.lineWidth=3;
+    wordCtx.shadowColor='rgba(234,147,84,.55)';wordCtx.shadowBlur=23;
+    wordCtx.strokeText('SUBSTANCE',1024,136,1990);
+    wordCtx.shadowBlur=0;
+    wordCtx.fillStyle='rgba(245,201,163,.30)';
+    wordCtx.fillText('SUBSTANCE',1024,136,1990);
+    const wordTexture=new THREE.CanvasTexture(wordCanvas);
+    wordTexture.colorSpace=THREE.SRGBColorSpace;textures.push(wordTexture);
+    const wordMat=new THREE.MeshBasicMaterial({map:wordTexture,transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide,toneMapped:false});
+    materials.push(wordMat);
+    const wordGeo=new THREE.PlaneGeometry(7.6,.97);geometries.push(wordGeo);
+    const wordPlane=new THREE.Mesh(wordGeo,wordMat);
+    wordPlane.position.set(0,0,-4.7);
+    group.add(wordPlane);
+    animObjects.wordMat=wordMat;
     // Atmosphere is physical scene light and a rear glow plane, not full-screen fake bloom.
     const glowCanvas=document.createElement('canvas');glowCanvas.width=256;glowCanvas.height=256;
     const ctx=glowCanvas.getContext('2d');
@@ -336,6 +359,9 @@
     lights.sweep.intensity=35+twist*22+fracture*15;
     lights.key.position.x=3.5+pointerX*.7+Math.sin(sweep*.3)*1.1;
     lights.core.opacity=.5+fracture*.26+travel*.25;
+    if(animObjects.wordMat){
+      animObjects.wordMat.opacity=.67*range(p,.31,.48)*(1-range(p,.91,.98));
+    }
     renderer.toneMappingExposure=1.13+range(p,.80,.96)*.24;
   }
 
