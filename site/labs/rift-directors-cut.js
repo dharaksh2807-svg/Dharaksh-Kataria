@@ -392,6 +392,16 @@
     camera.aspect=width/height;
     camera.fov=innerWidth<700?51:42;
     camera.updateProjectionMatrix();
+    const useShadows=innerWidth>=960 && params.get('quality')!=='low';
+    if(renderer.shadowMap.enabled!==useShadows){
+      renderer.shadowMap.enabled=useShadows;
+      if(lights.key)lights.key.castShadow=useShadows;
+      for(const ring of rings){
+        ring.frame.castShadow=useShadows;
+        ring.frame.receiveShadow=useShadows;
+      }
+      renderer.shadowMap.needsUpdate=true;
+    }
     // Bring the portal up and nearer the center on mobile to keep text clear.
     if(portal)portal.position.y=innerWidth<700?1.58:0.03;
     if(portal)portal.scale.setScalar(innerWidth<700?.69:1);
