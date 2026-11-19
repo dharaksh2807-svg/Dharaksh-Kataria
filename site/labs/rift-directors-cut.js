@@ -55,6 +55,7 @@
   html.classList.add('js-active');
   const modeButtons=integrated?[...stage.querySelectorAll('[data-rift-mode]')]:[];
   const modeDescription=stage.querySelector('#riftModeDescription');
+  const mobileModeSelect=stage.querySelector('#riftModeSelect');
   function selectMode(next,save=false){
     if(!modeNames.includes(next))return;
     mode=next;
@@ -66,6 +67,7 @@
         button.setAttribute('aria-pressed',String(active));
       });
       if(modeDescription)modeDescription.textContent=modeExplanations[mode];
+      if(mobileModeSelect)mobileModeSelect.value=mode;
       if(save)try{localStorage.setItem('dk-rift-mode',mode);}catch{}
       lastFrame=0;
       schedule();
@@ -79,6 +81,7 @@
       if(progress>.08)window.scrollTo({top:Math.max(0,window.scrollY+stage.getBoundingClientRect().top),behavior:reduced?'instant':'smooth'});
     });
   }
+  mobileModeSelect?.addEventListener('change',()=>selectMode(mobileModeSelect.value,true));
   selectMode(mode);
   function syncButton(){
     if (!motionButton) return;
