@@ -63,38 +63,72 @@
     const f=690,scale=f/(f+zz+500);
     return {x:w*(mobile()?.67:.73)+xx*scale,y:h*(mobile()?.36:.5)+y*scale,s:scale,z:zz};
   }
+
+  // Six semester clusters, 67 deliberately illustrative nodes. The links are
+  // conceptual, not assertions about a production database relationship.
   function sceneKnowledge(t,alpha){
-    if(alpha<=.004)return;ctx.save();ctx.globalAlpha=alpha;
-    const centerX=w*(mobile()?.67:.73),centerY=h*(mobile()?.36:.5);
-    const scale=mobile()?.67:1;
-    glow(centerX,centerY,Math.min(w,h)*.61,'rgba(206,115,79,.25)',alpha);
-    const rot=t*.12+pointerX*.38, tilt=pointerY*.2;
-    const view=[];
-    points.forEach((p,i)=>{
-      const th=p.theta+rot,ph=p.phi+t*.032;
-      let x=Math.sin(ph)*Math.cos(th)*285*scale;
-      let y=Math.cos(ph)*275*scale;
-      let z=Math.sin(ph)*Math.sin(th)*280*scale;
-      const xt=x*Math.cos(tilt)+z*Math.sin(tilt),zt=z*Math.cos(tilt)-x*Math.sin(tilt);
-      const pos=project(xt,y,zt);view[i]={...pos,near:z>0};
+    if(alpha<=.004)return;
+    ctx.save();ctx.globalAlpha=alpha;
+    const cx=w*(mobile()?.70:.735),cy=h*(mobile()?.37:.49);
+    const spread=Math.min(w*(mobile()?.78:.46),650),height=Math.min(h*.57,490);
+    const parallaxX=pointerX*(mobile()?5:15),parallaxY=pointerY*(mobile()?4:12);
+    const groupR=Math.min(spread*.125,mobile()?24:65);
+    const clusters=Array.from({length:6},(_,i)=>({
+      x:cx+(i%3-1)*spread*.32+parallaxX*(i%2?.6:1.1),
+      y:cy+(Math.floor(i/3)-.5)*height*.67+parallaxY*(i%3?.6:1),
+      depth:.85+.07*(i%3),count:i===5?12:11
+    }));
+    // Deliberate backplate and six radial depth cues.
+    const aura=ctx.createRadialGradient(cx,cy,10,cx,cy,spread*.78);
+    aura.addColorStop(0,'rgba(83,132,105,.16)');
+    aura.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=aura;ctx.fillRect(cx-spread*.8,cy-height*.8,spread*1.6,height*1.6);
+    ctx.strokeStyle='rgba(170,205,174,.12)';ctx.lineWidth=1;
+    ctx.strokeRect(cx-spread*.53,cy-height*.51,spread*1.06,height*1.02);
+    // Multiple semantically illustrative information pathways; trace with moving light.
+    const links=[[0,1],[1,2],[3,4],[4,5],[0,3],[1,4],[2,5],[0,4],[1,5]];
+    links.forEach(([a,b],i)=>{
+      const u=clusters[a],v=clusters[b],bend=((i%3)-1)*28;
+      ctx.strokeStyle='rgba(155,188,156,.23)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(u.x,u.y);
+      ctx.bezierCurveTo(u.x+(v.x-u.x)*.40,u.y+bend,v.x-(v.x-u.x)*.4,v.y-bend,v.x,v.y);
+      ctx.stroke();
+      const speed=(t*.11+i*.09)%1;
+      const point=1-speed,dx=v.x-u.x,dy=v.y-u.y;
+      const bx=u.x+dx*point,by=u.y+dy*point+Math.sin(point*Math.PI)*bend*.40;
+      const beat=ctx.createRadialGradient(bx,by,0,bx,by,10);
+      beat.addColorStop(0,'rgba(243,183,130,.68)');
+      beat.addColorStop(1,'rgba(243,183,130,0)');
+      ctx.fillStyle=beat;ctx.fillRect(bx-10,by-10,20,20);
     });
-    ctx.lineWidth=.7;
-    view.forEach((p,i)=>{
-      if(i%17!==16){const q=view[i+1];line(p.x,p.y,q.x,q.y,'rgba(143,185,158,.19)')}
-      if(i<view.length-17){const q=view[i+17];line(p.x,p.y,q.x,q.y,'rgba(143,185,158,.23)')}
+    clusters.forEach((g,i)=>{
+      const radius=groupR*(.92+.08*g.depth),ringStart=-Math.PI/2;
+      const glowRing=ctx.createRadialGradient(g.x,g.y,3,g.x,g.y,radius*1.6);
+      glowRing.addColorStop(0,'rgba(141,187,152,.18)');
+      glowRing.addColorStop(1,'rgba(141,187,152,0)');
+      ctx.fillStyle=glowRing;ctx.beginPath();ctx.arc(g.x,g.y,radius*1.6,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='rgba(175,212,184,.35)';ctx.lineWidth=1.3;
+      ctx.beginPath();ctx.arc(g.x,g.y,radius,0,Math.PI*2);ctx.stroke();
+      ctx.strokeStyle='rgba(203,156,118,.42)';
+      ctx.beginPath();ctx.arc(g.x,g.y,radius+5,ringStart+t*.14+i*.5,ringStart+t*.14+i*.5+Math.PI*.44);ctx.stroke();
+      const base=g.count;
+      for(let j=0;j<base;j++){
+        const band=j%3===0?.64:1.0;
+        const angle=ringStart+j*Math.PI*2/base+(t*.025)*(i%2?-1:1);
+        const x=g.x+Math.cos(angle)*radius*band,y=g.y+Math.sin(angle)*radius*.73*band;
+        const lit=(Math.floor(t*.72+i*2)%base)===j;
+        const scale=lit?2.75:Math.max(1.3,radius*.033);
+        circ(x,y,scale,lit?'#f4ba8f':'#9ebfab');
+        if(lit){ctx.strokeStyle='rgba(244,186,143,.52)';ctx.beginPath();ctx.arc(x,y,scale*2.9,0,Math.PI*2);ctx.stroke();}
+      }
+      ctx.fillStyle='#d6dfd0';ctx.font=(mobile()?'10':'12')+'px monospace';ctx.textAlign='center';
+      ctx.fillText('S'+String(i+1).padStart(2,'0'),g.x,g.y+4);
+      ctx.textAlign='start';
     });
-    view.forEach((p,i)=>{
-      const bright=(i%17===0||i%13===0);const pulse=.5+.5*Math.sin(t*1.4+i*.28);
-      circ(p.x,p.y,(bright?2.3:1.1)*p.s,'rgba(230,169,122,'+(bright?.55+.42*pulse:.2)+')');
-    });
-    const ticks=12;
-    ctx.save();ctx.translate(centerX,centerY);ctx.rotate(.22+t*.025);ctx.strokeStyle='rgba(239,163,112,.2)';ctx.lineWidth=1;
-    for(let rr=150*scale;rr<350*scale;rr+=110*scale){ctx.beginPath();ctx.ellipse(0,0,rr,rr*.39,0,0,Math.PI*2);ctx.stroke()}
-    for(let j=0;j<ticks;j++){const a=j*Math.PI*2/ticks;line(Math.cos(a)*350*scale,Math.sin(a)*350*scale*.39,Math.cos(a)*365*scale,Math.sin(a)*365*scale*.39,'rgba(235,175,126,.3)')}
-    ctx.restore();
-    // Engineered labels, rendered as annotations rather than fabricated product content.
-    ctx.font='10px monospace';ctx.fillStyle='rgba(197,214,195,.7)';
-    if(w>850){ctx.fillText('CURRICULUM / 06 SEMESTERS',centerX-176*scale,centerY-235*scale);ctx.fillText('SUBJECT / KNOWLEDGE GRAPH',centerX+100*scale,centerY+210*scale)}
+    ctx.fillStyle='#c5d3c3';ctx.font=(mobile()?'8':'10')+'px monospace';
+    ctx.fillText('06 SEMESTERS / 67 SUBJECTS',cx-spread*.52,cy-height*.54);
+    ctx.fillStyle='#d9a889';
+    ctx.fillText('CONCEPTUAL NETWORK · ILLUSTRATIVE LINKS',cx-spread*.52,cy+height*.57);
     ctx.restore();
   }
   function sceneMemory(t,alpha){
