@@ -20,10 +20,12 @@ const server=http.createServer((req,res)=>{
  const origin='http://127.0.0.1:'+server.address().port;
  const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH||undefined});
  const findings=[],failures=[];
- async function capture(name,width,motion,chapter){
+ async function capture(name,width,motion,chapter,forceFallback=false){
   const page=await browser.newPage({viewport:{width,height:900},reducedMotion:motion,deviceScaleFactor:1});
   const errors=[];page.on('pageerror',error=>errors.push(error.message));
+  page.on('console',message=>{if(/Sculpture shader unavailable|Sculpture unavailable/.test(message.text()))errors.push(message.text())});
   await page.route('**/*',route=>route.request().url().startsWith(origin)?route.continue():route.abort());
+  if(forceFallback){await page.addInitScript(()=>{const orig=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(type,...rest){if(this.id==='sculptureCanvas'&&type==='webgl2')return null;return orig.call(this,type,...rest)}})}
   try{
    await page.goto(origin,{waitUntil:'domcontentloaded'});
    await page.locator('#introCurtain').waitFor({state:'hidden',timeout:8000}).catch(()=>{});
@@ -63,6 +65,7 @@ const server=http.createServer((req,res)=>{
   for(let i=0;i<3;i++)await capture('journey-'+['knowledge','memory','metro'][i],1440,'reduce',i);
   await capture('journey-metro-mobile',390,'reduce',2);
   await capture('hero-reduced-motion',1440,'reduce');
+  await capture('hero-2d-fallback',1440,'reduce',undefined,true);
   await capture('journey-knowledge-mobile',390,'reduce',0);
  }finally{
   await browser.close();await new Promise(resolve=>server.close(resolve));
