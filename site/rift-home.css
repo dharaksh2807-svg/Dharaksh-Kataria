@@ -255,3 +255,23 @@ html.motion-off .rift-home .rift-handoff,
 html.motion-off .rift-home .substance-ghost{display:none!important}
 html.motion-off .rift-home .bridge-card{opacity:1!important;transform:none!important}
 html.motion-off .rift-home .rift-mode-switcher{display:none!important}
+
+
+/* V9.5 — no blank transition frames; real project navigation remains on screen. */
+.rift-home .intro{height:205svh}
+.rift-home .rift-handoff{z-index:31;visibility:visible}
+.rift-home .transition-veil{background:radial-gradient(circle at 70% 52%,#fff5de 0%,#eae7df 43%,#eae7df 100%)}
+.rift-home .rift-handoff[data-active="true"]{pointer-events:auto}
+.rift-home .rift-handoff[data-active="true"] .rift-handoff-link{pointer-events:auto}
+.rift-home .rift-handoff-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
+.rift-home .rift-handoff-links a{display:inline-flex;align-items:center;padding:8px 12px;border:1px solid #4963567a;border-radius:20px;background:#e9e8de;color:#1e352a;font:500 10px var(--font-mono);text-decoration:none;pointer-events:auto}
+.rift-home .rift-handoff-links a:hover,.rift-home .rift-handoff-links a:focus-visible{background:#20362a;color:#fff}
+@media(max-width:760px){
+.rift-home .intro{height:185svh}
+.rift-home .rift-handoff{bottom:95px}
+.rift-home .rift-handoff-links a{padding:7px 10px;font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){
+.rift-home .intro{height:auto!important}
+.rift-home .rift-handoff{display:none!important}
+}
