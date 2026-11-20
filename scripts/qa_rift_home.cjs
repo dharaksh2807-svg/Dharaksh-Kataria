@@ -94,6 +94,7 @@ async function main(){
       }
       check(stages[2].titleOpacity>.90,'Name faded too early during the fracture');
       check(stages[3].titleOpacity>.90,'Name should remain readable until late transition');
+      check(stages[4].titleOpacity>.90,'Name disappears before the final 18% of scroll');
       check(stages[5].handoffOpacity>.80&&!stages[5].handoffHidden,'Final handoff not visible');
       const links=await page.locator('#riftProjects .bridge-card').count();
       check(links===3,'Expected three real project case-study links');
@@ -142,6 +143,43 @@ async function main(){
       check(state.titleOpacity>.99,'Reduced-motion title invisible');
       report.checks.reduced=state;
     }finally{await reduced.close();}
+    // Standalone Director's Cut must not terminate on an empty cream frame.
+    const labContext=await browser.newContext({viewport:{width:1440,height:900}});
+    try{
+      const lab=await labContext.newPage();
+      const labUrl=new URL('labs/rift-directors-cut.html',url).href;
+      const response=await lab.goto(labUrl,{waitUntil:'domcontentloaded',timeout:20000});
+      check(response?.status()===200,'Director Cut lab unavailable');
+      await lab.waitForFunction(()=>!!window.__riftDirector,{timeout:15000});
+      await lab.waitForTimeout(1200);
+      await lab.evaluate(()=>{
+        const intro=document.querySelector('.intro');
+        window.scrollTo({top:intro.offsetHeight-innerHeight,behavior:'instant'});
+      });
+      await lab.waitForTimeout(320);
+      const labResult=await lab.evaluate(()=>{
+        const stage=document.querySelector('.stage'),handoff=stage.querySelector('.rift-handoff');
+        const heading=handoff.querySelector('h2');
+        const r=heading.getBoundingClientRect();
+        const h=stage.getBoundingClientRect();
+        return {scroll:window.__riftDirector.getState().scroll,
+          opacity:Number(getComputedStyle(handoff).opacity),
+          titleOpacity:Number(getComputedStyle(stage.querySelector('.title-wrap')).opacity),
+          active:!handoff.inert,
+          headingVisible:r.bottom>0&&r.top<innerHeight&&r.width>50,
+          sticky:getComputedStyle(stage).position,
+          stageVisible:h.bottom>0&&h.top<innerHeight,
+          shortcuts:handoff.querySelectorAll('.rift-handoff-links a').length};
+      });
+      await lab.screenshot({path:path.join(out,'standalone-final-handoff.png')});
+      check(labResult.scroll>.97,'Standalone scroll never reached the final transition');
+      check(labResult.stageVisible&&labResult.sticky==='sticky','Standalone portal is not pinned through transition');
+      check(labResult.opacity>.95&&labResult.active&&labResult.headingVisible,'Standalone handoff is missing: empty cream frame regression');
+      check(labResult.shortcuts===3,'Standalone final frame must have real project shortcuts');
+      report.checks.standaloneHandoff=labResult;
+      await lab.locator('#discover').scrollIntoViewIfNeeded();
+      await lab.screenshot({path:path.join(out,'standalone-projects.png')});
+    }finally{await labContext.close();}
     if(!report.checks.desktop.stages[0].motion.webglReady)
       report.warnings.push('WebGL did not initialize: visual review must use the CSS fallback, not claim 3D success.');
   }finally{await browser.close();}
