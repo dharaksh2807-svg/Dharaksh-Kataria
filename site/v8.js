@@ -160,6 +160,11 @@
     });
     grid?.addEventListener("pointerover", (event) => {
       const card = event.target.closest(".project-card");
+      // Browser pointerover can fire when keyboard focus scrolls a different
+      // card underneath the stationary cursor. Preserve the focused card's
+      // explanation until the user intentionally moves the pointer.
+      const focusedCard = document.activeElement?.closest?.(".project-card");
+      if (focusedCard && focusedCard !== card) return;
       if (card && !card.contains(event.relatedTarget))
         document.dispatchEvent(
           new CustomEvent("portfolio:project-hover", {
