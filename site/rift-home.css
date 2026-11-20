@@ -275,3 +275,9 @@ html.motion-off .rift-home .rift-mode-switcher{display:none!important}
 .rift-home .intro{height:auto!important}
 .rift-home .rift-handoff{display:none!important}
 }
+
+
+/* V9.6 — retire opening controls before the work reveal; never overlay CTA links. */
+.rift-home .rift-mode-switcher,.rift-home .bottom-bar,.rift-home .side-readout,.rift-home .float-annotation{transition:opacity .22s ease,visibility .22s ease}
+.rift-home .rift-stage.rift-ending :is(.rift-mode-switcher,.bottom-bar,.side-readout,.float-annotation){opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+@media(prefers-reduced-motion:reduce){.rift-home .rift-mode-switcher,.rift-home .bottom-bar{transition:none!important}}
