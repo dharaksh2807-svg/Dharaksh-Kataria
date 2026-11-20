@@ -22,8 +22,8 @@ await new Promise(resolve=>server.listen(0,"127.0.0.1",resolve));
 const origin="http://127.0.0.1:"+server.address().port;
 const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH||undefined});
 const slugs=["srmedu","projectmatch","kv","metro","oodp","fairshift","regula","alarm","toll","revalue","postpro","micchami"];
-async function pageFor(width=1440) {
-  const page=await browser.newPage({viewport:{width,height:900},reducedMotion:"reduce"});
+async function pageFor(width=1440, motion="reduce") {
+  const page=await browser.newPage({viewport:{width,height:900},reducedMotion:motion});
   page.errors=[];
   page.on("pageerror",e=>page.errors.push(e.message));
   await page.route("**/*",route=>route.request().url().startsWith(origin)?route.continue():route.abort());
@@ -34,6 +34,56 @@ async function test(name,fn){
  catch(err){tests.push({name,result:"FAIL",error:err.message});failures.push(name+": "+err.message);console.error("FAIL",name,err.message)}
 }
 try {
+  await test("Homepage displays full name and visible companion",async()=>{
+    const page=await pageFor(1440);
+    try{
+      await page.goto(origin+"/");
+      assert.match(await page.locator("#heroTitle").innerText(),/Dharaksh\s+Kataria\./);
+      assert.equal(await page.locator("#kioLaunch").isVisible(),true);
+      const layout=await page.locator("#kioGuide").evaluate(node=>({
+        position:getComputedStyle(node).position,
+        display:getComputedStyle(node).display
+      }));
+      assert.equal(layout.position,"fixed");
+      assert.notEqual(layout.display,"none");
+      assert.deepEqual(page.errors,[]);
+    }finally{await page.close()}
+  });
+  await test("Kio animates when enabled and respects reduced motion",async()=>{
+    const normal=await pageFor(1440,"no-preference");
+    try {
+      await normal.goto(origin+"/");
+      await normal.waitForSelector("#kioGuide");
+      const live=await normal.locator("#kioGuide .kio-person").evaluate(
+        node=>getComputedStyle(node).animationName
+      );
+      assert.match(live,/kio-float/);
+      assert.equal(await normal.locator("#kioLaunch").isVisible(),true);
+    }finally{await normal.close()}
+    const reduced=await pageFor(1440,"reduce");
+    try{
+      await reduced.goto(origin+"/");
+      await reduced.waitForSelector("#kioGuide");
+      const dormant=await reduced.locator("#kioGuide .kio-person").evaluate(
+        node=>getComputedStyle(node).animationName
+      );
+      assert.equal(dormant,"none");
+    }finally{await reduced.close()}
+  });
+  await test("World cards open their stories and keep focus controls independent",async()=>{
+    const page=await pageFor(390);
+    try{
+      await page.goto(origin+"/");
+      assert.equal(await page.locator("#worldProjects a").count(),4);
+      await page.locator('[data-world-sector="1"]').click();
+      assert.equal(await page.evaluate(()=>portfolioWorld.state.selected),1);
+      await page.locator('#worldProjects .world-sector-story[href="projects/projectmatch.html"]').click();
+      await page.waitForURL("**/projects/projectmatch.html");
+      assert.equal(await page.locator(".cp-chapters-back").count(),1);
+      assert.equal(await page.locator(".cp-chapters-back").getAttribute("href"),"../index.html#universe");
+      assert.deepEqual(page.errors,[]);
+    }finally{await page.close()}
+  });
   for(const slug of slugs) {
     await test("Case chapters "+slug,async()=>{
       const page=await pageFor(390);

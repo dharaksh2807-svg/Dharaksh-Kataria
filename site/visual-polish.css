@@ -1,0 +1,170 @@
+/* Targeted usability and art-direction fixes for V8; loaded after the original styles. */
+
+/* Brand: the owner's full name is the primary first-screen identity. */
+.hero h1.hero-name {
+  font-size:clamp(67px,7.0vw,118px);
+  line-height:.94;
+  letter-spacing:-.072em;
+  max-width:min(1050px,100%);
+  white-space:normal;
+}
+.hero h1.hero-name .hero-line{white-space:normal}
+.hero h1.hero-name .hero-line span{max-width:100%}
+.hero-name .hero-endmark{color:#e1b797}
+.hero-signature-line{
+  font-family:'Instrument Serif',Georgia,serif;
+  color:#d9e3d5;
+  font-size:clamp(22px,2.35vw,34px);
+  line-height:1.2;
+  letter-spacing:-.02em;
+  margin:26px 0 0;
+}
+.hero-signature-line em{font-style:italic;color:#dfa789}
+.hero-copy .hero-lead{margin-top:22px}
+@media(max-width:760px){
+  .hero h1.hero-name{font-size:clamp(48px,10vw,78px)}
+  .hero-signature-line{font-size:clamp(21px,5.3vw,30px)}
+}
+@media(max-width:400px){.hero h1.hero-name{font-size:clamp(45px,10.5vw,55px)}}
+
+/* A district has two distinct actions: an obvious full-surface story link
+   and a dedicated focus control, never a nested button inside a link. */
+.world-district-list{min-width:0}
+.world-sector-tile{
+  position:relative;display:flex;flex-direction:column;min-width:0;
+  border-right:1px solid #344a40;border-bottom:1px solid #344a40;
+  background:transparent;
+  transition:background .22s,border-color .22s;
+}
+.world-sector-tile:hover,.world-sector-tile:focus-within{
+  background:linear-gradient(125deg,rgba(146,176,147,.13),rgba(204,131,98,.09));
+  border-color:#7b967e;
+}
+.world-sector-story{
+  display:flex;flex-direction:column;justify-content:space-between;
+  flex:1;min-height:118px;padding:19px clamp(15px,2vw,27px) 8px;
+  gap:13px;color:#e2e9df;text-decoration:none;
+}
+.world-sector-story span:first-child{font:9px 'DM Mono',monospace;color:#dda584;letter-spacing:.12em}
+.world-sector-story strong{font-size:clamp(14px,1.35vw,18px);font-weight:500;line-height:1.3}
+.world-sector-story small{
+  width:fit-content;font:10px 'DM Mono',monospace;color:#f2c6a9;
+  letter-spacing:.03em;line-height:1.6;border-bottom:1px solid #c89779;
+  padding-bottom:5px;
+}
+.world-sector-story:hover small{color:#fff2e6;border-color:#fff2e6}
+.world-sector-tile .world-sector{
+  align-self:flex-start;display:inline-flex;align-items:center;gap:9px;
+  min-height:36px;margin:4px clamp(15px,2vw,27px) 13px;padding:7px 12px;
+  background:transparent;border:1px solid #607568;border-radius:999px;
+  font:9px 'DM Mono',monospace;letter-spacing:.075em;
+  color:#bfd2c1;transition:background .2s,border-color .2s;
+}
+.world-sector-tile .world-sector:hover,
+.world-sector-tile .world-sector.is-active{background:#294f3c;border-color:#c7a286;color:#f8e5d4}
+.world-sector-tile .world-sector:active{transform:none}
+.world-sector-story:focus-visible,.world-sector-tile .world-sector:focus-visible{
+  outline:3px solid #e9b18d;outline-offset:-2px;
+}
+.world-project-links{display:none!important}
+@media(max-width:760px){
+  .world-sector-story{min-height:108px;padding:14px 13px 8px;gap:8px}
+  .world-sector-story strong{font-size:14px}
+  .world-sector-story small{font-size:9px}
+  .world-sector-tile .world-sector{margin:4px 13px 12px;padding:7px 10px;min-height:37px}
+}
+@media(max-width:420px){
+  .world-sector-story{min-height:116px}
+  .world-sector-story strong{overflow-wrap:anywhere}
+  .world-sector-story small{font-size:8px}
+}
+
+/* Kio: closed panel is an unobtrusive floating character instead of invisible.
+   Opening the guide retains the existing inline, accessible two-column layout. */
+#kioGuide.kio-shell:not(.kio-open):not(.kio-suppressed){
+  display:block;position:fixed;z-index:83;right:max(14px,env(safe-area-inset-right));
+  bottom:max(14px,env(safe-area-inset-bottom));
+  width:112px;height:156px;margin:0;pointer-events:none;filter:none;
+}
+#kioGuide:not(.kio-open) .kio-launch{
+  position:absolute;inset:auto 0 0 auto;display:block;width:112px;height:151px;
+  pointer-events:auto;grid-column:auto;grid-row:auto;
+}
+#kioGuide:not(.kio-open) .kio-person{width:103px;height:123px}
+#kioGuide:not(.kio-open) .kio-aura{height:122px}
+#kioGuide:not(.kio-open) .kio-launch-label{display:flex;min-height:35px}
+#kioGuide:not(.kio-open) .kio-hint{display:none!important}
+#kioGuide.kio-compact:not(.kio-open){width:86px;height:116px}
+#kioGuide.kio-compact:not(.kio-open) .kio-launch{width:86px;height:112px}
+#kioGuide.kio-compact:not(.kio-open) .kio-person{width:78px;height:93px}
+#kioGuide.kio-compact:not(.kio-open) .kio-launch-label{min-height:24px}
+#kioGuide:not(.kio-reduced) .kio-person{
+  animation:kio-float 4.4s ease-in-out infinite;
+}
+#kioGuide:not(.kio-reduced) .kio-figure{
+  animation:kio-breathe 3s ease-in-out infinite;
+}
+#kioGuide:not(.kio-reduced) .kio-eyes{animation:kio-blink 6.1s linear infinite}
+#kioGuide:not(.kio-reduced) .kio-leg-front,
+#kioGuide:not(.kio-reduced) .kio-leg-back{animation:kio-foot 4.5s ease-in-out infinite}
+#kioGuide:not(.kio-reduced) .kio-arm-left{animation:kio-arm-sway 3.2s ease-in-out infinite}
+#kioGuide:not(.kio-reduced) .kio-arm-right{animation:kio-wave 3.8s ease-in-out infinite}
+#kioGuide[data-mood="wave"]:not(.kio-reduced) .kio-arm-right{
+  animation:kio-wave-hello .65s ease-in-out infinite alternate;
+}
+#kioGuide:not(.kio-reduced) .kio-aura{animation:kio-aura 5.5s ease-in-out infinite}
+#kioGuide:not(.kio-reduced) .kio-ground{animation:kio-shadow 4.4s ease-in-out infinite}
+#kioGuide:not(.kio-reduced) .kio-sparkles{animation:kio-sparkle 3.8s ease-in-out infinite}
+#kioGuide.kio-reduced .kio-person,#kioGuide.kio-reduced .kio-figure,
+#kioGuide.kio-reduced .kio-eyes,#kioGuide.kio-reduced .kio-arm-right,
+#kioGuide.kio-reduced .kio-arm-left,#kioGuide.kio-reduced .kio-leg-front,
+#kioGuide.kio-reduced .kio-leg-back{animation:none!important}
+@media(max-width:760px){
+  #kioGuide.kio-shell:not(.kio-open):not(.kio-suppressed){
+    width:82px;height:115px;right:8px;bottom:max(9px,env(safe-area-inset-bottom));
+  }
+  #kioGuide:not(.kio-open) .kio-launch{width:82px;height:111px}
+  #kioGuide:not(.kio-open) .kio-person{width:75px;height:90px}
+  #kioGuide:not(.kio-open) .kio-launch-label{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  #kioGuide *,#kioGuide *:before,#kioGuide *:after{animation:none!important;transition:none!important}
+}
+html.motion-off #kioGuide *,html.motion-off #kioGuide *:before,
+html.motion-off #kioGuide *:after{animation:none!important}
+
+/* Return navigation stays visible throughout long-form case studies. */
+.cp-chapters-back{
+  flex:none;display:inline-flex;align-items:center;min-height:38px;
+  white-space:nowrap;background:#173c2d;color:#f8e6d8!important;
+  border:1px solid #173c2d;border-radius:100px;padding:9px 13px;
+  font:500 10px 'DM Mono',monospace;letter-spacing:.03em;
+}
+.cp-chapters-back:hover{background:#355c45}
+.cp-chapters-back:focus-visible{outline:3px solid #bb7854;outline-offset:3px}
+@media(max-width:760px){
+  .cp-chapters-inner{display:flex;flex-wrap:wrap;gap:6px 12px}
+  .cp-chapters-back{min-height:36px;font-size:9px}
+  .cp-chapters-kicker{margin-left:auto}
+  .cp-chapters-links{flex:1 1 100%;min-width:0}
+}
+@media(max-width:390px){.cp-chapters-kicker{font-size:9px}}
+
+/* Without animation, the initial hidden headline transform must never persist. */
+html.motion-off .hero-line>span{opacity:1!important;transform:none!important;filter:none!important}
+@media(prefers-reduced-motion:reduce){
+ .hero-line>span{opacity:1!important;transform:none!important;filter:none!important}
+}
+
+#kioGuide:not(.kio-reduced) .kio-head{
+  animation:kio-nod 5.4s ease-in-out infinite;
+}
+
+/* Entire district-tile background follows the story link. The intentional 3D-focus
+   button remains separately clickable above that link's transparent hit area. */
+.world-sector-story{cursor:pointer}
+.world-sector-story::after{content:"";position:absolute;inset:0;z-index:1}
+.world-sector-tile .world-sector{position:relative;z-index:2}
+.world-sector-tile:has(.world-sector-story:focus-visible){
+  outline:3px solid #e9b18d;outline-offset:-3px;
+}

@@ -5,7 +5,9 @@
     "test": "node scripts/test_case_media.cjs",
     "test:universe": "node scripts/test_universe.cjs",
     "test:motion": "node scripts/test_motion.cjs",
-    "test:upgrades": "node scripts/test_upgrades.cjs"
+    "test:upgrades": "node scripts/test_upgrades.cjs",
+    "test:visuals": "node scripts/test_visuals.cjs",
+    "test:rift-home": "node scripts/qa_rift_home.cjs"
   },
   "devDependencies": {
     "playwright": "1.65.1"

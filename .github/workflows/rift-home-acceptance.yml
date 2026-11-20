@@ -1,0 +1,57 @@
+name: Rift Homepage Acceptance
+on:
+  push:
+    branches:
+      - feat/v8-technical-showcases
+    paths:
+      - 'site/index.html'
+      - 'site/main.js'
+      - 'site/guide.js'
+      - 'scripts/test_motion.cjs'
+      - 'site/rift-home.css'
+      - 'site/labs/rift-directors-cut.*'
+      - 'scripts/qa_rift_home.cjs'
+      - '.github/workflows/rift-home-acceptance.yml'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+      - name: Start local preview
+        run: |
+          python3 -m http.server 4173 --directory site >/tmp/rift-web.log 2>&1 &
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            curl -fsS http://127.0.0.1:4173/index.html >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/rift-web.log
+          exit 1
+      - name: Browser acceptance and visual captures
+        run: npm run test:rift-home
+      - name: Existing regressions
+        run: |
+          npm run test:upgrades
+          npm run test:motion
+          npm run test:universe
+          npm test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rift-home-browser-evidence
+          path: screenshots/rift-home/
+          if-no-files-found: ignore

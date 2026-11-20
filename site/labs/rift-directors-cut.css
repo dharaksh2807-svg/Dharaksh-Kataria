@@ -1,0 +1,153 @@
+/* Rift Director's Cut — preserves the approved V9 editorial composition.
+   Decorative 3D is progressive; the original CSS Rift remains the fallback. */
+:root{--rift-scroll:0;--substance-alpha:0;--substance-scale:1;--substance-shift:0px;--title-y:0px;--title-scale:1;--title-opacity:1;--beam-shift:0px;--wipe:0%;--wipe-opacity:0;--portal-fallback-scale:1;--portal-fallback-spin:0deg}
+html{scroll-behavior:smooth}
+body{background:#080b0b;overflow-x:clip}
+.skip-link{position:fixed;top:-100px;left:20px;z-index:100;background:#f6e8d4;color:#111;padding:14px;font:500 12px 'DM Sans',sans-serif}
+.skip-link:focus{top:20px}
+.intro{height:235svh;position:relative}
+.stage{min-height:640px;height:100svh;overflow:hidden;background:radial-gradient(ellipse at 72% 52%,#292018 0%,#121513 31%,#050808 72%);isolation:isolate}
+.rift-stage::before{z-index:5;background:linear-gradient(90deg,#030606eb 0%,#0508089c 34%,transparent 61%,#0507072c 100%),radial-gradient(ellipse at 68% 52%,transparent 18%,#02050570 94%);pointer-events:none}
+.rift-stage::after{z-index:18;opacity:.16;mix-blend-mode:soft-light}
+.rift-bloom{z-index:1;right:6%;top:18%;width:53vw;height:74vh;background:radial-gradient(ellipse,#c993643d,transparent 65%);filter:blur(45px);pointer-events:none}
+.floor-grid{z-index:1;opacity:.55}
+.stage-canvas{position:absolute;z-index:4;inset:0;width:100%;height:100%;opacity:0;pointer-events:none;transition:opacity .5s ease}
+html.webgl-ready .stage-canvas{opacity:1}
+.portal-fallback{z-index:3;opacity:1;transform:translate3d(calc(var(--mx,0)*-7px),calc(var(--my,0)*-5px),0) scale(var(--portal-fallback-scale)) rotateZ(var(--portal-fallback-spin));transform-origin:72% 54%;transition:opacity .35s}
+html.webgl-ready .portal-fallback{opacity:0;visibility:hidden}
+.portal-fallback .rift-portal{left:52%;top:12%;width:43%;height:77%}
+.portal-fallback .rift-portal .gate{box-shadow:0 0 26px #eeb78718}
+.portal-fallback .rift-light{opacity:.65}
+.portal-fallback .rift-blade{opacity:.56}
+.substance-ghost{position:absolute;z-index:2;left:37%;top:37%;white-space:nowrap;font:700 clamp(115px,18vw,320px)/1 'DM Sans',sans-serif;letter-spacing:-.12em;color:#eed6b319;-webkit-text-stroke:1px #f7c59a66;text-shadow:0 0 75px #e9a67830;opacity:var(--substance-alpha);transform:translate3d(var(--substance-shift),0,0) scale(var(--substance-scale));transform-origin:48% 50%;pointer-events:none;mask-image:linear-gradient(90deg,transparent 0%,#000 12%,#000 65%,transparent 100%);will-change:transform,opacity}
+.light-shafts{position:absolute;inset:0;z-index:6;overflow:hidden;pointer-events:none;mix-blend-mode:screen;mask-image:linear-gradient(90deg,transparent 29%,black 52%,black 90%,transparent)}
+.light-shafts i{position:absolute;top:-24%;height:150%;width:10%;left:58%;transform:translate3d(var(--beam-shift),0,0) skewX(-12deg);background:linear-gradient(90deg,transparent 0%,#f6b67b0b 30%,#ffe5bc4a 49%,#f6ac7440 52%,transparent 68%);filter:blur(17px);opacity:.5}
+.light-shafts i:nth-child(2){left:83%;width:2%;opacity:.75;filter:blur(3px)}
+.light-shafts i:nth-child(3){left:48%;width:1px;opacity:.58;filter:blur(1px)}
+.nav{z-index:30}
+.title-wrap{z-index:15;transform:translate3d(0,var(--title-y),0) scale(var(--title-scale));opacity:var(--title-opacity);transform-origin:30% 52%;transition:none;will-change:transform,opacity}
+.hero-title{filter:drop-shadow(0 12px 24px #000a);isolation:isolate}
+.hero-title .serif{color:#ffd5b0}
+.hero-description{max-width:318px}
+.hero-action{transition:color .22s,border-color .22s,transform .22s;will-change:transform}
+.hero-action:hover,.hero-action:focus-visible{color:#ffdebc;border-color:#ffdebc}
+.hero-controls{display:inline-flex;align-items:center;gap:16px}
+.hero-controls>a{color:#d2b89f;font-size:10px;letter-spacing:.08em}
+.motion-button{background:#090b0b8b;backdrop-filter:blur(8px)}
+.prototype-label{z-index:31}
+.float-annotation{font-size:9px;letter-spacing:.11em}
+.transition-veil{position:absolute;inset:0;z-index:21;pointer-events:none;opacity:var(--wipe-opacity);background:radial-gradient(circle at 70% 52%,#fff5dd 0%,#eae7df 42%,#e8e5dc 100%);clip-path:circle(var(--wipe) at 70% 52%);will-change:clip-path,opacity}
+.projects-bridge{z-index:2;min-height:100vh;background:#eae7df;padding-bottom:110px}
+.projects-bridge::before{content:'02';z-index:0}
+.projects-bridge>*{position:relative;z-index:1}
+.bridge-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:60px 0 24px}
+.bridge-card{position:relative;min-height:290px;display:flex;flex-direction:column;gap:14px;overflow:hidden;background:#14201b;color:#f7f0e7;padding:31px 27px;border:1px solid #334137;border-radius:3px;transform:translate3d(0,var(--card-shift,0px),0);transition:transform .6s cubic-bezier(.16,1,.3,1),box-shadow .4s,border-color .3s}
+.bridge-card:nth-child(2){background:#22201b}.bridge-card:nth-child(3){background:#182123}
+.bridge-card::before{content:'';position:absolute;top:-150%;left:-75%;height:220%;width:55%;background:linear-gradient(90deg,transparent,#fac29e23,transparent);transform:rotate(18deg);transition:transform .7s ease;pointer-events:none}
+.bridge-card:hover::before,.bridge-card:focus-visible::before{transform:translateX(340%) rotate(18deg)}
+.bridge-card:hover,.bridge-card:focus-visible{transform:translateY(-8px);box-shadow:0 25px 45px #0816112c;border-color:#bb8a63}
+.bridge-card .card-index{color:#dbac86}
+.bridge-card strong{font-size:clamp(26px,2.55vw,43px);line-height:1.04;letter-spacing:-.05em;max-width:260px}
+.bridge-card>span:nth-of-type(2){font-size:13px;line-height:1.7;color:#bcbeb8;max-width:245px}
+.bridge-card .card-arrow{position:absolute;bottom:24px;right:26px;font-size:24px;color:#efc9a5;transition:transform .3s}
+.bridge-card:hover .card-arrow{transform:translate(4px,-4px)}
+.next-links{gap:13px}
+.next-links a{transition:background .25s,color .25s,transform .25s}
+.next-links a:hover{transform:translateY(-3px)}
+html.js-active:not(.reduced-motion) .bridge-card:not(.is-visible){opacity:.32;transform:translateY(35px)}
+html.js-active .bridge-card.is-visible{opacity:1}
+html.motion-off .light-shafts i{opacity:.25}
+html.motion-off .portal-fallback .rift-light,html.motion-off .portal-fallback .rift-core{animation:none}
+@media (max-width:1050px){
+ .rift-stage .hero-title{font-size:clamp(73px,10.5vw,120px)}
+ .bridge-grid{gap:12px}.bridge-card{padding:24px 21px}
+ .portal-fallback .rift-portal{left:42%;width:64%;height:66%;top:12%}
+ .substance-ghost{left:30%;font-size:20vw}
+}
+@media (max-width:760px){
+ .intro{height:205svh}
+ .stage{min-height:680px;height:100svh}
+ .rift-stage::before{background:linear-gradient(180deg,transparent 0%,#05080912 29%,#050809bd 57%,#050809f5 89%),linear-gradient(90deg,#04070859,transparent 72%)}
+ .nav{height:74px;padding-inline:22px}
+ .nav-links a:not(.nav-exit){display:none}
+ .nav-exit{font-size:9px;padding:9px 10px}
+ .title-wrap{left:7%;right:7%;width:86%;inset:33% 7% 0;justify-content:flex-start;transform:translate3d(0,var(--title-y),0) scale(var(--title-scale));transform-origin:0 40%}
+ .rift-stage .hero-title{font-size:clamp(58px,13vw,90px)!important}
+ .hero-description{max-width:290px;margin:23px 0 20px}
+ .eyebrow{font-size:9px;gap:10px;margin-bottom:18px}
+ .hero-actions{gap:16px}
+ .hero-action{gap:8px;font-size:11px}
+ .prototype-label{font-size:8px;top:86px;right:20px;max-width:175px}
+ .substance-ghost{top:16%;left:-5%;font-size:32vw;mask-image:linear-gradient(90deg,transparent,#000 14%,#000 60%,transparent)}
+ .portal-fallback .rift-portal{left:21%;top:5%;width:83%;height:46%}
+ .portal-fallback .rift-light{left:24%;top:6%;height:47%;width:78%}
+ .portal-fallback .rift-blade{height:64%}
+ .rift-bloom{top:5%;right:1%;width:100vw;height:52vh}
+ .light-shafts i{left:38%;height:75%;top:-15%}
+ .light-shafts i:nth-child(2){left:81%}
+ .bottom-bar{bottom:21px;gap:12px}
+ .bottom-bar>span:nth-child(2){display:none}
+ .hero-controls{gap:8px}
+ .hero-controls>a{font-size:9px}
+ .motion-button{padding:9px 10px;font-size:9px}
+ .bridge-grid{grid-template-columns:1fr;gap:12px;margin:37px 0 24px}
+ .bridge-card{min-height:202px;padding:23px}
+ .bridge-card strong{font-size:32px;max-width:none}
+ .projects-bridge{padding:85px 7% 80px}
+}
+@media (max-width:390px){
+ .rift-stage .hero-title{font-size:clamp(53px,13vw,70px)!important}
+ .hero-description{font-size:12px}
+ .hero-controls>a{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+ html{scroll-behavior:auto}
+ .stage-canvas,.portal-fallback,.title-wrap,.substance-ghost,.light-shafts i,.transition-veil,.bridge-card,.bridge-card::before{transition:none!important;animation:none!important}
+ .bridge-card{transform:none!important;opacity:1!important}
+}
+
+/* V9.3 — readable title and an actual content destination during the final shot. */
+.rift-stage .title-wrap{max-width:min(720px,58vw);overflow:visible}
+.rift-stage .hero-title{font-size:clamp(76px,9.1vw,138px);letter-spacing:-.067em;overflow:visible}
+.rift-stage .hero-title>span{display:block;white-space:nowrap;overflow:visible}
+.rift-stage .hero-title .serif{font-size:.94em}
+.rift-handoff{position:absolute;z-index:26;left:7%;right:7%;bottom:clamp(95px,13vh,160px);max-width:700px;opacity:var(--handoff-alpha,0);transform:translateY(var(--handoff-shift,45px));pointer-events:none;color:#1b2420;transition:none;text-shadow:none}
+.rift-handoff h2{font:600 clamp(42px,5.2vw,88px)/1.05 'DM Sans',sans-serif;letter-spacing:-.075em;margin:12px 0}
+.rift-handoff h2 em{font:italic 1.05em 'Instrument Serif',serif;color:#8c4f34}
+.rift-handoff p{font:400 clamp(13px,1.1vw,17px)/1.65 'DM Sans',sans-serif;color:#39483e}
+.rift-handoff-kicker{font:500 10px 'DM Mono',monospace;letter-spacing:.18em;color:#9b674a}
+.rift-handoff-link{display:inline-flex;align-items:center;gap:26px;margin-top:18px;padding:13px 20px;border:1px solid #5c665b;border-radius:30px;color:#172820;font:500 12px 'DM Mono',monospace;background:#fff9ebdd;pointer-events:auto}
+.rift-handoff-link:hover,.rift-handoff-link:focus-visible{background:#14251c;color:#fff;border-color:#14251c}
+.rift-stage .substance-ghost{font-size:clamp(90px,12vw,190px);left:42%;top:40%;letter-spacing:-.09em}
+@media(max-width:1050px){.rift-stage .hero-title{font-size:clamp(64px,9vw,110px)}}
+@media(max-width:760px){.rift-stage .title-wrap{max-width:92%;overflow:visible}.rift-stage .hero-title{font-size:clamp(47px,11.8vw,76px)!important}.rift-stage .hero-title>span{white-space:nowrap}.rift-handoff{bottom:120px;max-width:90%}.rift-handoff h2{font-size:clamp(36px,9vw,56px)}.rift-stage .substance-ghost{font-size:20vw;left:8%}}
+@media(max-width:390px){.rift-stage .hero-title{font-size:clamp(43px,11.4vw,55px)!important}}
+@media(prefers-reduced-motion:reduce){.rift-handoff{opacity:0;pointer-events:none}}
+
+/* Fix: preserve the cinematic scene for the full scroll track. A normal-flow 100svh stage in a 235svh intro left a vacant cream shot before the projects section. */
+.intro>.stage{position:sticky;top:0;height:100svh;min-height:0}
+.rift-stage .transition-veil{z-index:21}
+.rift-stage .rift-handoff{z-index:27}
+@media(prefers-reduced-motion:reduce){.intro{height:auto!important}.intro>.stage{position:relative!important;min-height:100svh}.rift-handoff,.transition-veil{display:none!important}}
+html.motion-off .intro{height:auto!important}
+html.motion-off .intro>.stage{position:relative!important;min-height:100svh}
+html.motion-off .transition-veil,html.motion-off .rift-handoff{display:none!important}
+
+
+/* V9.5 — final project links are always legible, never an empty cream sheet. */
+.intro{height:205svh}
+.rift-stage .title-wrap{will-change:transform,opacity}
+.rift-stage .rift-handoff{z-index:32;visibility:visible}
+.rift-stage .rift-handoff[data-active="true"]{pointer-events:auto}
+.rift-stage .rift-handoff-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px}
+.rift-stage .rift-handoff-links a{display:inline-flex;align-items:center;padding:9px 13px;border:1px solid #647264b3;border-radius:20px;color:#1f3529;background:#fff7e8;font:500 10px 'DM Mono',monospace;pointer-events:auto}
+.rift-stage .rift-handoff-links a:hover,.rift-stage .rift-handoff-links a:focus-visible{background:#1f392a;color:#fff}
+@media(max-width:760px){.intro{height:185svh}.rift-stage .rift-handoff{bottom:95px}.rift-stage .rift-handoff-links a{font-size:9px;padding:8px}}
+@media(prefers-reduced-motion:reduce){.intro{height:auto!important}.rift-stage .rift-handoff{display:none!important}}
+
+
+/* V9.6 — ending frame is a clean project introduction, not ghosted hero controls. */
+.rift-stage .bottom-bar,.rift-stage .prototype-label,.rift-stage .float-annotation,.rift-stage .side-readout{transition:opacity .2s ease,visibility .2s ease}
+.rift-stage.rift-ending :is(.bottom-bar,.prototype-label,.float-annotation,.side-readout){opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+.rift-stage.rift-ending .nav{color:#18271f}
+.rift-stage.rift-ending .nav a{color:#18271f}

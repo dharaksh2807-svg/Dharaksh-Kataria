@@ -199,7 +199,7 @@
   const header=$('#siteHeader'),indicator=$('#scrollIndicator');let ticking=false;
   function renderScroll(){const scroll=Math.max(0,window.scrollY),total=Math.max(1,document.documentElement.scrollHeight-innerHeight);indicator.style.width=`${Math.min(100,scroll/total*100)}%`;header.classList.toggle('scrolled',scroll>40);ticking=false}
   window.addEventListener('scroll',()=>{if(!ticking){requestAnimationFrame(renderScroll);ticking=true}},{passive:true});renderScroll();
-  function updateIST(){try{$('#liveTime').textContent=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date())+' IST'}catch{$('#liveTime').textContent='INDIA / IST'}}
+  function updateIST(){const clock=$('#liveTime');if(!clock)return;try{clock.textContent=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date())+' IST'}catch{clock.textContent='INDIA / IST'}}
   updateIST();setInterval(updateIST,60000);
   $('#year').textContent=new Date().getFullYear();
   function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.classList.remove('show'),2300)}

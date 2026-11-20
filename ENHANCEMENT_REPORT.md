@@ -63,3 +63,15 @@ Inspect `http://localhost:4173/projects/srmedu.html`, `/projects/projectmatch.ht
 ## Constraints
 
 Never expose a private Metro repository URL or fabricate game deployment, project performance results or historic artifacts. Do not merge based solely on the new test source.
+## Screenshot-driven visual corrections (19 November 2026)
+
+The owner reviewed desktop screenshots and requested simpler navigation and stronger personal branding. The existing code has been changed as follows:
+
+- The homepage hero now prominently renders **Dharaksh Kataria** with the original “Software with substance.” retained as a supporting serif statement, rather than hiding the owner's full name in the small navigation identity.
+- The four world district tiles now have full-tile *Open Story* links and separate **Focus in 3D** buttons. An extra duplicate row of project links was removed. The four regular links remain accessible with JavaScript disabled.
+- All 12 case studies inherit a persistent **Back to 3D World** link in the sticky chapter rail.
+- The Kio SVG character is visible as an unobtrusive floating launcher when the panel is closed; the panel continues to use the Phase 4 inline guide when opened. Explicit Hide Kio still suppresses it, and reduced-motion preference still stops animations. The Kio node is reparented to the body after closing to avoid section clipping.
+- The original motion-enabled Kio animations are restored and the initial hero headline remains visible when the visitor disables animation or their operating system requests reduced motion.
+- The focused `npm run test:upgrades` suite includes new navigation, branding and motion-preference assertions.
+
+**Verification limitation:** The edits were inspected and JavaScript syntax checked via the connected repository. New browser tests and screenshot comparisons **have not yet been rerun** on the owner's Mac. Run `npm run test:upgrades && npm run test:motion && npm run test:universe && npm test` and visually inspect desktop/mobile layout before merging PR #1.

@@ -39,6 +39,9 @@
     const nav = el("nav", "cp-chapters");
     nav.setAttribute("aria-label", "Case study chapters");
     const inner = add(nav, "div", "cp-chapters-inner");
+    const back = add(inner,"a","cp-chapters-back","← BACK TO 3D WORLD");
+    back.href="../index.html#universe";
+    back.setAttribute("aria-label","Return to the Engineering Universe");
     add(inner, "span", "cp-chapters-kicker", "READING / " + project.toUpperCase());
     const scroller = add(inner, "div", "cp-chapters-links");
     const links = sections.map(({node,label}, i) => {
