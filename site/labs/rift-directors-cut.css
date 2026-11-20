@@ -132,3 +132,15 @@ html.motion-off .portal-fallback .rift-light,html.motion-off .portal-fallback .r
 html.motion-off .intro{height:auto!important}
 html.motion-off .intro>.stage{position:relative!important;min-height:100svh}
 html.motion-off .transition-veil,html.motion-off .rift-handoff{display:none!important}
+
+
+/* V9.5 — final project links are always legible, never an empty cream sheet. */
+.intro{height:205svh}
+.rift-stage .title-wrap{will-change:transform,opacity}
+.rift-stage .rift-handoff{z-index:32;visibility:visible}
+.rift-stage .rift-handoff[data-active="true"]{pointer-events:auto}
+.rift-stage .rift-handoff-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px}
+.rift-stage .rift-handoff-links a{display:inline-flex;align-items:center;padding:9px 13px;border:1px solid #647264b3;border-radius:20px;color:#1f3529;background:#fff7e8;font:500 10px 'DM Mono',monospace;pointer-events:auto}
+.rift-stage .rift-handoff-links a:hover,.rift-stage .rift-handoff-links a:focus-visible{background:#1f392a;color:#fff}
+@media(max-width:760px){.intro{height:185svh}.rift-stage .rift-handoff{bottom:95px}.rift-stage .rift-handoff-links a{font-size:9px;padding:8px}}
+@media(prefers-reduced-motion:reduce){.intro{height:auto!important}.rift-stage .rift-handoff{display:none!important}}
