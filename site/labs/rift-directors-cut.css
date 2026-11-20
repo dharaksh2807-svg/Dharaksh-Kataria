@@ -144,3 +144,10 @@ html.motion-off .transition-veil,html.motion-off .rift-handoff{display:none!impo
 .rift-stage .rift-handoff-links a:hover,.rift-stage .rift-handoff-links a:focus-visible{background:#1f392a;color:#fff}
 @media(max-width:760px){.intro{height:185svh}.rift-stage .rift-handoff{bottom:95px}.rift-stage .rift-handoff-links a{font-size:9px;padding:8px}}
 @media(prefers-reduced-motion:reduce){.intro{height:auto!important}.rift-stage .rift-handoff{display:none!important}}
+
+
+/* V9.6 — ending frame is a clean project introduction, not ghosted hero controls. */
+.rift-stage .bottom-bar,.rift-stage .prototype-label,.rift-stage .float-annotation,.rift-stage .side-readout{transition:opacity .2s ease,visibility .2s ease}
+.rift-stage.rift-ending :is(.bottom-bar,.prototype-label,.float-annotation,.side-readout){opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+.rift-stage.rift-ending .nav{color:#18271f}
+.rift-stage.rift-ending .nav a{color:#18271f}
