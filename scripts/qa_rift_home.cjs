@@ -92,6 +92,11 @@ async function main(){
       check(stages[3].titleOpacity>.90,'Name should remain readable until late transition');
       check(stages[4].titleOpacity>.90,'Name disappears before the final 18% of scroll');
       check(stages[5].handoffOpacity>.80&&!stages[5].handoffHidden,'Final handoff not visible');
+      const finalControlsHidden=await page.evaluate(()=>{
+        const el=document.querySelector('.rift-home .rift-mode-switcher');
+        return el&&getComputedStyle(el).visibility==='hidden';
+      });
+      check(finalControlsHidden,'Motion controls overlap the final project handoff');
       const links=await page.locator('#riftProjects .bridge-card').count();
       check(links===3,'Expected three real project case-study links');
       await page.evaluate(()=>document.getElementById('riftProjects').scrollIntoView({behavior:'instant',block:'start'}));
