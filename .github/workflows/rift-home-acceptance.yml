@@ -9,6 +9,9 @@ on:
       - 'site/labs/rift-directors-cut.*'
       - 'scripts/qa_rift_home.cjs'
       - '.github/workflows/rift-home-acceptance.yml'
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 permissions:
   contents: read
