@@ -28,7 +28,7 @@ async function seek(page,p){
 }
 async function openPage(context){
   const page=await context.newPage();
-  page.on('pageerror',e=>report.errors.push('Page error: '+e.message));
+  page.on('pageerror',e=>report.errors.push('Page error: '+(e.stack||e.message)));
   page.on('response',r=>{
     if(r.url().startsWith('http://127.0.0.1:4173/')&&r.status()>=400)
       report.errors.push('HTTP '+r.status()+': '+r.url());
@@ -60,10 +60,6 @@ async function main(){
       const bounds=await title.boundingBox();
       check(bounds&&bounds.x>=0&&bounds.x+bounds.width<=1440,'Desktop name clipped');
       await page.screenshot({path:path.join(out,'desktop-opening.png')});
-      const picker=page.locator('#riftModeSelect');
-      check(await picker.isVisible(),'Mobile style switcher not visible');
-      await picker.selectOption('ascension');
-      check((await page.evaluate(()=>window.__riftDirector.getState())).mode==='ascension','Mobile style selection failed');
       const kio=await page.locator('#kioGuide').boundingBox();
       check(kio&&kio.width>=150,'Kio is unexpectedly small on desktop');
       // All five motion systems must be selectable in the actual homepage.
@@ -116,6 +112,11 @@ async function main(){
       return {titleVisible:true,modeResults,kioWidth:kio.width,stages,projectLinks:links,reverseRestoresTitle:true,globalMotionControl:true,frameStats:stats};
     });
     report.checks.mobile=await withVideo(browser,'mobile-journey',{viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true},async page=>{
+      const picker=page.locator('#riftModeSelect');
+      check(await picker.isVisible(),'Mobile style switcher not visible');
+      await picker.selectOption('ascension');
+      check((await page.evaluate(()=>window.__riftDirector.getState())).mode==='ascension','Mobile style selection failed');
+      await picker.selectOption('director');
       const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);
       check(!overflow,'Mobile horizontal overflow');
       await page.screenshot({path:path.join(out,'mobile-opening.png')});
