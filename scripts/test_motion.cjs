@@ -209,9 +209,16 @@ const server = http.createServer((req, res) => {
         await page.close();
       }
     });
-    await test("SVG drawing follows scroll progress", async () => {
+    await test("Legacy project artwork still draws SVG paths with scroll progress", async () => {
       const page = await pageFor();
       try {
+        // Project records predating screenshot metadata retain the system artwork.
+        await page.route("**/projects.js", async route => {
+          const response = await route.fetch();
+          const body = (await response.text()).replace(/preview: \{[^}]+\}, /g, "");
+          await route.fulfill({ response, body });
+        });
+        await page.reload();
         const svg = page.locator(".match-edges path");
         await svg.scrollIntoViewIfNeeded();
         await page.waitForTimeout(250);

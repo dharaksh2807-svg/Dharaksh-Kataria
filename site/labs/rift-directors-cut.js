@@ -77,18 +77,17 @@
   for(const button of modeButtons){
     button.addEventListener('click',()=>{
       selectMode(button.dataset.riftMode,true);
-      // Explicit mode selection returns to the scene start only when user
-      // is already deep into its scroll transition.
-      if(progress>.08)window.scrollTo({top:Math.max(0,window.scrollY+stage.getBoundingClientRect().top),behavior:reduced?'instant':'smooth'});
     });
   }
   mobileModeSelect?.addEventListener('change',()=>selectMode(mobileModeSelect.value,true));
   selectMode(mode);
   function syncButton(){
-    if (!motionButton) return;
-    motionButton.disabled = reduced;
-    motionButton.textContent = reduced ? 'Reduced motion on' : paused ? 'Resume motion' : 'Pause motion';
-    motionButton.setAttribute('aria-pressed',String(paused));
+    if(motionButton){
+      motionButton.disabled = reduced;
+      motionButton.textContent = reduced ? 'Reduced motion on' : paused ? 'Resume motion' : 'Pause motion';
+      motionButton.setAttribute('aria-pressed',String(paused));
+    }
+    if(integrated)html.classList.toggle('rift-static',paused);
     // The integrated homepage shares the existing global MOTION control.
     if(!integrated)html.classList.toggle('motion-off',paused);
     html.classList.toggle('reduced-motion',reduced);
@@ -278,6 +277,7 @@
     wordPlane.position.set(0,0,-4.7);
     group.add(wordPlane);
     animObjects.wordMat=wordMat;
+    animObjects.wordPlane=wordPlane;
     // Atmosphere is physical scene light and a rear glow plane, not full-screen fake bloom.
     const glowCanvas=document.createElement('canvas');glowCanvas.width=256;glowCanvas.height=256;
     const ctx=glowCanvas.getContext('2d');
@@ -332,16 +332,6 @@
 
   const animObjects={};
   function prepareProjects(){
-    if(integrated&&handoff){
-      // Reuse the actual project previews and destinations for the final camera frame.
-      const previews=document.querySelector('#riftProjects .bridge-grid').cloneNode(true);
-      previews.classList.add('rift-handoff-projects');
-      previews.querySelectorAll('img').forEach(image=>{image.loading='eager';});
-      handoff.querySelector('h2').innerHTML='Selected <em>work.</em>';
-      handoff.querySelector('p').remove();
-      handoff.querySelector('.rift-handoff-link').remove();
-      handoff.querySelector('.rift-handoff-links').replaceWith(previews);
-    }
     const cards=Array.from(document.querySelectorAll('.bridge-card'));
     if(!('IntersectionObserver' in window)||reduced){
       cards.forEach(el=>el.classList.add('is-visible'));
@@ -356,18 +346,40 @@
   function readProgress(){
     const max=Math.max(1,intro.offsetHeight-innerHeight);
     progress=clamp(-intro.getBoundingClientRect().top/max);
+    if(integrated){
+      const work=document.getElementById('work').getBoundingClientRect();
+      html.classList.toggle('rift-work-active',work.top<innerHeight);
+    }
   }
 
   function updateText(p,entry){
+    if(integrated){
+      const exit=range(p,.56,.77);
+      stage.classList.toggle('rift-ending',exit>=1);
+      stage.querySelector('.title-wrap').inert=exit>=1;
+      css('--title-opacity',(1-exit).toFixed(3));
+      css('--title-y',(-exit*40).toFixed(2)+'px');
+      // Reveal the real, normal-flow showcase as the camera clears the portal.
+      // Anchor navigation and reverse scrolling use this same scroll-derived state.
+      const workReveal=range(p,.62,.79);
+      css('--work-alpha',workReveal.toFixed(3));
+      document.getElementById('work').style.pointerEvents=workReveal>0?'auto':'none';
+      const word=mode==='ascension' ? .82 : .18*range(p,.24,.42);
+      css('--substance-alpha',(word*(1-range(p,.72,.9))).toFixed(3));
+      css('--rift-scroll',p.toFixed(4));
+      css('--substance-scale',(mode==='ascension'?1+p*.25:1+p*.65).toFixed(3));
+      css('--substance-shift',(mode==='ascension'?0:-p*185).toFixed(1)+'px');
+      css('--beam-shift',((p-.3)*280).toFixed(1)+'px');
+      css('--mx',pointerX.toFixed(3));css('--my',pointerY.toFixed(3));
+      css('--portal-fallback-scale',(1+p*(mode==='infinite'?4:2)).toFixed(3));
+      css('--portal-fallback-spin',((mode==='kinetic'?35:mode==='fracture'?-12:0)+p*(mode==='kinetic'?140:12)).toFixed(2)+'deg');
+      stage.dataset.riftMode=mode;
+      return;
+    }
     // Once the work reveal starts, retire hero-only controls and annotations.
     stage.classList.toggle('rift-ending',p>=.81&&!reduced&&!paused);
     const transition=range(p,.73,.96);
-    // Swap the complete opening for real projects in one scroll-derived state.
-    // Both directions use the same boundary, with no delayed or empty handoff.
-    const projectsVisible=integrated&&p>=.89&&!reduced&&!paused;
-    stage.classList.toggle('rift-projects-visible',projectsVisible);
-    const projectFrame=Number(projectsVisible);
-    const vanish=integrated?1-projectFrame:1-range(p,.80,.97);
+    const vanish=1-range(p,.80,.97);
     const substanceIn=range(p,mode==='ascension'?.10:.24,mode==='ascension'?.27:.42);
     const substanceOut=1-range(p,mode==='ascension'?.77:.64,mode==='ascension'?.94:.85);
     const reveal=substanceIn*substanceOut;
@@ -380,13 +392,12 @@
     css('--substance-scale',(1+p*.65).toFixed(3));
     css('--substance-shift',(-p*185).toFixed(1)+'px');
     css('--beam-shift',((p-.3)*280 + Math.sin(elapsed*.0005)*9).toFixed(1)+'px');
-    css('--wipe',(integrated?projectFrame*164:transition*164).toFixed(1)+'%');
-    // The homepage background and project previews share a single reveal state.
-    css('--wipe-opacity',(integrated?projectFrame:.80*range(p,.78,.92)).toFixed(3));
-    css('--handoff-alpha',(integrated?projectFrame:range(p,.77,.90)).toFixed(3));
-    css('--handoff-shift',(integrated?0:(1-range(p,.78,.96))*45).toFixed(2)+'px');
+    css('--wipe',(transition*164).toFixed(1)+'%');
+    css('--wipe-opacity',(.80*range(p,.78,.92)).toFixed(3));
+    css('--handoff-alpha',range(p,.77,.90).toFixed(3));
+    css('--handoff-shift',((1-range(p,.78,.96))*45).toFixed(2)+'px');
     if(handoff){
-      const active=integrated?projectsVisible:p>.77&&!reduced&&!globalMuted;
+      const active=p>.77&&!reduced&&!globalMuted;
       if(handoff.dataset.active!==String(active)){
         handoff.dataset.active=String(active);
         handoff.toggleAttribute('inert',!active);
@@ -402,76 +413,73 @@
 
   function animate3D(p,t){
     if(!webglReady||!scene||!camera||!portal)return;
-    const twist=pulse(p,.14,.34,.56)*(mode==='kinetic'?1.22:mode==='infinite'?.73:1);
-    const fracture=pulse(p,mode==='fracture'?.26:.37,mode==='fracture'?.48:.51,mode==='fracture'?.77:.65)*(mode==='fracture'?1.35:mode==='kinetic'?.18:mode==='infinite'?.12:1);
-    const travel=range(p,mode==='infinite'?.38:.60,mode==='infinite'?.98:.96);
-    const kinetic=mode==='kinetic'?1:0;
-    const ascension=mode==='ascension'?1:0;
-    const introEase=1-Math.pow(1-clamp(t/1.4),3);
-    const drift=Math.sin(t*.34)*.009;
-    const slowMove=paused||reduced?0:Math.sin(t*.28)*.035;
-    // The cinematic entrance is a deliberate, asymmetric composition.
-    // Blend back to the previously approved motion sequence by 30% scroll.
+    const kinetic=mode==='kinetic';
+    const broken=mode==='fracture';
+    const infinite=mode==='infinite';
+    const ascension=mode==='ascension';
+    const twist=pulse(p,.14,.34,.56);
+    const fracture=broken
+      ? .48*(1-range(p,.55,.80))+1.05*pulse(p,.02,.40,.73)
+      : (kinetic||infinite||ascension?0:pulse(p,.37,.51,.65));
+    const travel=range(p,infinite?.12:ascension?.40:.56,.98);
     const openingPose=cinematicOpening?(1-range(p,.035,.30)):0;
-    if(animObjects.group){
-      animObjects.group.rotation.y=-.11-openingPose*.34;
-      animObjects.group.rotation.x=openingPose*.10;
-      animObjects.group.rotation.z=openingPose*.07;
-    }
+    const drift=paused||reduced?0:Math.sin(t*.28)*.012;
+    const group=animObjects.group;
+    group.rotation.set(ascension?.55:broken?.12:openingPose*.10,
+      kinetic?.30:broken?-.42:infinite?.02:-.11-openingPose*.34,
+      ascension?-.08:broken?.08:kinetic?-.20:openingPose*.07);
 
     for(let i=0;i<rings.length;i++){
       const node=rings[i],layer=node.group;
-      const rotationMultiplier=mode==='kinetic'?2.2:mode==='ascension'?1.3:mode==='infinite'?1.55:1;
-      const lag=mode==='kinetic'?range(p,Math.min(.25,i*.012),Math.min(.88,.51+i*.025)):1;
-      const spinClockwise=i*.035 + p*(.12+i*.07)*rotationMultiplier*lag + twist*(i*.082)*(1+kinetic*.45);
-      layer.rotation.z=-spinClockwise - openingPose*(.19+.045*Math.sin(i*.82)) + drift*.3;
-      layer.rotation.y=-.035 + twist*(i%2?-.17:.13) + ascension*(i%2?-.09:.07)*range(p,.22,.63);
-      layer.rotation.x=twist*(i*.014)+(i%2?1:-1)*slowMove*.25;
-      const squeeze=1-twist*(.13+.02*i);
-      const sc=node.baseScale*squeeze*(1+.028*Math.sin(t*.23+i*.62))*(1+(mode==='infinite'?.095:0)*range(p,.35,.72));
-      layer.scale.set(sc,sc,sc);
-      layer.position.z=-i*(cinematicOpening?.86:.72)*(1+(mode==='infinite'?.37:0)*range(p,.30,.77)) - twist*(i*.13) - p*.32;
-      // Slightly misregister the back layers on the opening shot for a sculptural
-      // architectural silhouette; all offsets converge into the proven timeline.
-      layer.position.x=openingPose*(Math.sin(i*.79)*.075+i*.021);
-      layer.position.y=openingPose*(Math.sin(i*.52)*.075-i*.012);
-      if(i===0)node.frontMat.opacity=clamp(1-fracture*.94);
+      layer.visible=!broken||i<4;
+      const beat=range(p,Math.min(.42,i*.035),Math.min(.9,.30+i*.055));
+      let spin=i*.035+p*(.12+i*.07)+twist*i*.082;
+      if(kinetic)spin=.12+i*.24+beat*Math.PI*(i%2?1:-1);
+      if(broken)spin=i*.015;
+      if(infinite)spin=i*.07+p*.16;
+      if(ascension)spin=i*.025;
+      layer.rotation.set(ascension?i*.018:twist*i*.014,
+        kinetic?(i%2?-.18:.18):broken?0:twist*(i%2?-.17:.13),
+        -spin-(mode==='director'?openingPose*(.19+.045*Math.sin(i*.82)):0)+drift*.2);
+      const scale=infinite?Math.pow(.92,i):kinetic?Math.pow(.87,i):node.baseScale*(1-twist*.11);
+      layer.scale.setScalar(scale);
+      layer.position.set(
+        broken?i*.13:mode==='director'?openingPose*(Math.sin(i*.79)*.075+i*.021):0,
+        ascension?i*.24:broken?-i*.10:0,
+        -i*(infinite?2.25:kinetic?.42:broken?1.25:.86)-p*.32
+      );
+      if(i===0)node.frontMat.opacity=clamp(1-fracture*2.1);
     }
-
     fracturePieces.forEach((part,i)=>{
       const {mesh,base,material}=part;
-      const directionX=(i===1?1:i===3?-1:i===0?.28:-.28);
-      const directionY=(i===0?1:i===2?-1:i===1?.18:-.18);
-      mesh.position.set(
-        base[0]+fracture*directionX*(mode==='fracture'?1.05:.64),
-        base[1]+fracture*directionY*(mode==='fracture'?.92:.59),
-        .35 + fracture*(i%2===0?1.25:-.95)*(mode==='fracture'?1.45:1)
-      );
-      mesh.rotation.z=base[2]+fracture*(i%2===0?-.23:.23);
-      mesh.rotation.y=fracture*(i%2===0?.21:-.22);
-      material.opacity=clamp(fracture*1.9);
+      const dx=i===1?1:i===3?-1:i===0?.28:-.28;
+      const dy=i===0?1:i===2?-1:i===1?.18:-.18;
+      mesh.position.set(base[0]+fracture*dx*(broken?1.55:.64),
+        base[1]+fracture*dy*(broken?1.35:.59),
+        .35+fracture*(i%2===0?1.25:-.95));
+      mesh.rotation.set(0,fracture*(i%2===0?.21:-.22),base[2]+fracture*(i%2===0?-.23:.23));
+      material.opacity=clamp(fracture*2.1);
       mesh.visible=fracture>.008;
     });
     const cx=2.25;
     const aimX=innerWidth<700?cx:cx*travel;
-    camera.position.set(
-      aimX+pointerX*.06*(1-travel)-(innerWidth<700?0:openingPose*.44),
-      -.05+pointerY*.05*(1-travel)+Math.sin(t*.32)*.018+openingPose*.12,
-      10.6-travel*(mode==='infinite'?20.9:17.5) - (1-introEase)*.7
-    );
-    camera.lookAt(aimX+openingPose*.14,openingPose*.05,-13);
-    camera.rotateZ(-travel*(mode==='infinite'?.28:mode==='ascension'?.17:.105) - twist*.014);
-    portal.rotation.y=-.05+pointerX*.042*(1-travel)+twist*.045;
-    portal.rotation.x=pointerY*.026*(1-travel);
+    const rise=ascension?p*3.2:0;
+    camera.position.set(aimX+pointerX*.04*(1-travel)-(mode==='director'?openingPose*.44:0),
+      -.05+rise+pointerY*.04*(1-travel),
+      (infinite?9:10.6)-travel*(infinite?30:kinetic?14:broken?11.5:ascension?15:17.5));
+    camera.lookAt(aimX,ascension?rise+1.2:0,infinite?-34:-15);
+    camera.rotateZ(kinetic?-.08*range(p,.1,.7):infinite?-travel*.08:ascension?0:-travel*.105);
+    portal.rotation.set(pointerY*.02*(1-travel),-.05+pointerX*.03*(1-travel),0);
     portal.position.x=cx;
-    const sweep=t*.34+p*7;
-    lights.sweep.position.set(2.0+Math.sin(sweep)*4,1.5+Math.cos(sweep*.74)*2.5,6-p*3);
-    lights.sweep.intensity=(cinematicOpening?43:35)+twist*22+fracture*15+ascension*18*range(p,.12,.75);
-    lights.key.position.x=3.5+pointerX*.7+Math.sin(sweep*.3)*1.1;
-    lights.core.opacity=(cinematicOpening?.84:.5)+fracture*.26+travel*.18;
-    if(animObjects.wordMat){
-      animObjects.wordMat.opacity=(mode==='ascension'?.85:.67)*range(p,mode==='ascension'?.18:.31,mode==='ascension'?.38:.48)*(1-range(p,.91,.98));
-    }
+    lights.sweep.position.set(ascension?cx-2:2+Math.sin(p*7+t*.2)*4,
+      ascension?7-p*10:1.5+Math.cos(p*5)*2.5,6-p*3);
+    lights.sweep.intensity=ascension?85:broken?55:43+twist*22;
+    lights.key.position.set(ascension?-3:3.5,ascension?10:7,ascension?2:8);
+    lights.rim.intensity=kinetic?4:infinite?1.4:2.4;
+    lights.core.opacity=infinite?.55:ascension?.35:.84+fracture*.26;
+    animObjects.orbit.visible=mode==='director';
+    animObjects.wordMat.opacity=ascension?.9*(1-range(p,.88,.98)):.6*range(p,.31,.48)*(1-range(p,.85,.98));
+    animObjects.wordPlane.position.y=ascension?1.3+p*3:0;
     renderer.toneMappingExposure=(cinematicOpening?(1.01+openingPose*.06):1.13)+range(p,.80,.96)*.24;
   }
 

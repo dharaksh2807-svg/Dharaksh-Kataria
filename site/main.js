@@ -38,8 +38,15 @@
     const sourceHtml = source && !same ? `<a class="project-direct project-source" href="${escape(source)}" target="_blank" rel="noopener noreferrer" aria-label="View ${escape(p.title)} source code">GITHUB <span>↗</span></a>` : '';
     card.style.setProperty('--v8-vt-name',`project-${p.id}`);
     card.style.setProperty('--project-title-name',`project-title-${p.id}`);
-    card.innerHTML = `<div class="project-visual visual-${escape(p.theme)}"><span class="project-kicker">${escape(p.categories.join(' / '))}</span>${artFor(p.theme)}<span class="project-visual-tag">ORIGINAL SYSTEM VISUAL / ${escape(p.num)}</span></div><div class="project-info"><div class="project-info-left"><div class="project-num">${escape(p.num)} — ${escape(p.status)}</div><h3 class="project-title">${escape(p.title)}</h3><p class="project-summary">${escape(p.short)}</p></div><div class="project-arrow-wrap"><span class="project-open" aria-hidden="true">↗</span></div></div><div class="project-linkbar"><button type="button" class="project-case-open" aria-label="Read ${escape(p.title)} case study">CASE STUDY <span>→</span></button>${linkHtml}${sourceHtml}${!live&&!source?'<span class="private-pill">NO PUBLIC DEMO</span>':''}</div>`;
-    $('.project-case-open',card).addEventListener('click', () => navigateToDetail(p));
+    const preview = p.preview;
+    const visual = preview ? `<img class="project-screenshot" src="${escape(preview.src)}" alt="${escape(preview.alt)}" width="1280" height="800" loading="${p.id === 'srmedu' ? 'eager' : 'lazy'}" decoding="async">` : artFor(p.theme);
+    const visualLabel = preview ? preview.label : 'ORIGINAL SYSTEM VISUAL';
+    card.innerHTML = `<div class="project-visual visual-${escape(p.theme)}"><span class="project-kicker">${escape(p.categories.join(' / '))}</span>${visual}<span class="project-visual-tag">${escape(visualLabel)}</span></div><div class="project-info"><div class="project-info-left"><div class="project-num">${escape(p.num)} — ${escape(p.status)}</div><h3 class="project-title">${escape(p.title)}</h3><p class="project-summary">${escape(p.short)}</p><p class="project-technical">${escape(p.architecture)}</p><div class="project-stack">${p.technologies.slice(0, 4).map(technology => `<span>${escape(technology)}</span>`).join('')}</div></div><div class="project-arrow-wrap"><span class="project-open" aria-hidden="true">↗</span></div></div><div class="project-linkbar"><a class="project-case-open" href="${detailUrl(p)}" aria-label="Read ${escape(p.title)} case study">Read case study</a>${linkHtml}${sourceHtml}${!live&&!source?'<span class="private-pill">NO PUBLIC DEMO</span>':''}</div>`;
+    $('.project-case-open',card).addEventListener('click', event => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      navigateToDetail(p);
+    });
     $('.project-visual',card).addEventListener('click', () => navigateToDetail(p));
     $('.project-visual',card).setAttribute('role','button');
     $('.project-visual',card).setAttribute('tabindex','0');
@@ -197,7 +204,7 @@
 
   // Scroll states, low-cost rAF updates.
   const header=$('#siteHeader'),indicator=$('#scrollIndicator');let ticking=false;
-  function renderScroll(){const scroll=Math.max(0,window.scrollY),total=Math.max(1,document.documentElement.scrollHeight-innerHeight);indicator.style.width=`${Math.min(100,scroll/total*100)}%`;header.classList.toggle('scrolled',scroll>40);ticking=false}
+  function renderScroll(){const scroll=Math.max(0,window.scrollY),total=Math.max(1,document.documentElement.scrollHeight-innerHeight);if(indicator)indicator.style.width=`${Math.min(100,scroll/total*100)}%`;header.classList.toggle('scrolled',scroll>40);ticking=false}
   window.addEventListener('scroll',()=>{if(!ticking){requestAnimationFrame(renderScroll);ticking=true}},{passive:true});renderScroll();
   function updateIST(){const clock=$('#liveTime');if(!clock)return;try{clock.textContent=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date())+' IST'}catch{clock.textContent='INDIA / IST'}}
   updateIST();setInterval(updateIST,60000);

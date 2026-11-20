@@ -31,281 +31,154 @@ html.webgl-ready .rift-home .portal-fallback{opacity:0;visibility:hidden}
 .rift-home .light-shafts i{position:absolute;top:-24%;height:150%;width:10%;left:58%;transform:translate3d(var(--beam-shift),0,0) skewX(-12deg);background:linear-gradient(90deg,transparent 0%,#f6b67b0b 30%,#ffe5bc4a 49%,#f6ac7440 52%,transparent 68%);filter:blur(17px);opacity:.48}
 .rift-home .light-shafts i:nth-child(2){left:83%;width:2%;opacity:.67;filter:blur(3px)}
 .rift-home .light-shafts i:nth-child(3){left:48%;width:1px;opacity:.58;filter:blur(1px)}
-.rift-home .title-wrap{position:absolute;z-index:15;left:clamp(26px,7vw,112px);top:52%;width:min(54vw,760px);transform:translate3d(0,calc(-50% + var(--title-y)),0) scale(var(--title-scale));transform-origin:left center;opacity:var(--title-opacity);pointer-events:none;filter:drop-shadow(0 7px 23px #000b)}
-.rift-home .eyebrow{display:flex;align-items:center;gap:13px;margin-bottom:27px;color:#f0b487;font:500 10px/1.6 var(--font-mono);letter-spacing:.14em}
-.rift-home .eyebrow::before{content:'';width:30px;height:1px;background:#f0b487}
-.rift-home .hero-title{font:600 clamp(68px,8.5vw,132px)/.88 var(--font-sans);letter-spacing:-.085em;margin:0;color:#f5f1e9;overflow:visible}
+
+/* One flowing composition reserves room for every control. */
+.rift-home .intro{height:220svh}
+.rift-home .stage{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:center;padding:calc(var(--header-h,80px) + 32px) clamp(24px,7vw,112px) 64px}
+.rift-home .title-wrap{position:relative;z-index:15;min-width:0;max-width:690px;opacity:var(--title-opacity);transform:translateY(var(--title-y));pointer-events:auto}
+.rift-home .eyebrow{color:#edba95;font:500 .75rem/1.6 var(--font-mono);letter-spacing:.1em;margin-bottom:22px}
+.rift-home .hero-title{font:600 clamp(64px,8.3vw,132px)/.9 var(--font-sans);letter-spacing:-.075em;color:#f5f1e9;margin:0}
 .rift-home .hero-title span{display:block;white-space:nowrap}
-.rift-home .hero-title .serif{font:italic 1.03em/1.03 var(--font-serif);color:#ffd3b0;letter-spacing:-.068em;margin-left:.03em}
-.rift-home .hero-description{font-size:clamp(13px,1.1vw,16px);line-height:1.8;color:#bfc4b9;max-width:330px;margin:32px 0 27px}
-.rift-home .hero-actions{display:flex;align-items:center;flex-wrap:wrap;gap:27px;pointer-events:auto}
-.rift-home .hero-action{display:inline-flex;align-items:center;gap:20px;padding-bottom:10px;border-bottom:1px solid #c4b8a9;color:#f6f0e5;font:500 12px/1.4 var(--font-sans);transition:color .2s,border-color .2s,transform .2s}
-.rift-home .hero-action svg{width:16px;height:16px;transition:transform .25s}
-.rift-home .hero-action:hover,.rift-home .hero-action:focus-visible{color:#ffdebc;border-color:#ffdebc}
-.rift-home .hero-action:hover svg{transform:translate(4px,-4px)}
-.rift-home .hero-action.secondary{color:#b6b8af;border-color:#656960}
-.rift-home .float-annotation{position:absolute;z-index:12;right:7%;bottom:22%;color:#e2c4a9a3;font:500 9px var(--font-mono);letter-spacing:.1em}
-.rift-home .side-readout{position:absolute;z-index:13;right:28px;top:50%;writing-mode:vertical-rl;color:#d5c8b7a1;font:500 9px var(--font-mono);letter-spacing:.32em}
-.rift-home .bottom-bar{position:absolute;z-index:27;left:clamp(26px,5vw,84px);right:clamp(26px,5vw,84px);bottom:27px;display:flex;justify-content:space-between;align-items:end;gap:16px;color:#b9b4aa;font:500 10px var(--font-mono);letter-spacing:.12em}
-.rift-home .bottom-bar .line{display:inline-block;width:72px;height:1px;background:#d5c0a0;margin-right:10px;vertical-align:middle}
-.rift-home .hero-controls{display:flex;align-items:center;gap:13px}
-.rift-home .hero-controls>a{color:#e0bea4;font-size:10px}
-.rift-home .motion-button{background:#0c0e0dc9;color:#f4e6d8;border:1px solid #d8cdb85a;border-radius:30px;padding:10px 14px;font:500 10px var(--font-mono);letter-spacing:.04em}
-.rift-home .motion-button:hover,.rift-home .motion-button:focus-visible{background:#5d3c2c}
-.rift-home .transition-veil{position:absolute;inset:0;z-index:21;pointer-events:none;opacity:var(--wipe-opacity);background:radial-gradient(circle at 70% 52%,#fff5dd 0%,#eae7df 42%,#e8e5dc 100%);clip-path:circle(var(--wipe) at 70% 52%)}
-.rift-home .rift-handoff{position:absolute;z-index:26;left:clamp(26px,7vw,112px);right:7%;bottom:clamp(90px,12vh,150px);max-width:730px;color:#1b2420;opacity:var(--handoff-alpha);transform:translateY(var(--handoff-shift));pointer-events:none}
-.rift-home .rift-handoff h2{font:600 clamp(44px,6vw,91px)/.96 var(--font-sans);letter-spacing:-.075em;margin:13px 0 20px}
-.rift-home .rift-handoff h2 em{font:italic 1.06em var(--font-serif);color:#8c4f34}
-.rift-home .rift-handoff p{max-width:480px;color:#36473d;font-size:15px;line-height:1.6}
-.rift-home .rift-handoff-kicker{color:#9b674a;font:500 10px var(--font-mono);letter-spacing:.16em}
-.rift-home .rift-handoff-link{display:inline-flex;align-items:center;gap:24px;margin-top:22px;padding:13px 21px;border:1px solid #4c5a4e;border-radius:50px;background:#fff8ec;color:#172820;font:500 12px var(--font-mono);pointer-events:auto}
-.rift-home .rift-handoff-link:hover,.rift-home .rift-handoff-link:focus-visible{background:#182d21;color:#fff}
-.rift-home .projects-bridge{position:relative;background:#eae7df;color:#192820;padding:clamp(45px,6vw,92px) 0 clamp(75px,8vw,130px);min-height:100svh;overflow:hidden;scroll-margin-top:80px}
-.rift-home .projects-bridge::before{content:'02';position:absolute;right:5%;top:1%;font:600 min(25vw,340px)/1 var(--font-sans);color:#1327200a;pointer-events:none}
-.rift-home .rift-bridge-inner{position:relative;z-index:1}
-.rift-home .bridge-kicker{font:500 10px var(--font-mono);letter-spacing:.17em;color:#8b614b}
-.rift-home .bridge-heading{display:flex;align-items:end;justify-content:space-between;gap:25px;margin:17px 0 28px}
-.rift-home .bridge-heading h2{font:600 clamp(47px,6.4vw,92px)/.95 var(--font-sans);letter-spacing:-.075em}
-.rift-home .bridge-heading h2 em{font:italic 1.04em var(--font-serif);color:#a06b50}
-.rift-home .bridge-heading p{font-size:15px;line-height:1.65;color:#576359;max-width:365px}
-.rift-home .bridge-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px;margin:34px 0 23px}
-.rift-home .bridge-card{position:relative;display:flex;flex-direction:column;gap:16px;min-height:260px;padding:29px 26px;background:#14231c;color:#f7f0e7;border:1px solid #405449;border-radius:4px;overflow:hidden;transform:translateY(0);transition:transform .5s cubic-bezier(.16,1,.3,1),box-shadow .3s,border-color .3s}
-.rift-home .bridge-card:nth-child(2){background:#24211c}.rift-home .bridge-card:nth-child(3){background:#19242a}
-.rift-home .bridge-card::before{content:'';position:absolute;inset:-60% auto auto -70%;width:52%;height:240%;background:linear-gradient(90deg,transparent,#ffd4a51d,transparent);transform:rotate(17deg);transition:translate .75s;pointer-events:none}
-.rift-home .bridge-card:hover::before,.rift-home .bridge-card:focus-visible::before{translate:320% 0}
-.rift-home .bridge-card:hover,.rift-home .bridge-card:focus-visible{transform:translateY(-7px);border-color:#c49c7a;box-shadow:0 25px 45px #14221d2b}
-.rift-home .bridge-card .card-index{font:500 10px var(--font-mono);letter-spacing:.14em;color:#dfb18f}
-.rift-home .bridge-card strong{font:600 clamp(27px,2.7vw,42px)/1.05 var(--font-sans);letter-spacing:-.055em;max-width:310px}
-.rift-home .bridge-card .card-description{font-size:13px;line-height:1.7;color:#c2c9be;max-width:275px}
-.rift-home .bridge-card .card-arrow{position:absolute;right:24px;bottom:22px;font-size:25px;color:#f3c59f;transition:transform .3s}
-.rift-home .bridge-card:hover .card-arrow{transform:translate(5px,-5px)}
-.rift-home .bridge-next{display:flex;flex-wrap:wrap;gap:11px;margin-top:25px}
-.rift-home .bridge-next :is(a,button){padding:12px 17px;border:1px solid #9ba99d;border-radius:30px;background:transparent;font:500 11px var(--font-mono);color:#23372b;transition:background .2s,color .2s,transform .2s}
-.rift-home .bridge-next :first-child{background:#17291f;color:#fff5e8}
-.rift-home .bridge-next :is(a,button):hover{transform:translateY(-3px);background:#c78b65;color:#141b17}
-html.js-active:not(.reduced-motion) .rift-home .bridge-card:not(.is-visible){opacity:.82;transform:translateY(12px)}
-html.js-active .rift-home .bridge-card.is-visible{opacity:1}
-.rift-home :is(a,button):focus-visible{outline:2px solid #f0a774;outline-offset:4px}
-.rift-home .bridge-next :is(a,button):focus-visible,.rift-home .bridge-card:focus-visible{outline-color:#a85c38}
-@media(max-width:1000px){
- .rift-home .title-wrap{width:60vw}
- .rift-home .hero-title{font-size:clamp(62px,8.5vw,108px)}
- .rift-home .bridge-grid{gap:11px}
- .rift-home .bridge-card{padding:23px 20px}
+.rift-home .hero-title .serif{font:italic 1.03em/1.03 var(--font-serif);color:#ffd3b0;letter-spacing:-.06em}
+.rift-home .hero-description{font-size:1rem;line-height:1.75;color:#c4c7be;max-width:360px;margin:24px 0}
+.rift-home .hero-action{display:inline-flex;align-items:center;min-height:44px;border-bottom:1px solid #e0b18e;color:#fff0df;font-size:.95rem;transition:color .2s,background .2s}
+.rift-home .hero-action:hover{color:#eeb589}
+.rift-home .hero-action:active{background:#eeb58918}
+.rift-home .rift-mode-switcher{display:grid;gap:10px;margin-top:32px;max-width:100%;color:#f5eee4}
+.rift-home .rift-mode-label{font:500 .75rem var(--font-mono);letter-spacing:.1em;color:#d6a780}
+.rift-home .rift-mode-label-suffix{color:#b7b3a6}
+.rift-home .rift-mode-buttons{display:flex;gap:6px;flex-wrap:wrap}
+.rift-home .rift-mode{font:500 .875rem var(--font-sans);color:#ced0c6;background:#0a0e0de6;border:1px solid #777e70;border-radius:99px;padding:10px 14px;min-height:44px;transition:background .2s,color .2s,border-color .2s}
+.rift-home .rift-mode:is(:hover,:focus-visible){background:#463629;border-color:#c5a080;color:#fff9ed}
+.rift-home .rift-mode.is-active{color:#201812;background:#e7c49e;border-color:#e7c49e}
+.rift-home .rift-mode:active{background:#b28b66}
+.rift-home .rift-mode-description{font:400 .75rem/1.6 var(--font-mono);color:#c2b9aa;min-height:3.2em;max-width:460px}
+.rift-home .rift-mobile-picker{display:none}
+.rift-home .bottom-bar{position:absolute;z-index:12;bottom:24px;left:7%;display:flex;align-items:center;gap:14px;color:#c6b7a4;font:500 .75rem var(--font-mono);letter-spacing:.1em;opacity:var(--title-opacity)}
+.rift-home .bottom-bar .line{height:1px;width:44px;background:#cfad8b}
+.rift-home .rift-ending .title-wrap{visibility:hidden;pointer-events:none}
+.rift-home :is(a,button,select):focus-visible{outline:2px solid #f0b184;outline-offset:5px}
+/* The actual Work section rises through the camera's exit plane. No cloned cards. */
+.rift-home #work{position:relative;z-index:20;margin-top:calc(-100svh + var(--header-h,80px));padding:34px 0 110px;background:#101714;color:#f4eee4;border-top:1px solid #8b71534d;opacity:var(--work-alpha,1);scroll-margin-top:0}
+.rift-home #work::before{content:'';position:absolute;inset:0 0 auto;height:320px;pointer-events:none;background:radial-gradient(ellipse at 74% 0,#ba81511a,transparent 65%)}
+.work-anchor{position:absolute;top:0;scroll-margin-top:0}
+.rift-home .work-heading{position:relative;margin-bottom:24px;gap:24px}
+.rift-home .work-heading .eyebrow{margin:0;color:#d3a17d;font-size:.75rem}
+.rift-home .work-heading h2{font-size:clamp(40px,5vw,76px);margin-top:10px;color:#f4eee4}
+.rift-home .work-heading h2 em{color:#e3ad85}
+.rift-home .work-heading>p{color:#bdc5ba;font-size:1rem;max-width:380px;line-height:1.65}
+.rift-home .filter-row{border-color:#58644f80;margin-bottom:32px;padding-block:10px}
+.rift-home .filter-button{font-size:.875rem;color:#c2ccbd;min-height:44px}
+.rift-home .filter-button:hover{background:#2b372e;color:#fff1de}
+.rift-home .filter-button.is-active{background:#e6c5a1;color:#152118}
+.rift-home .filter-count{color:#c2ccbd;font-size:.75rem}
+.rift-home .projects-grid{display:grid;grid-template-columns:1fr;gap:48px}
+.rift-home .project-card,.rift-home .project-card.is-wide{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);grid-template-rows:1fr auto;column-gap:36px;grid-column:auto;background:transparent;border:0;border-bottom:1px solid #52614885;border-radius:0;padding:0 0 40px;box-shadow:none;cursor:auto;transform:none!important;opacity:1!important;filter:none!important}
+.rift-home .project-card:hover{box-shadow:none;border-color:#b28d68}
+.rift-home .project-card[hidden]{display:none}
+.rift-home .project-card .project-visual{grid-column:1;grid-row:1/3;height:auto;min-height:360px;aspect-ratio:16/10;border-radius:3px;overflow:hidden;transform:none!important;cursor:pointer}
+.rift-home .project-card .project-visual .visual-content{transform:none!important}
+.rift-home .project-screenshot{width:100%;height:100%;object-fit:cover;object-position:top;display:block;transition:filter .25s}
+.rift-home .project-visual:hover .project-screenshot{filter:brightness(1.06)}
+.rift-home .project-card:has(.project-screenshot) .project-kicker{display:none}
+.rift-home .project-card .project-visual-tag{inset:auto 12px 12px auto;background:#08100eee;color:#eee6d9;font:500 .75rem/1.4 var(--font-mono);padding:8px 10px;border:1px solid #8e9b7a66}
+.rift-home .project-card .project-info{display:block;padding:18px 0 24px;min-height:0;color:#f4eee4}
+.rift-home .project-card .project-num{font:400 .75rem/1.6 var(--font-mono);color:#ddb08b}
+.rift-home .project-card .project-title{font-size:clamp(28px,3vw,44px);line-height:1.08;letter-spacing:-.05em;color:#f4eee4;margin:14px 0}
+.rift-home .project-summary{font-size:1rem;line-height:1.6;color:#e1e3d7;max-width:none}
+.rift-home .project-technical{font-size:1rem;line-height:1.65;color:#b7c2b3;margin-top:18px}
+.rift-home .project-stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.rift-home .project-stack span{font:400 .75rem/1.5 var(--font-mono);padding:5px 9px;border:1px solid #66715d80;color:#cbd2c3;border-radius:4px}
+.rift-home .project-arrow-wrap{display:none}
+.rift-home .project-card .project-linkbar{grid-column:2;display:flex;flex-wrap:wrap;gap:10px 20px;padding:0;background:transparent;border:0;align-items:center}
+.rift-home .project-case-open{font:500 1rem var(--font-sans);color:#f3ccaa;border-bottom:1px solid #bd9876;padding:10px 0;min-height:44px;display:inline-flex;align-items:center}
+.rift-home .project-case-open:hover{color:#fff5e9}
+.rift-home .project-direct{font-size:.75rem;color:#b7c5b0;min-height:44px;display:inline-flex;align-items:center}
+.rift-home .private-pill{font-size:.75rem;color:#bdc5ba}
+.rift-home .work-footer{margin-top:28px;gap:24px;color:#bdc5ba}
+.rift-home .work-footnote{font-size:.75rem;line-height:1.6;color:#bdc5ba}
+.rift-home .text-link-button{color:#e6bd9b;font-size:.875rem}
+/* A compact guide is available from the header throughout the project showcase. */
+body:has(.rift-home) #kioGuide.kio-shell:not(.kio-open):not(.kio-suppressed){width:76px;height:104px;right:12px;bottom:12px}
+body:has(.rift-home) #kioGuide:not(.kio-open) .kio-launch{width:76px;height:104px}
+body:has(.rift-home) #kioGuide:not(.kio-open) .kio-person{width:69px;height:84px}
+body:has(.rift-home) #kioGuide:not(.kio-open) .kio-aura{height:75px}
+body:has(.rift-home) #kioGuide:not(.kio-open) .kio-launch-label{display:none}
+body:has(.rift-home) #kioGuide .kio-hint{display:none!important}
+html.rift-work-active #kioGuide:not(.kio-open){visibility:hidden;pointer-events:none;opacity:0}
+@media(max-width:1100px){
+ .rift-home .stage{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);padding-inline:5vw}
+ .rift-home .hero-title{font-size:clamp(64px,9vw,100px)}
+ .rift-home .project-card,.rift-home .project-card.is-wide{column-gap:24px;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}
 }
 @media(max-width:760px){
- .rift-home .intro{height:195svh}
- .rift-home .stage{min-height:min(100svh,640px)}
- .rift-home .stage::before{background:linear-gradient(180deg,transparent 0%,#05080823 28%,#050808e6 58%,#050808fc 92%),linear-gradient(90deg,#05080859,transparent 78%)}
- .rift-home .rift-bloom{top:0;right:0;width:100vw;height:50vh}
- .rift-home .title-wrap{left:6.5%;top:59%;width:87%;max-width:none}
- .rift-home .hero-title{font-size:clamp(47px,12vw,77px);line-height:.94}
- .rift-home .hero-title .serif{font-size:1em}
- .rift-home .eyebrow{font-size:9px;margin-bottom:15px;letter-spacing:.06em}
- .rift-home .hero-description{font-size:13px;max-width:290px;margin:20px 0}
- .rift-home .hero-actions{gap:15px}
- .rift-home .hero-action{font-size:11px}
- .rift-home .rift-portal{left:19%;top:6%;width:84%;height:44%}
- .rift-home .rift-bloom{height:55vh}
- .rift-home .substance-ghost{left:6%;top:14%;font-size:22vw}
- .rift-home .light-shafts i{top:-15%;height:75%;left:39%}
- .rift-home .light-shafts i:nth-child(2){left:81%}
- .rift-home .side-readout,.rift-home .float-annotation{display:none}
- .rift-home .bottom-bar{left:6%;right:6%;bottom:20px;font-size:8px}
- .rift-home .bottom-bar>span:nth-child(2){display:none}
- .rift-home .bottom-bar .line{width:24px}
- .rift-home .hero-controls{gap:8px}
- .rift-home .hero-controls>a{font-size:9px}
- .rift-home .motion-button{font-size:9px;padding:8px 10px}
- .rift-home .rift-handoff{left:7%;right:7%;bottom:110px}
- .rift-home .rift-handoff h2{font-size:clamp(40px,10vw,63px)}
- .rift-home .bridge-heading{display:block}
- .rift-home .bridge-heading p{margin-top:15px}
- .rift-home .bridge-grid{grid-template-columns:1fr;gap:12px}
- .rift-home .bridge-card{min-height:195px}
- .rift-home .bridge-card strong{font-size:32px}
- .rift-home .projects-bridge{padding:52px 0 85px}
+ .rift-home .intro{height:210svh}
+ .rift-home .stage{display:flex;align-items:end;padding:calc(var(--header-h,69px) + 24px) 6% 54px}
+ .rift-home .stage::before{background:linear-gradient(180deg,#05080800,#05080820 24%,#050808ed 55%,#050808 90%)}
+ .rift-home .title-wrap{width:100%;max-width:none}
+ .rift-home .hero-title{font-size:clamp(48px,12.5vw,84px);line-height:.94}
+ .rift-home .eyebrow{font-size:.75rem;letter-spacing:.035em;margin-bottom:14px}
+ .rift-home .hero-description{font-size:1rem;line-height:1.6;max-width:330px;margin:20px 0 12px}
+ .rift-home .rift-mode-switcher{margin-top:20px;gap:0}
+ .rift-home .rift-mode-label,.rift-home .rift-mode-buttons,.rift-home .rift-mode-description{display:none}
+ .rift-home .rift-mobile-picker{display:flex;align-items:center;gap:16px;font:500 .75rem var(--font-mono);color:#e6b58b}
+ .rift-home .rift-mobile-picker select{appearance:none;background:#111a16;border:1px solid #9d8a70;color:#f4e9d8;border-radius:6px;padding:11px 35px 11px 14px;font:400 1rem var(--font-sans);min-height:44px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23e6b58b' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+ .rift-home .bottom-bar{left:6%;bottom:20px;font-size:.7rem}
+ .rift-home .rift-portal{left:25%;top:8%;width:68%;height:38%}
+ .rift-home .substance-ghost{left:5%;top:18%;font-size:23vw}
+ .rift-home .rift-bloom{top:0;height:50vh;width:100vw}
+ .rift-home #work{padding-top:26px;padding-bottom:70px}
+ .rift-home .work-heading{display:block;margin-bottom:18px}
+ .rift-home .work-heading>p{display:none}
+ .rift-home .work-heading h2{font-size:48px}
+ .rift-home .filter-row{gap:4px;margin-bottom:24px}
+ .rift-home .filter-button{padding:10px 12px}
+ .rift-home .filter-count{font-size:.75rem}
+ .rift-home .project-card,.rift-home .project-card.is-wide{display:flex;flex-direction:column;gap:0;padding-bottom:32px}
+ .rift-home .project-card .project-visual{width:100%;min-height:0;height:auto;aspect-ratio:16/10}
+ .rift-home .project-card .project-info{padding:24px 0}
+ .rift-home .project-card .project-title{font-size:32px}
+ .rift-home .project-card .project-linkbar{gap:12px 20px}
+ .rift-home .project-card .project-visual-tag{font-size:.65rem}
 }
-@media(max-width:390px){
- .rift-home .hero-title{font-size:clamp(43px,11.6vw,56px)}
- .rift-home .hero-description{font-size:12px}
- .rift-home .hero-controls>a{display:none}
+@media(max-height:720px) and (min-width:761px){
+ .rift-home .hero-title{font-size:clamp(58px,7.5vw,90px)}
+ .rift-home .hero-description{margin:16px 0;line-height:1.5}
+ .rift-home .rift-mode-switcher{margin-top:18px}
+ .rift-home .rift-mode-description{display:none}
 }
+@media(max-height:720px) and (max-width:760px){
+ .rift-home .hero-description{margin:12px 0;line-height:1.45}
+ .rift-home .hero-title{font-size:clamp(44px,11vw,60px)}
+ .rift-home .rift-mode-switcher{margin-top:14px}
+}
+html:is(.motion-off,.rift-static) .rift-home .intro{height:auto}
+html:is(.motion-off,.rift-static) .rift-home .stage{position:relative;min-height:100svh}
+html:is(.motion-off,.rift-static) .rift-home #work{margin-top:0;opacity:1;pointer-events:auto!important}
+html:is(.motion-off,.rift-static) .rift-home .title-wrap{opacity:1;transform:none;visibility:visible}
+html:is(.motion-off,.rift-static) .rift-home .rift-mode-switcher{display:none}
 @media(prefers-reduced-motion:reduce){
  .rift-home .intro{height:auto!important}
- .rift-home .stage{position:relative!important;height:auto;min-height:100svh}
- .rift-home .transition-veil,.rift-home .rift-handoff,.rift-home .substance-ghost{display:none!important}
- .rift-home .title-wrap{opacity:1!important;transform:translate3d(0,-50%,0)!important}
- .rift-home .bridge-card{opacity:1!important;transform:none!important}
- .rift-home *, .rift-home *::before,.rift-home *::after{animation:none!important;transition:none!important}
+ .rift-home .stage{position:relative;min-height:100svh}
+ .rift-home #work{margin-top:0;opacity:1;pointer-events:auto!important}
+ .rift-home .title-wrap{opacity:1!important;transform:none!important;visibility:visible}
+ .rift-home .rift-mode-switcher,.rift-home .substance-ghost{display:none}
+ .rift-home *,.rift-home *::before,.rift-home *::after{animation:none!important;transition:none!important}
 }
-@media(hover:none){
- .rift-home .bridge-card:hover{transform:none;box-shadow:none}
-}
-/* The old global Kio size was unintentionally reduced by visual-polish.css.
-   Restore a visible, optional guide without obscuring mobile content. */
-#kioGuide.kio-shell.kio-balanced:not(.kio-open):not(.kio-suppressed){width:176px;height:234px;right:max(14px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))}
-#kioGuide.kio-balanced:not(.kio-open) .kio-launch{width:174px;height:228px}
-#kioGuide.kio-balanced:not(.kio-open) .kio-person{width:158px;height:191px}
-#kioGuide.kio-balanced:not(.kio-open) .kio-aura{height:172px}
-#kioGuide.kio-balanced:not(.kio-open) .kio-launch-label{display:flex;min-height:41px}
-@media(max-width:760px){
- #kioGuide.kio-shell.kio-balanced:not(.kio-open):not(.kio-suppressed){width:112px;height:147px;right:8px;bottom:max(9px,env(safe-area-inset-bottom))}
- #kioGuide.kio-balanced:not(.kio-open) .kio-launch{width:110px;height:144px}
- #kioGuide.kio-balanced:not(.kio-open) .kio-person{width:101px;height:123px}
- #kioGuide.kio-balanced:not(.kio-open) .kio-aura{height:111px}
- #kioGuide.kio-balanced:not(.kio-open) .kio-launch-label{display:flex;min-height:27px}
- #kioGuide.kio-balanced:not(.kio-open) .kio-launch-label small{display:none}
-}
-/* Existing system cursor and ripple are enhanced, never replace the OS cursor. */
-@media(hover:hover) and (pointer:fine){
- .cursor-halo{width:280px;height:280px;z-index:19;opacity:0;transition:opacity .2s ease;will-change:transform;background:radial-gradient(circle,#e7a06c17 0%,#e7a06c0d 30%,transparent 66%)}
- .cursor-halo::after{content:'';position:absolute;left:50%;top:50%;width:22px;height:22px;border:1px solid #e9b58ba1;border-radius:50%;transform:translate(-50%,-50%) scale(var(--cursor-scale,1));transition:transform .23s cubic-bezier(.18,.85,.2,1),border-color .23s;box-shadow:0 0 19px #e2a37d22}
- .cursor-halo.is-action{--cursor-scale:1.65}
- .cursor-halo.is-action::after{border-color:#ffcda4}
- .cursor-halo.is-clicked{--cursor-scale:.6}
-}
-html.motion-off .cursor-halo{display:none!important}
-@media(prefers-reduced-motion:reduce){.cursor-halo{display:none!important}}
-
-
-/* Contextual interaction compass: helpful only where there is a real action. */
-.explore-compass{position:fixed;left:clamp(17px,2.4vw,36px);bottom:23px;z-index:64;display:flex;align-items:center;gap:14px;max-width:min(460px,calc(100vw - 230px));padding:13px 15px;background:#17271feb;color:#f3eee5;border:1px solid #70847685;border-radius:8px;box-shadow:0 18px 50px #08100c4a;backdrop-filter:blur(15px);opacity:0;visibility:hidden;transform:translateY(15px);pointer-events:none;transition:opacity .28s ease,transform .28s ease,visibility .28s ease}
-.explore-compass.is-visible{opacity:1;visibility:visible;transform:none;pointer-events:auto}
-.explore-compass-mark{display:grid;place-items:center;width:37px;height:37px;flex:0 0 37px;border:1px solid #bb956c;border-radius:50%;color:#f0ac7d;font-size:22px}
-.explore-compass>div{flex:1;min-width:0}
-.explore-compass strong{display:block;color:#e2a983;font:500 9px var(--font-mono);letter-spacing:.12em}
-.explore-compass p{margin:5px 0 0;font-size:11px;line-height:1.45;color:#d2dbce}
-.explore-compass button{background:transparent;color:#f1c09b;border:1px solid #a17d5f77;padding:9px;border-radius:4px;font:500 10px var(--font-mono);white-space:nowrap}
-.explore-compass button:hover,.explore-compass button:focus-visible{background:#4b3428}
-.explore-compass .explore-compass-close{border:0;font-size:17px;padding:6px;color:#c7d2c6}
-@media(max-width:760px){.explore-compass{display:none!important}}
-@media(prefers-reduced-motion:reduce){.explore-compass{transition:none!important}}
-
-
-/* Precision feedback: a short tactile press and a directional navigation cue.
-   The existing v4 ripple provides the click wave; no second burst is added. */
-.rift-home :is(.hero-action,.rift-handoff-link,.bridge-next a,.bridge-next button):active{transform:translateY(1px) scale(.975)}
-.rift-home .bridge-card:active{transform:scale(.987)}
-.site-header .nav-link{position:relative}
-.site-header .nav-link::after{content:'';position:absolute;bottom:-9px;left:0;right:0;height:1px;background:#f0b18b;transform:scaleX(0);transform-origin:right;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
-.site-header .nav-link:hover::after,.site-header .nav-link:focus-visible::after{transform:scaleX(1);transform-origin:left}
-.site-header :is(.search-trigger,.v6-guide-toggle,.motion-switch):active{transform:translateY(1px) scale(.98)}
-@media(prefers-reduced-motion:reduce){.site-header .nav-link::after{transition:none!important}}
-
-
-/* Five real-time animation directions share the same renderer and geometry.
-   Native picker on mobile avoids five crowded touch targets. */
-.rift-home .rift-mode-switcher{position:absolute;z-index:28;left:clamp(26px,7vw,112px);bottom:81px;display:grid;gap:9px;max-width:min(750px,64vw);color:#f5eee4}
-.rift-home .rift-mode-label{font:500 9px var(--font-mono);letter-spacing:.15em;color:#d6a780}
-.rift-home .rift-mode-label-suffix{color:#b7b3a6}
-.rift-home .rift-mode-buttons{display:flex;gap:5px;flex-wrap:wrap}
-.rift-home .rift-mode{font:500 10px var(--font-mono);letter-spacing:.01em;color:#c6c8be;background:#0a0e0dc9;border:1px solid #8a8b7b74;border-radius:99px;padding:9px 13px;white-space:nowrap;min-height:34px;transition:background .22s,border-color .22s,color .22s,transform .22s}
-.rift-home .rift-mode:is(:hover,:focus-visible){color:#fff9ed;background:#463629;border-color:#b89b7b}
-.rift-home .rift-mode.is-active{color:#201812;background:#e7c49e;border-color:#e7c49e;box-shadow:0 0 22px #f1af7f19}
-.rift-home .rift-mode:active{transform:scale(.96)}
-.rift-home .rift-mode-description{font:400 10px/1.45 var(--font-mono);letter-spacing:.015em;color:#bdb6aa;max-width:660px;min-height:15px}
-.rift-home .rift-mobile-picker{display:none}
-.rift-home .rift-portal-label{position:absolute;right:4%;top:17%;font:500 10px var(--font-mono);color:#e7bc9d}
-.rift-home [data-rift-mode="ascension"] ~ .rift-mode-description{color:#ecc7aa}
-@media(min-width:761px) and (max-height:730px){
- .rift-home .rift-mode-switcher{bottom:62px}
- .rift-home .rift-mode-description{display:none}
- .rift-home .title-wrap{top:47%}
-}
-@media(max-width:760px){
- .rift-home .rift-mode-switcher{left:6%;right:6%;top:94px;bottom:auto;max-width:none;gap:5px;z-index:28}
- .rift-home .rift-mode-label{display:none}
- .rift-home .rift-mode-buttons{display:none}
- .rift-home .rift-mobile-picker{display:flex;align-items:center;gap:9px;justify-content:flex-start;font:500 9px var(--font-mono);letter-spacing:.13em;color:#e6b58b}
- .rift-home .rift-mobile-picker select{appearance:auto;width:min(245px,75vw);max-width:100%;background:#101817e8;border:1px solid #c4ad8b80;border-radius:7px;padding:10px 10px;color:#fff1df;font:500 12px var(--font-mono);min-height:44px}
- .rift-home .rift-mode-description{display:none}
-}
-@media(prefers-reduced-motion:reduce){
- .rift-home .rift-mode-switcher{display:none}
-}
-
-
-/* Genuine public captures have their provenance visibly labeled.
-   Promotional artwork is never described as gameplay evidence. */
-.rift-home .bridge-media{position:relative;display:block;overflow:hidden;aspect-ratio:16/9;background:#26352d;border:1px solid #6c7c714a;border-radius:2px;margin:2px 0 2px}
-.rift-home .bridge-media img{width:100%;height:100%;display:block;object-fit:cover;object-position:center top;filter:saturate(.75) contrast(1.06);transition:transform .75s cubic-bezier(.16,1,.3,1),filter .45s}
-.rift-home .bridge-media-label{position:absolute;left:0;right:0;bottom:0;padding:10px 10px 9px;background:linear-gradient(transparent,#0b1614e0);color:#e6e3d4;font:500 8px var(--font-mono);letter-spacing:.08em}
-.rift-home .bridge-card:hover .bridge-media img,.rift-home .bridge-card:focus-visible .bridge-media img{transform:scale(1.045);filter:saturate(.93) contrast(1.08)}
-.rift-home .bridge-card .card-evidence{font:500 9px/1.5 var(--font-mono);letter-spacing:.055em;color:#dcb393;max-width:85%}
-.rift-home .bridge-card{min-height:425px;padding-bottom:49px}
-.rift-home .bridge-card strong{font-size:clamp(25px,2.45vw,37px)}
-@media(max-width:760px){
- .rift-home .bridge-card{min-height:355px;padding-bottom:40px}
- .rift-home .bridge-media{aspect-ratio:2.2/1}
- .rift-home .bridge-card strong{font-size:29px}
-}
-@media(prefers-reduced-motion:reduce){
- .rift-home .bridge-media img{transform:none!important;transition:none!important}
-}
-
-
-/* Global MOTION OFF is a usability mode, not a frozen 200vh cinematic.
-   Reveal normal content with no empty scroll and no invisible controls. */
-html.motion-off .rift-home .intro{height:auto!important}
-html.motion-off .rift-home .stage{position:relative!important;min-height:100svh}
-html.motion-off .rift-home .title-wrap{opacity:1!important;transform:translate3d(0,-50%,0)!important}
-html.motion-off .rift-home .transition-veil,
-html.motion-off .rift-home .rift-handoff,
-html.motion-off .rift-home .substance-ghost{display:none!important}
-html.motion-off .rift-home .bridge-card{opacity:1!important;transform:none!important}
-html.motion-off .rift-home .rift-mode-switcher{display:none!important}
-
-
-/* V9.5 — no blank transition frames; real project navigation remains on screen. */
-.rift-home .intro{height:205svh}
-.rift-home .rift-handoff{z-index:31;visibility:visible}
-.rift-home .transition-veil{background:radial-gradient(circle at 70% 52%,#fff5de 0%,#eae7df 43%,#eae7df 100%)}
-.rift-home .rift-handoff[data-active="true"]{pointer-events:auto}
-.rift-home .rift-handoff[data-active="true"] .rift-handoff-link{pointer-events:auto}
-.rift-home .rift-handoff-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
-.rift-home .rift-handoff-links a{display:inline-flex;align-items:center;padding:8px 12px;border:1px solid #4963567a;border-radius:20px;background:#e9e8de;color:#1e352a;font:500 10px var(--font-mono);text-decoration:none;pointer-events:auto}
-.rift-home .rift-handoff-links a:hover,.rift-home .rift-handoff-links a:focus-visible{background:#20362a;color:#fff}
-@media(max-width:760px){
-.rift-home .intro{height:185svh}
-.rift-home .rift-handoff{bottom:95px}
-.rift-home .rift-handoff-links a{padding:7px 10px;font-size:9px}
-}
-@media(prefers-reduced-motion:reduce){
-.rift-home .intro{height:auto!important}
-.rift-home .rift-handoff{display:none!important}
-}
-
-
-/* V9.6 — retire opening controls before the work reveal; never overlay CTA links. */
-.rift-home .rift-mode-switcher,.rift-home .bottom-bar,.rift-home .side-readout,.rift-home .float-annotation{transition:opacity .22s ease,visibility .22s ease}
-.rift-home .rift-stage.rift-ending :is(.rift-mode-switcher,.bottom-bar,.side-readout,.float-annotation){opacity:0!important;visibility:hidden!important;pointer-events:none!important}
-@media(prefers-reduced-motion:reduce){.rift-home .rift-mode-switcher,.rift-home .bottom-bar{transition:none!important}}
-
-
-/* The fly-through lands on project previews in the same frame as the veil. */
-.rift-home .title-wrap{z-index:25}
-.rift-home .rift-projects-visible .title-wrap{visibility:hidden;pointer-events:none}
-.rift-home .rift-handoff{top:max(110px,14svh);bottom:170px;right:220px;max-width:1120px}
-.rift-home .rift-handoff h2{font-size:clamp(38px,5vw,72px);margin:15px 0 25px}
-.rift-home .rift-handoff-projects{margin:0;gap:16px}
-.rift-home .rift-handoff-projects .bridge-card{min-height:0;padding:20px 20px 40px;gap:12px;opacity:1!important;transform:none!important}
-.rift-home .rift-handoff-projects .bridge-card strong{font-size:clamp(22px,2.2vw,32px)}
-.rift-home .rift-handoff-projects .card-evidence{display:none}
-.rift-home .bottom-bar{right:220px}
-.rift-home .bottom-bar>span:nth-child(2){display:none}
-@media(max-width:760px){
- .rift-home .bottom-bar{right:135px;align-items:start;gap:14px;flex-direction:column;bottom:22px}
- .rift-home .hero-controls{flex-wrap:wrap}
- .rift-home .hero-controls>a{display:inline-flex;font-size:10px;padding:8px 0}
- .rift-home .rift-handoff{top:160px;bottom:160px;right:6%;left:6%}
- .rift-home .rift-handoff h2{font-size:38px;margin:10px 0 20px}
- .rift-home .rift-handoff-projects{display:grid;grid-template-columns:1fr;gap:10px}
- .rift-home .rift-handoff-projects .bridge-card{display:grid;grid-template-columns:90px 1fr;gap:7px 14px;padding:13px;min-height:100px;align-content:center}
- .rift-home .rift-handoff-projects .bridge-media{grid-column:1;grid-row:1/3;aspect-ratio:1.3;margin:0;align-self:center}
- .rift-home .rift-handoff-projects .bridge-media-label,.rift-home .rift-handoff-projects .card-description,.rift-home .rift-handoff-projects .card-arrow{display:none}
- .rift-home .rift-handoff-projects .card-index{grid-column:2;font-size:8px}
- .rift-home .rift-handoff-projects .bridge-card strong{grid-column:2;font-size:23px}
-}
-/* The inline guide opens below the persistent site navigation. */
+.rift-home [data-rift-mode="kinetic"] .rift-portal{transform:perspective(1000px) rotateY(16deg) rotateZ(-32deg)}
+.rift-home [data-rift-mode="kinetic"] .gate:nth-child(2){rotate:25deg}
+.rift-home [data-rift-mode="kinetic"] .gate:nth-child(3){rotate:-25deg}
+.rift-home [data-rift-mode="fracture"] .gate:nth-child(1){translate:8% -9%;rotate:8deg}
+.rift-home [data-rift-mode="fracture"] .gate:nth-child(2){translate:-14% 12%;rotate:-5deg}
+.rift-home [data-rift-mode="infinite"] .rift-portal{transform:perspective(700px) rotateY(0);width:55%;left:45%}
+.rift-home [data-rift-mode="infinite"] .gate:nth-child(2){--s:.68}
+.rift-home [data-rift-mode="infinite"] .gate:nth-child(3){--s:.4}
+.rift-home [data-rift-mode="infinite"] .gate:nth-child(4){--s:.19}
+.rift-home [data-rift-mode="ascension"] .rift-portal{transform:perspective(900px) rotateX(35deg) rotateZ(-5deg)}
+.rift-home [data-rift-mode="ascension"] .substance-ghost{top:22%;left:36%;color:#f7d5ae80;-webkit-text-stroke:1px #f7c59a99;font-size:clamp(80px,10vw,170px);transform:translateY(calc(var(--rift-scroll)*-180px))}
+.rift-home [data-rift-mode="ascension"] .light-shafts{mask-image:none;background:linear-gradient(120deg,transparent 45%,#f6d7aa18 57%,transparent 63%)}
+@media(max-width:760px){.rift-home [data-rift-mode="ascension"] .substance-ghost{left:5%;top:22%;font-size:20vw}}
+.rift-home .project-card .project-info{background:transparent}
+.rift-home .project-card .project-linkbar :is(.project-live,.project-source){background:transparent;color:#d0cbbb;border:0;padding:10px 0}
+/* Inline guide content reserves the persistent navigation's height. */
 .rift-home > #kioGuide.kio-open{margin-top:calc(var(--header-h,80px) + 24px)}

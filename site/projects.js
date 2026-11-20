@@ -2,7 +2,7 @@
 window.PORTFOLIO = {
   projects: [
     {
-      id: 'srmedu', num: '01', title: 'SRM Smart Study Hub', short: 'The campus study companion I wanted to exist.',
+      id: 'srmedu', preview: { src: 'assets/media/srmedu-capture-01.webp', alt: 'SRM Smart Study Hub subject catalogue', label: 'PUBLIC INTERFACE CAPTURE' }, num: '01', title: 'SRM Smart Study Hub', short: 'The campus study companion I wanted to exist.',
       category: 'product', categories: ['EDTECH', 'PRODUCT ENGINEERING'], year: '2026', status: 'LIVE PRODUCT',
       theme: 'study', size: 'wide', role: 'Independent creator & developer',
       link: 'https://www.srmedu.in/', linkLabel: 'Visit live platform', source: null,
@@ -30,7 +30,7 @@ window.PORTFOLIO = {
       concepts: ['Memory-efficient inference', 'Retention policies', 'Reproducible evaluation', 'Failure analysis']
     },
     {
-      id: 'projectmatch', num: '03', title: 'ProjectMatch', short: 'Find collaborators by what they can build, not who they know.',
+      id: 'projectmatch', preview: { src: 'assets/media/projectmatch-capture-01.webp', alt: 'ProjectMatch public collaboration platform', label: 'PUBLIC INTERFACE CAPTURE' }, num: '03', title: 'ProjectMatch', short: 'Find collaborators by what they can build, not who they know.',
       category: 'product', categories: ['FULL STACK', 'COLLABORATION'], year: '2026', status: 'LIVE DEMO',
       theme: 'match', size: 'normal', role: 'Independent developer',
       link: 'https://projectmatch-phi.vercel.app/', linkLabel: 'Explore the app', source: 'https://github.com/dharaksh2807-svg/projectmatch',
@@ -58,7 +58,7 @@ window.PORTFOLIO = {
       concepts: ['Collision engineering', 'Procedural solvability', 'World generation', 'Performance']
     },
     {
-      id: 'oodp', num: '05', title: 'OODP Mastery', short: 'A deeper way to learn C++ and object-oriented programming.',
+      id: 'oodp', preview: { src: 'assets/media/oodp-capture-01.webp', alt: 'OODP Mastery public learning interface', label: 'PUBLIC INTERFACE CAPTURE' }, num: '05', title: 'OODP Mastery', short: 'A deeper way to learn C++ and object-oriented programming.',
       category: 'product', categories: ['EDTECH', 'C++ LEARNING'], year: '2026', status: 'LIVE PRODUCT',
       theme: 'oodp', size: 'normal', role: 'Independent creator & developer',
       link: 'https://oops-mastery.netlify.app/', linkLabel: 'Explore learning platform', source: 'https://github.com/dharaksh2807-svg/oops-mastery.',

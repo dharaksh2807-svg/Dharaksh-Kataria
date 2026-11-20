@@ -23,22 +23,22 @@ const server=http.createServer((req,res)=>{
  async function capture(name,width,motion,chapter,forceFallback=false){
   const page=await browser.newPage({viewport:{width,height:900},reducedMotion:motion,deviceScaleFactor:1});
   const errors=[];page.on('pageerror',error=>errors.push(error.message));
-  page.on('console',message=>{if(/Sculpture shader unavailable|Sculpture unavailable/.test(message.text()))errors.push(message.text())});
+
   await page.route('**/*',route=>route.request().url().startsWith(origin)?route.continue():route.abort());
-  if(forceFallback){await page.addInitScript(()=>{const orig=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(type,...rest){if(this.id==='sculptureCanvas'&&type==='webgl2')return null;return orig.call(this,type,...rest)}})}
+  if(forceFallback){await page.addInitScript(()=>{const orig=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(type,...rest){if(this.id==='riftCanvas'&&type.startsWith('webgl'))return null;return orig.call(this,type,...rest)}})}
   try{
    await page.goto(origin,{waitUntil:'domcontentloaded'});
    await page.locator('#introCurtain').waitFor({state:'hidden',timeout:8000}).catch(()=>{});
    await page.evaluate(()=>window.portfolioGuide?.hide());
    if(chapter===undefined){
-    await page.locator('#heroArt').scrollIntoViewIfNeeded();
-    if(motion==='no-preference')await page.waitForTimeout(750);
-    else await page.waitForTimeout(200);
-    await page.locator('#heroArt').screenshot({path:path.join(output,name+'.png')});
-    const state=await page.locator('#sculptureCanvas').evaluate(node=>({
-      width:node.width,height:node.height,
-      webgl2:!!node.getContext('webgl2')
-    }));
+    await page.waitForFunction(()=>!!window.__riftDirector);
+    if(!forceFallback)await page.waitForFunction(()=>window.__riftDirector.getState().webglReady);
+    await page.locator('.rift-home .stage').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(200);
+    await page.locator('.rift-home .stage').screenshot({path:path.join(output,name+'.png')});
+    const state=await page.evaluate(()=>window.__riftDirector.getState());
+    assert.equal(state.webglReady,!forceFallback);
+    assert.equal(state.reduced,motion==='reduce');
     findings.push({name,chapter:'hero',state,errors});
    }else{
     await page.locator('#journeySticky').scrollIntoViewIfNeeded();
