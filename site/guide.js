@@ -144,7 +144,7 @@
   function refreshPref(){host.classList.toggle('kio-suppressed',!!prefs.hidden);if(toggleButton){toggleButton.setAttribute('aria-pressed',String(opened));toggleButton.title=prefs.hidden?'Show Kio guide':(opened?'Close guide panel':'Open Kio guide');toggleButton.querySelector('span').textContent=prefs.hidden?'○':'✳'}}
   function setHidden(value){prefs.hidden=!!value;savePrefs();if(value&&opened)setOpen(false);refreshPref()}
   toggleButton?.addEventListener('click',()=>{if(prefs.hidden){setHidden(false);setOpen(true);}else setOpen(!opened)});
-  let currentSection='top', hintTimer=0, scrollTimer=0, tourTimer=0, gestureTimer=0;
+  let currentSection='top', hintTimer=0, scrollTimer=0, tourTimer=0, gestureTimer=0, contextualHoldUntil=0;
   const still=()=>reduced.matches||root.classList.contains('motion-off');
   function position(){
     const s=steps[index];
@@ -250,7 +250,7 @@
       currentSection=closest;
       const label=sections.find(s=>s.id===closest)?.label;
       host.dataset.section=closest;
-      if(opened){index=Math.max(0,steps.findIndex(step=>step.id===closest));position();}
+      if(opened){index=Math.max(0,steps.findIndex(step=>step.id===closest));if(performance.now()>=contextualHoldUntil)position();}
       if(!hint.classList.contains('kio-hint-visible'))$('#kioHintText').textContent='Exploring: '+label;
     }
   }
@@ -268,6 +268,8 @@
   document.addEventListener('portfolio:case-close',()=>{host.dataset.mood='idle'});
   function gesture(message,target){
     clearTimeout(gestureTimer);
+    // Keep a focused project's explanation visible while focus triggers scrolling.
+    contextualHoldUntil=performance.now()+1800;
     host.dataset.mood='pointing';
     if(opened){copy.textContent=message;
       const from=launcher.getBoundingClientRect(),to=target?.getBoundingClientRect();
