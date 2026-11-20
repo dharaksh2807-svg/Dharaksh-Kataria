@@ -5,6 +5,9 @@ on:
       - feat/v8-technical-showcases
     paths:
       - 'site/index.html'
+      - 'site/main.js'
+      - 'site/guide.js'
+      - 'scripts/test_motion.cjs'
       - 'site/rift-home.css'
       - 'site/labs/rift-directors-cut.*'
       - 'scripts/qa_rift_home.cjs'
