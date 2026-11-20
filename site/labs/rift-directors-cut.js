@@ -349,6 +349,8 @@
   }
 
   function updateText(p,entry){
+    // Once the work reveal starts, retire hero-only controls and annotations.
+    stage.classList.toggle('rift-ending',p>=.81&&!reduced&&!paused);
     const transition=range(p,.73,.96);
     // Keep the complete name present through fracture; dim only during the final fly-through.
     const vanish=1-range(p,.80,.97);
