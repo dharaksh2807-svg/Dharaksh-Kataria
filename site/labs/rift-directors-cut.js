@@ -351,7 +351,7 @@
   function updateText(p,entry){
     const transition=range(p,.73,.96);
     // Keep the complete name present through fracture; dim only during the final fly-through.
-    const vanish=1-range(p,.70,.92);
+    const vanish=1-range(p,.80,.97);
     const substanceIn=range(p,mode==='ascension'?.10:.24,mode==='ascension'?.27:.42);
     const substanceOut=1-range(p,mode==='ascension'?.77:.64,mode==='ascension'?.94:.85);
     const reveal=substanceIn*substanceOut;
@@ -366,11 +366,12 @@
     css('--beam-shift',((p-.3)*280 + Math.sin(elapsed*.0005)*9).toFixed(1)+'px');
     css('--wipe',(transition*164).toFixed(1)+'%');
     // The veil now reveals real content; it must never leave a blank cream frame.
-    css('--wipe-opacity',(.92*range(p,.79,.94)).toFixed(3));
-    css('--handoff-alpha',range(p,.79,.93).toFixed(3));
+    // Never cover the entire page with an opaque cream layer: real content must remain visible.
+    css('--wipe-opacity',(.80*range(p,.78,.92)).toFixed(3));
+    css('--handoff-alpha',range(p,.77,.90).toFixed(3));
     css('--handoff-shift',((1-range(p,.78,.96))*45).toFixed(2)+'px');
     if(handoff){
-      const active=p>.79&&!reduced;
+      const active=p>.77&&!reduced&&!globalMuted;
       if(handoff.dataset.active!==String(active)){
         handoff.dataset.active=String(active);
         handoff.toggleAttribute('inert',!active);
@@ -535,8 +536,14 @@
     raf=requestAnimationFrame(frame);
   }
 
-  function onScroll(){readProgress();schedule();}
-  function onResize(){readProgress();resize();schedule();}
+  function onScroll(){
+    readProgress();
+    // Keep the title-to-project handoff reliable even when the scene is no longer
+    // submitting WebGL frames (visibility observer, slow device or manual pause).
+    if(!reduced&&!paused)updateText(progress,1);
+    schedule();
+  }
+  function onResize(){readProgress();resize();if(!reduced&&!paused)updateText(progress,1);schedule();}
   function onPointer(e){
     if(paused||reduced||e.pointerType==='touch')return;
     targetX=clamp(e.clientX/innerWidth*2-1,-1,1);
