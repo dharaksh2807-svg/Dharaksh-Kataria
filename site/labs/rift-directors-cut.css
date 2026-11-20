@@ -123,3 +123,12 @@ html.motion-off .portal-fallback .rift-light,html.motion-off .portal-fallback .r
 @media(max-width:760px){.rift-stage .title-wrap{max-width:92%;overflow:visible}.rift-stage .hero-title{font-size:clamp(47px,11.8vw,76px)!important}.rift-stage .hero-title>span{white-space:nowrap}.rift-handoff{bottom:120px;max-width:90%}.rift-handoff h2{font-size:clamp(36px,9vw,56px)}.rift-stage .substance-ghost{font-size:20vw;left:8%}}
 @media(max-width:390px){.rift-stage .hero-title{font-size:clamp(43px,11.4vw,55px)!important}}
 @media(prefers-reduced-motion:reduce){.rift-handoff{opacity:0;pointer-events:none}}
+
+/* Fix: preserve the cinematic scene for the full scroll track. A normal-flow 100svh stage in a 235svh intro left a vacant cream shot before the projects section. */
+.intro>.stage{position:sticky;top:0;height:100svh;min-height:0}
+.rift-stage .transition-veil{z-index:21}
+.rift-stage .rift-handoff{z-index:27}
+@media(prefers-reduced-motion:reduce){.intro{height:auto!important}.intro>.stage{position:relative!important;min-height:100svh}.rift-handoff,.transition-veil{display:none!important}}
+html.motion-off .intro{height:auto!important}
+html.motion-off .intro>.stage{position:relative!important;min-height:100svh}
+html.motion-off .transition-veil,html.motion-off .rift-handoff{display:none!important}
