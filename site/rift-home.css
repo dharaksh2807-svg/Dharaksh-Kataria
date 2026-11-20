@@ -5,7 +5,7 @@
   --wipe:0%;--wipe-opacity:0;--handoff-alpha:0;--handoff-shift:45px;
   --portal-fallback-scale:1;--portal-fallback-spin:0deg;
 }
-.rift-home{position:relative;color:#f5efe5;background:#080b0b;isolation:isolate;font-family:var(--font-sans,'DM Sans',sans-serif)}
+.rift-home{position:relative;display:flow-root;color:#f5efe5;background:#080b0b;isolation:isolate;font-family:var(--font-sans,'DM Sans',sans-serif)}
 .rift-home .intro{height:220svh;position:relative}
 .rift-home .stage{position:sticky;top:0;height:100svh;min-height:min(100svh,640px);overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 72% 51%,#292018 0%,#101311 37%,#050808 79%)}
 .rift-home .stage::before{content:'';position:absolute;inset:0;z-index:9;background:linear-gradient(90deg,#050808f5 0%,#050808e0 30%,#05080866 48%,transparent 65%),radial-gradient(ellipse at 68% 53%,transparent 18%,#02050566 95%);pointer-events:none}
@@ -281,3 +281,31 @@ html.motion-off .rift-home .rift-mode-switcher{display:none!important}
 .rift-home .rift-mode-switcher,.rift-home .bottom-bar,.rift-home .side-readout,.rift-home .float-annotation{transition:opacity .22s ease,visibility .22s ease}
 .rift-home .rift-stage.rift-ending :is(.rift-mode-switcher,.bottom-bar,.side-readout,.float-annotation){opacity:0!important;visibility:hidden!important;pointer-events:none!important}
 @media(prefers-reduced-motion:reduce){.rift-home .rift-mode-switcher,.rift-home .bottom-bar{transition:none!important}}
+
+
+/* The fly-through lands on project previews in the same frame as the veil. */
+.rift-home .title-wrap{z-index:25}
+.rift-home .rift-projects-visible .title-wrap{visibility:hidden;pointer-events:none}
+.rift-home .rift-handoff{top:max(110px,14svh);bottom:170px;right:220px;max-width:1120px}
+.rift-home .rift-handoff h2{font-size:clamp(38px,5vw,72px);margin:15px 0 25px}
+.rift-home .rift-handoff-projects{margin:0;gap:16px}
+.rift-home .rift-handoff-projects .bridge-card{min-height:0;padding:20px 20px 40px;gap:12px;opacity:1!important;transform:none!important}
+.rift-home .rift-handoff-projects .bridge-card strong{font-size:clamp(22px,2.2vw,32px)}
+.rift-home .rift-handoff-projects .card-evidence{display:none}
+.rift-home .bottom-bar{right:220px}
+.rift-home .bottom-bar>span:nth-child(2){display:none}
+@media(max-width:760px){
+ .rift-home .bottom-bar{right:135px;align-items:start;gap:14px;flex-direction:column;bottom:22px}
+ .rift-home .hero-controls{flex-wrap:wrap}
+ .rift-home .hero-controls>a{display:inline-flex;font-size:10px;padding:8px 0}
+ .rift-home .rift-handoff{top:160px;bottom:160px;right:6%;left:6%}
+ .rift-home .rift-handoff h2{font-size:38px;margin:10px 0 20px}
+ .rift-home .rift-handoff-projects{display:grid;grid-template-columns:1fr;gap:10px}
+ .rift-home .rift-handoff-projects .bridge-card{display:grid;grid-template-columns:90px 1fr;gap:7px 14px;padding:13px;min-height:100px;align-content:center}
+ .rift-home .rift-handoff-projects .bridge-media{grid-column:1;grid-row:1/3;aspect-ratio:1.3;margin:0;align-self:center}
+ .rift-home .rift-handoff-projects .bridge-media-label,.rift-home .rift-handoff-projects .card-description,.rift-home .rift-handoff-projects .card-arrow{display:none}
+ .rift-home .rift-handoff-projects .card-index{grid-column:2;font-size:8px}
+ .rift-home .rift-handoff-projects .bridge-card strong{grid-column:2;font-size:23px}
+}
+/* The inline guide opens below the persistent site navigation. */
+.rift-home > #kioGuide.kio-open{margin-top:calc(var(--header-h,80px) + 24px)}
