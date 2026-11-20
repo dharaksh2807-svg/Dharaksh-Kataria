@@ -1,0 +1,216 @@
+{
+  "url": "http://127.0.0.1:4173/index.html",
+  "date": "2026-11-20T08:42:23.057Z",
+  "checks": {
+    "desktop": {
+      "hardReload": true,
+      "legacyHeroAbsent": true,
+      "skipExperience": true,
+      "kioOpenClose": true,
+      "searchWorks": true,
+      "workNavigation": true,
+      "titleVisible": true,
+      "modeResults": [
+        {
+          "mode": "director",
+          "webgl": true
+        },
+        {
+          "mode": "kinetic",
+          "webgl": true
+        },
+        {
+          "mode": "fracture",
+          "webgl": true
+        },
+        {
+          "mode": "infinite",
+          "webgl": true
+        },
+        {
+          "mode": "ascension",
+          "webgl": true
+        }
+      ],
+      "kioWidth": 176,
+      "stages": [
+        {
+          "p": 0,
+          "motion": {
+            "webglReady": true,
+            "reduced": false,
+            "paused": false,
+            "mode": "director",
+            "adaptiveLow": false,
+            "contextLost": false,
+            "scroll": 0,
+            "elapsedMs": 5081.3,
+            "renderedFrames": 89
+          },
+          "titleOpacity": 1,
+          "handoffOpacity": 0,
+          "handoffHidden": true
+        },
+        {
+          "p": 0.35,
+          "motion": {
+            "webglReady": true,
+            "reduced": false,
+            "paused": false,
+            "mode": "director",
+            "adaptiveLow": false,
+            "contextLost": false,
+            "scroll": 0.3502645502645503,
+            "elapsedMs": 5321.3,
+            "renderedFrames": 93
+          },
+          "titleOpacity": 1,
+          "handoffOpacity": 0,
+          "handoffHidden": true
+        },
+        {
+          "p": 0.53,
+          "motion": {
+            "webglReady": true,
+            "reduced": false,
+            "paused": false,
+            "mode": "director",
+            "adaptiveLow": false,
+            "contextLost": false,
+            "scroll": 0.5301587301587302,
+            "elapsedMs": 5741.3,
+            "renderedFrames": 100
+          },
+          "titleOpacity": 1,
+          "handoffOpacity": 0,
+          "handoffHidden": true
+        },
+        {
+          "p": 0.7,
+          "motion": {
+            "webglReady": true,
+            "reduced": false,
+            "paused": false,
+            "mode": "director",
+            "adaptiveLow": false,
+            "contextLost": false,
+            "scroll": 0.7005291005291006,
+            "elapsedMs": 6221.3,
+            "renderedFrames": 108
+          },
+          "titleOpacity": 1,
+          "handoffOpacity": 0,
+          "handoffHidden": true
+        },
+        {
+          "p": 0.82,
+          "motion": {
+            "webglReady": true,
+            "reduced": false,
+            "paused": false,
+            "mode": "director",
+            "adaptiveLow": false,
+            "contextLost": false,
+            "scroll": 0.8201058201058201,
+            "elapsedMs": 6581.3,
+            "renderedFrames": 114
+          },
+          "titleOpacity": 1,
+          "handoffOpacity": 0,
+          "handoffHidden": true
+        },
+        {
+          "p": 0.93,
+          "motion": {
+            "webglReady": true,
+            "reduced": false,
+            "paused": false,
+            "mode": "director",
+            "adaptiveLow": false,
+            "contextLost": false,
+            "scroll": 0.9301587301587302,
+            "elapsedMs": 6941.3,
+            "renderedFrames": 120
+          },
+          "titleOpacity": 0,
+          "handoffOpacity": 1,
+          "handoffHidden": false
+        },
+        {
+          "p": 0.99,
+          "motion": {
+            "webglReady": true,
+            "reduced": false,
+            "paused": false,
+            "mode": "director",
+            "adaptiveLow": false,
+            "contextLost": false,
+            "scroll": 0.9904761904761905,
+            "elapsedMs": 7471.3,
+            "renderedFrames": 129
+          },
+          "titleOpacity": 0,
+          "handoffOpacity": 1,
+          "handoffHidden": false
+        }
+      ],
+      "projectLinks": 3,
+      "reverseRestoresTitle": true,
+      "globalMotionControl": true,
+      "frameStats": {
+        "count": 13,
+        "medianRafMs": 60,
+        "p95RafMs": 60,
+        "approximateRafFps": 16.666666666666668,
+        "note": "RAF delivery timing only, not GPU timing; device testing must be done separately"
+      }
+    },
+    "mobile": {
+      "skipExperience": true,
+      "mobileNavigation": true,
+      "caseStudyAndBack": true,
+      "overflow": false,
+      "titleBounds": {
+        "x": 25.34375,
+        "y": 402.2109375,
+        "width": 339.296875,
+        "height": 89.09375
+      },
+      "kioWidth": 112,
+      "webgl": true
+    },
+    "reduced": {
+      "engine": {
+        "webglReady": true,
+        "reduced": true,
+        "paused": true,
+        "mode": "director",
+        "adaptiveLow": false,
+        "contextLost": false,
+        "scroll": 0,
+        "elapsedMs": 0,
+        "renderedFrames": 1
+      },
+      "introHeight": 900,
+      "viewport": 900,
+      "titleOpacity": 1
+    },
+    "standaloneHandoff": {
+      "scroll": 1,
+      "opacity": 1,
+      "titleOpacity": 0,
+      "active": true,
+      "headingVisible": true,
+      "sticky": "sticky",
+      "stageVisible": true,
+      "shortcuts": 3
+    }
+  },
+  "warnings": [],
+  "errors": [],
+  "limitations": [
+    "Browser viewport emulation is not a physical mobile-device test.",
+    "RAF timing is not a GPU frame-time measurement.",
+    "Visual and animation quality require human review of the images and recordings."
+  ]
+}

@@ -28,7 +28,8 @@ async function seek(page,p){
 }
 async function openPage(context){
   const page=await context.newPage();
-  page.on('pageerror',e=>report.errors.push('Page error: '+(e.stack||e.message)));
+  page.on('console',message=>{if(message.type()==='error')report.errors.push('Console error: '+message.text());});
+  page.on('pageerror',e=>report.errors.push('Page error at '+page.url()+': '+(e.stack||e.message)));
   page.on('response',r=>{
     if(r.url().startsWith('http://127.0.0.1:4173/')&&r.status()>=400)
       report.errors.push('HTTP '+r.status()+': '+r.url());
@@ -55,6 +56,9 @@ async function main(){
   const browser=await chromium.launch({headless:true});
   try{
     report.checks.desktop=await withVideo(browser,'desktop-journey',{viewport:{width:1440,height:900},deviceScaleFactor:1},async page=>{
+      check(await page.locator('#riftCanvas').count()===1,'Expected exactly one Rift hero');
+      check(await page.locator('#heroArt,#sculptureCanvas,script[src="hero.js"]').count()===0,'Legacy sculpture still active');
+      check((await page.evaluate(()=>window.__riftDirector.getState())).webglReady,'Actual 3D portal did not initialize');
       const title=page.locator('#heroTitle');
       check((await title.innerText()).replace(/\s+/g,' ').includes('Dharaksh Kataria.'),'Full name missing');
       const bounds=await title.boundingBox();
@@ -74,7 +78,9 @@ async function main(){
         check((await button.getAttribute('aria-pressed'))==='true','Mode '+mode+' missing pressed status');
         modeResults.push({mode,webgl:state.webglReady});
         await page.waitForTimeout(170);
+        await seek(page,.53);
         await page.screenshot({path:path.join(out,'mode-'+mode+'.png')});
+        await seek(page,0);
       }
       await page.locator('.rift-mode[data-rift-mode="director"]').click();
       const stages=[];
@@ -86,12 +92,23 @@ async function main(){
           return {motion:window.__riftDirector.getState(),titleOpacity:Number(title.opacity),handoffOpacity:Number(getComputedStyle(handoff).opacity),handoffHidden:handoff.inert};
         });
         stages.push({p,...state});
-        if([.35,.53,.82,.93,.99].includes(p))await page.screenshot({path:path.join(out,'scroll-'+Math.round(p*100)+'.png')});
+        if(p>0)await page.screenshot({path:path.join(out,'scroll-'+Math.round(p*100)+'.png')});
       }
       check(stages[2].titleOpacity>.90,'Name faded too early during the fracture');
       check(stages[3].titleOpacity>.90,'Name should remain readable until late transition');
       check(stages[4].titleOpacity>.90,'Name disappears before the final 18% of scroll');
       check(stages[5].handoffOpacity>.80&&!stages[5].handoffHidden,'Final handoff not visible');
+      for(const p of [.885,.89,.895,.91]){
+        await seek(page,p);
+        const visible=await page.evaluate(()=>({
+          title:Number(getComputedStyle(document.querySelector('.title-wrap')).opacity),
+          projects:Number(getComputedStyle(document.querySelector('.rift-handoff')).opacity),
+          cards:[...document.querySelectorAll('.rift-handoff-projects img')].every(img=>img.complete&&img.naturalWidth>0)
+        }));
+        check((visible.title===1&&visible.projects===0)||(visible.title===0&&visible.projects===1),'Overlapping or blank handoff at '+p);
+        check(visible.cards,'Final project images missing');
+      }
+      await seek(page,.99);
       const finalControlsHidden=await page.evaluate(()=>{
         const el=document.querySelector('.rift-home .rift-mode-switcher');
         return el&&getComputedStyle(el).visibility==='hidden';
@@ -104,7 +121,10 @@ async function main(){
       await page.screenshot({path:path.join(out,'project-handoff.png')});
       const card=await page.locator('#riftProjects .bridge-card').first().boundingBox();
       check(card&&card.height>100,'No actual project cards at transition destination');
+      await seek(page,.53);
+      await page.screenshot({path:path.join(out,'reverse-fracture.png')});
       await seek(page,.30);await seek(page,0);
+      await page.screenshot({path:path.join(out,'reverse-opening.png')});
       const reverse=await page.evaluate(()=>Number(getComputedStyle(document.querySelector('.rift-home .title-wrap')).opacity));
       check(reverse>.9,'Reverse scrolling did not restore the name');
       const motion=page.locator('#motionSwitch');
@@ -113,8 +133,32 @@ async function main(){
       await page.waitForTimeout(100);
       check((await page.evaluate(()=>window.__riftDirector.getState())).paused,'Global motion OFF did not pause portal');
       await motion.click();
+      const skip=page.locator('.hero-controls a');
+      check(await skip.isVisible(),'Skip experience hidden');
+      await skip.click();
+      await page.waitForTimeout(700);
+      check(await page.locator('#riftProjects .bridge-card').first().isVisible(),'Skip did not reach real projects');
+      await seek(page,0);
+      await page.locator('#kioLaunch').click();
+      check(await page.locator('#kioClose').isVisible(),'Kio did not open');
+      await page.locator('#kioClose').click();
+      await page.locator('#searchTrigger').click();
+      check(await page.locator('#paletteInput').isVisible(),'Search did not open');
+      await page.keyboard.press('Escape');
+      await page.locator('.nav-links a[href="#work"]').click();
+      await page.waitForTimeout(800);
+      check(await page.locator('#projectsGrid .project-card').count()>0,'Work navigation lost projects');
+      await page.goto(new URL('/',url).href);
+      await page.waitForFunction(()=>window.__riftDirector?.getState().webglReady);
+      const cdp=await page.context().newCDPSession(page);
+      await cdp.send('Network.clearBrowserCache');
+      await Promise.all([page.waitForEvent('domcontentloaded'),cdp.send('Page.reload',{ignoreCache:true})]);
+      await page.waitForFunction(()=>window.__riftDirector?.getState().webglReady);
+      check(await page.locator('#heroArt,#sculptureCanvas').count()===0,'Sculpture returned after hard reload');
+      await page.waitForTimeout(700);
+      await page.screenshot({path:path.join(out,'root-hard-reload.png')});
       const stats=await page.evaluate(()=>window.__riftDirector.getFrameStats());
-      return {titleVisible:true,modeResults,kioWidth:kio.width,stages,projectLinks:links,reverseRestoresTitle:true,globalMotionControl:true,frameStats:stats};
+      return {hardReload:true,legacyHeroAbsent:true,skipExperience:true,kioOpenClose:true,searchWorks:true,workNavigation:true,titleVisible:true,modeResults,kioWidth:kio.width,stages,projectLinks:links,reverseRestoresTitle:true,globalMotionControl:true,frameStats:stats};
     });
     report.checks.mobile=await withVideo(browser,'mobile-journey',{viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true},async page=>{
       const picker=page.locator('#riftModeSelect');
@@ -127,12 +171,32 @@ async function main(){
       await page.screenshot({path:path.join(out,'mobile-opening.png')});
       const title=await page.locator('#heroTitle').boundingBox();
       check(title&&title.x>=0&&title.x+title.width<=390,'Mobile title is clipped');
+      check(await page.locator('.hero-controls a').isVisible(),'Mobile Skip Experience hidden');
+      await page.locator('.hero-controls a').click();
+      await page.waitForTimeout(700);
+      await seek(page,0);
+      await page.locator('#menuToggle').click();
+      check(await page.locator('#mobileMenu a[href="#work"]').isVisible(),'Mobile navigation failed');
+      await page.locator('#menuToggle').click();
       await seek(page,.53);
       await page.screenshot({path:path.join(out,'mobile-transition.png')});
+      await seek(page,.93);
+      await page.screenshot({path:path.join(out,'mobile-final-reveal.png')});
+      const finalCards=await page.locator('.rift-handoff-projects .bridge-card').all();
+      for(const card of finalCards){
+        const box=await card.boundingBox();
+        check(box&&box.y>70&&box.y+box.height<690,'Mobile final project clipped or overlapping Kio');
+      }
+      await finalCards[0].click();
+      await page.waitForURL('**/projects/srmedu.html');
+      await page.goBack();
+      await page.waitForFunction(()=>!!window.__riftDirector);
+      await seek(page,0);
+      await page.screenshot({path:path.join(out,'mobile-reverse.png')});
       await page.locator('#riftProjects').scrollIntoViewIfNeeded();
       await page.screenshot({path:path.join(out,'mobile-projects.png')});
       const kio=await page.locator('#kioGuide').boundingBox();
-      return {overflow:false,titleBounds:title,kioWidth:kio?.width,webgl:(await page.evaluate(()=>window.__riftDirector.getState())).webglReady};
+      return {skipExperience:true,mobileNavigation:true,caseStudyAndBack:true,overflow:false,titleBounds:title,kioWidth:kio?.width,webgl:(await page.evaluate(()=>window.__riftDirector.getState())).webglReady};
     });
     const reduced=await browser.newContext({viewport:{width:1440,height:900},reducedMotion:'reduce'});
     try{

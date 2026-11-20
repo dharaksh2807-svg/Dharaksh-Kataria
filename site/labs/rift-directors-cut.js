@@ -1,4 +1,4 @@
-/* THE RIFT — DIRECTOR'S CUT / isolated Three.js cinematic experiment.
+/* THE RIFT — DIRECTOR'S CUT / shared homepage and cinematic preview renderer.
  * Source of truth is scroll progress: no cumulative ring rotations or camera drift.
  * Offline-capable on a Mac with the previously vendored Three.js r182 files;
  * otherwise the pinned CDN is attempted. CSS Rift remains if WebGL is unavailable.
@@ -332,6 +332,16 @@
 
   const animObjects={};
   function prepareProjects(){
+    if(integrated&&handoff){
+      // Reuse the actual project previews and destinations for the final camera frame.
+      const previews=document.querySelector('#riftProjects .bridge-grid').cloneNode(true);
+      previews.classList.add('rift-handoff-projects');
+      previews.querySelectorAll('img').forEach(image=>{image.loading='eager';});
+      handoff.querySelector('h2').innerHTML='Selected <em>work.</em>';
+      handoff.querySelector('p').remove();
+      handoff.querySelector('.rift-handoff-link').remove();
+      handoff.querySelector('.rift-handoff-links').replaceWith(previews);
+    }
     const cards=Array.from(document.querySelectorAll('.bridge-card'));
     if(!('IntersectionObserver' in window)||reduced){
       cards.forEach(el=>el.classList.add('is-visible'));
@@ -352,8 +362,12 @@
     // Once the work reveal starts, retire hero-only controls and annotations.
     stage.classList.toggle('rift-ending',p>=.81&&!reduced&&!paused);
     const transition=range(p,.73,.96);
-    // Keep the complete name present through fracture; dim only during the final fly-through.
-    const vanish=1-range(p,.80,.97);
+    // Swap the complete opening for real projects in one scroll-derived state.
+    // Both directions use the same boundary, with no delayed or empty handoff.
+    const projectsVisible=integrated&&p>=.89&&!reduced&&!paused;
+    stage.classList.toggle('rift-projects-visible',projectsVisible);
+    const projectFrame=Number(projectsVisible);
+    const vanish=integrated?1-projectFrame:1-range(p,.80,.97);
     const substanceIn=range(p,mode==='ascension'?.10:.24,mode==='ascension'?.27:.42);
     const substanceOut=1-range(p,mode==='ascension'?.77:.64,mode==='ascension'?.94:.85);
     const reveal=substanceIn*substanceOut;
@@ -366,14 +380,13 @@
     css('--substance-scale',(1+p*.65).toFixed(3));
     css('--substance-shift',(-p*185).toFixed(1)+'px');
     css('--beam-shift',((p-.3)*280 + Math.sin(elapsed*.0005)*9).toFixed(1)+'px');
-    css('--wipe',(transition*164).toFixed(1)+'%');
-    // The veil now reveals real content; it must never leave a blank cream frame.
-    // Never cover the entire page with an opaque cream layer: real content must remain visible.
-    css('--wipe-opacity',(.80*range(p,.78,.92)).toFixed(3));
-    css('--handoff-alpha',range(p,.77,.90).toFixed(3));
-    css('--handoff-shift',((1-range(p,.78,.96))*45).toFixed(2)+'px');
+    css('--wipe',(integrated?projectFrame*164:transition*164).toFixed(1)+'%');
+    // The homepage background and project previews share a single reveal state.
+    css('--wipe-opacity',(integrated?projectFrame:.80*range(p,.78,.92)).toFixed(3));
+    css('--handoff-alpha',(integrated?projectFrame:range(p,.77,.90)).toFixed(3));
+    css('--handoff-shift',(integrated?0:(1-range(p,.78,.96))*45).toFixed(2)+'px');
     if(handoff){
-      const active=p>.77&&!reduced&&!globalMuted;
+      const active=integrated?projectsVisible:p>.77&&!reduced&&!globalMuted;
       if(handoff.dataset.active!==String(active)){
         handoff.dataset.active=String(active);
         handoff.toggleAttribute('inert',!active);
@@ -440,9 +453,9 @@
       mesh.visible=fracture>.008;
     });
     const cx=2.25;
-    const aimX=cx*travel;
+    const aimX=innerWidth<700?cx:cx*travel;
     camera.position.set(
-      cx*travel+pointerX*.06*(1-travel)-openingPose*.44,
+      aimX+pointerX*.06*(1-travel)-(innerWidth<700?0:openingPose*.44),
       -.05+pointerY*.05*(1-travel)+Math.sin(t*.32)*.018+openingPose*.12,
       10.6-travel*(mode==='infinite'?20.9:17.5) - (1-introEase)*.7
     );
@@ -486,8 +499,8 @@
       renderer.shadowMap.needsUpdate=true;
     }
     // Bring the portal up and nearer the center on mobile to keep text clear.
-    if(portal)portal.position.y=innerWidth<700?1.58:0.03;
-    if(portal)portal.scale.setScalar(innerWidth<700?.69:1);
+    if(portal)portal.position.y=innerWidth<700?1.9:0.03;
+    if(portal)portal.scale.setScalar(innerWidth<700?.48:1);
   }
 
   function frame(now){
