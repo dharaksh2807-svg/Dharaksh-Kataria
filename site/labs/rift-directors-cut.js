@@ -54,7 +54,7 @@
   const pulse = (v,a,b,c) => range(v,a,b)*(1-range(v,b,c));
   const css = (key,val) => html.style.setProperty(key, String(val));
   const deg = Math.PI / 180;
-  const finale = {cameraEnd:.86, pulseStart:.86, pulsePeak:.90, pulseEnd:.98, revealStart:.92, revealEnd:.98};
+  const finale = {cameraEnd:.86, openingEnd:.90, pulseStart:.885, pulsePeak:.92, pulseEnd:.985, revealStart:.92, revealEnd:.985};
   const exitEnergy = p => pulse(p,finale.pulseStart,finale.pulsePeak,finale.pulseEnd);
 
   html.classList.add('js-active');
@@ -385,7 +385,8 @@
       css('--work-clip',reveal>=1?'none':`circle(${(reveal*76).toFixed(3)}vmax at 50% calc(50svh + var(--work-offset)))`);
       css('--work-visibility',reveal>0?'visible':'hidden');
       css('--exit-energy',cinematic?exitEnergy(p).toFixed(4):'0');
-      css('--exit-veil',cinematic?range(p,.90,finale.revealEnd).toFixed(4):'0');
+      css('--exit-release',(.72+range(p,finale.pulseStart,finale.pulseEnd)*.85).toFixed(4));
+      css('--exit-veil',cinematic?range(p,finale.openingEnd,finale.revealEnd).toFixed(4):'0');
       css('--exit-arrival',cinematic?range(p,.70,finale.cameraEnd).toFixed(4):'0');
       if(work.inert!==!active)work.inert=!active;
       work.style.pointerEvents=active?'auto':'none';
@@ -449,7 +450,7 @@
     const travel=range(p,infinite?.12:ascension?.40:.56,integrated?finale.cameraEnd:.98);
     const energy=integrated?exitEnergy(p):0;
     const settle=integrated?range(p,.70,finale.cameraEnd):0;
-    const opening=integrated?range(p,finale.cameraEnd,finale.pulsePeak):0;
+    const opening=integrated?range(p,finale.cameraEnd,finale.openingEnd):0;
     const reveal=integrated?range(p,finale.revealStart,finale.revealEnd):0;
     const openingPose=cinematicOpening?(1-range(p,.035,.30)):0;
     const drift=paused||reduced?0:Math.sin(t*.28)*.012;
@@ -516,8 +517,8 @@
     portal.position.y=(innerWidth<700?1.9:.03)*(1-settle)+rise*settle;
     lights.sweep.position.set(ascension?cx-2:2+Math.sin(p*7+t*.2)*4,
       ascension?7-p*10:1.5+Math.cos(p*5)*2.5,6-p*3);
-    lights.sweep.intensity=(ascension?85:broken?55:43+twist*22)+energy*14;
-    lights.key.intensity=3.4+(integrated?range(p,.78,finale.cameraEnd)*.25:0)+energy*.8;
+    lights.sweep.intensity=(ascension?85:broken?55:43+twist*22)+energy*20;
+    lights.key.intensity=3.4+(integrated?range(p,.78,finale.cameraEnd)*.25:0)+energy*1.05;
     lights.key.position.set(ascension?-3:3.5,ascension?10:7,ascension?2:8);
     lights.rim.intensity=kinetic?4:infinite?1.4:2.4;
     lights.core.opacity=infinite?.55:ascension?.35:.84+fracture*.26;
@@ -530,7 +531,7 @@
       aperture.position.copy(camera.position).addScaledVector(animObjects.apertureDirection,6);
       aperture.quaternion.copy(camera.quaternion);
       aperture.scale.setScalar(.18+range(p,.73,finale.pulseEnd)*2.5);
-      aperture.material.opacity=(.18*range(p,.73,finale.cameraEnd)+energy*.7)*(1-reveal);
+      aperture.material.opacity=(.24*range(p,.73,finale.cameraEnd)+energy*.82)*(1-reveal);
       aperture.visible=p>.73&&reveal<1;
     }
     renderer.toneMappingExposure=(cinematicOpening?(1.01+openingPose*.06):1.13)+(integrated?energy*.10:range(p,.80,.96)*.24);
@@ -630,14 +631,20 @@
   }
 
   if(integrated){
+    let arrival=null;
     document.querySelectorAll('a[href="#work"],a[href="#riftProjects"]').forEach(link=>{
       link.addEventListener('click',event=>{
-        if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+        if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
         event.preventDefault();
+        arrival?.cancel();
         if(location.hash!==link.hash)history.pushState(history.state,'',link.hash);
         work.scrollIntoView({behavior:'instant',block:'start'});
         onScroll();
         document.getElementById('workTitle')?.focus({preventScroll:true});
+        if(!paused&&!reduced)arrival=work.querySelector('.wrap').animate([
+          {opacity:.55},
+          {opacity:1}
+        ],{duration:300,easing:'cubic-bezier(.22,.7,.2,1)'});
       });
     });
   }
@@ -664,15 +671,26 @@
   if(motionPref.addEventListener)motionPref.addEventListener('change',onMedia);
   else motionPref.addListener(onMedia);
 
+  const finePointer=matchMedia('(hover: hover) and (pointer: fine)');
   stage.querySelectorAll('.hero-action').forEach(el=>{
+    function resetAction(){
+      for(const property of ['--cta-x','--cta-y','--light-x','--light-y'])el.style.removeProperty(property);
+    }
     el.addEventListener('pointermove',e=>{
-      if(reduced||paused||e.pointerType==='touch')return;
+      if(reduced||paused||motionPref.matches||!finePointer.matches||e.pointerType==='touch'||el.matches(':focus-visible'))return;
       const r=el.getBoundingClientRect();
-      const x=clamp((e.clientX-r.left-r.width*.5)*.09,-6,6);
-      const y=clamp((e.clientY-r.top-r.height*.5)*.13,-4,4);
-      el.style.transform='translate3d('+x+'px,'+y+'px,0)';
+      const x=clamp((e.clientX-r.left-r.width*.5)*.05,-3,3);
+      const y=clamp((e.clientY-r.top-r.height*.5)*.07,-2,2);
+      el.style.setProperty('--cta-x',x+'px');
+      el.style.setProperty('--cta-y',y+'px');
+      el.style.setProperty('--light-x',((e.clientX-r.left)/r.width*100)+'%');
+      el.style.setProperty('--light-y',((e.clientY-r.top)/r.height*100)+'%');
     });
-    el.addEventListener('pointerleave',()=>el.style.transform='');
+    el.addEventListener('pointerleave',resetAction);
+    el.addEventListener('focus',resetAction);
+    el.addEventListener('pointercancel',resetAction);
+    document.addEventListener('portfolio:motion',resetAction);
+    document.addEventListener('visibilitychange',()=>{if(document.hidden)resetAction();});
   });
 
   if('IntersectionObserver' in window){

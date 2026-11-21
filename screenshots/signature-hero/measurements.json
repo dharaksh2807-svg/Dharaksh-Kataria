@@ -1,0 +1,188 @@
+{
+  "browser": "Chromium",
+  "hardwareRequested": true,
+  "captures": [
+    {
+      "name": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "dpr": 1,
+      "motion": "no-preference",
+      "readyMilliseconds": 195,
+      "state": {
+        "ready": true,
+        "paused": false,
+        "reducedMotion": false,
+        "elapsed": 1.2499999999999998,
+        "renderCount": 77,
+        "triangles": 32896,
+        "drawCalls": 1,
+        "pixelRatio": 1,
+        "buffer": [
+          1022,
+          693
+        ],
+        "threeRevision": "182"
+      },
+      "performance": {
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "sampleMilliseconds": 5010.300000071526,
+        "submittedFrames": 301,
+        "submissionsPerSecond": 60.07624293868691,
+        "rafIntervalsMilliseconds": {
+          "count": 300,
+          "median": 16.699999999999818,
+          "p95": 16.799999999999272
+        },
+        "gpuTimerSupported": true,
+        "gpuDisjoint": false,
+        "gpuMilliseconds": {
+          "count": 301,
+          "median": 0.854874,
+          "p95": 3.32825
+        },
+        "state": {
+          "ready": true,
+          "paused": false,
+          "reducedMotion": false,
+          "elapsed": 6.56640000000002,
+          "renderCount": 396,
+          "triangles": 32896,
+          "drawCalls": 1,
+          "pixelRatio": 1,
+          "buffer": [
+            1022,
+            693
+          ],
+          "threeRevision": "182"
+        },
+        "note": "Submission rate and GPU draw duration measured in Chromium. Mobile is viewport/DPR emulation on the same host GPU. GPU timing excludes startup and environment prefiltering."
+      },
+      "requestCount": 5,
+      "assetBytes": 753795,
+      "errors": []
+    },
+    {
+      "name": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "dpr": 3,
+      "motion": "no-preference",
+      "readyMilliseconds": 82,
+      "state": {
+        "ready": true,
+        "paused": false,
+        "reducedMotion": false,
+        "elapsed": 1.2166999999999994,
+        "renderCount": 77,
+        "triangles": 32896,
+        "drawCalls": 1,
+        "pixelRatio": 1.5,
+        "buffer": [
+          655,
+          646
+        ],
+        "threeRevision": "182"
+      },
+      "performance": {
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "sampleMilliseconds": 5014.800000071526,
+        "submittedFrames": 301,
+        "submissionsPerSecond": 60.022333890824534,
+        "rafIntervalsMilliseconds": {
+          "count": 300,
+          "median": 16.699999999999818,
+          "p95": 16.700000000000728
+        },
+        "gpuTimerSupported": true,
+        "gpuDisjoint": false,
+        "gpuMilliseconds": {
+          "count": 301,
+          "median": 0.673749,
+          "p95": 1.153374
+        },
+        "state": {
+          "ready": true,
+          "paused": false,
+          "reducedMotion": false,
+          "elapsed": 6.383100000000021,
+          "renderCount": 386,
+          "triangles": 32896,
+          "drawCalls": 1,
+          "pixelRatio": 1.5,
+          "buffer": [
+            655,
+            646
+          ],
+          "threeRevision": "182"
+        },
+        "note": "Submission rate and GPU draw duration measured in Chromium. Mobile is viewport/DPR emulation on the same host GPU. GPU timing excludes startup and environment prefiltering."
+      },
+      "requestCount": 5,
+      "assetBytes": 753795,
+      "errors": []
+    },
+    {
+      "name": "reduced-motion-1440x900",
+      "width": 1440,
+      "height": 900,
+      "dpr": 1,
+      "motion": "reduce",
+      "readyMilliseconds": 81,
+      "state": {
+        "ready": true,
+        "paused": true,
+        "reducedMotion": true,
+        "elapsed": 0,
+        "renderCount": 2,
+        "triangles": 32896,
+        "drawCalls": 1,
+        "pixelRatio": 1,
+        "buffer": [
+          1022,
+          693
+        ],
+        "threeRevision": "182"
+      },
+      "idleRendersOverOneSecond": 0,
+      "requestCount": 5,
+      "assetBytes": 753795,
+      "errors": []
+    },
+    {
+      "name": "reduced-motion-390x844",
+      "width": 390,
+      "height": 844,
+      "dpr": 3,
+      "motion": "reduce",
+      "readyMilliseconds": 72,
+      "state": {
+        "ready": true,
+        "paused": true,
+        "reducedMotion": true,
+        "elapsed": 0,
+        "renderCount": 2,
+        "triangles": 32896,
+        "drawCalls": 1,
+        "pixelRatio": 1.5,
+        "buffer": [
+          655,
+          646
+        ],
+        "threeRevision": "182"
+      },
+      "idleRendersOverOneSecond": 0,
+      "requestCount": 5,
+      "assetBytes": 753795,
+      "errors": []
+    }
+  ],
+  "checks": [
+    "PASS desktop-1440x900 pause, resume and live reduced-motion preference",
+    "PASS mobile-390x844 pause, resume and live reduced-motion preference",
+    "PASS reduced-motion-1440x900 remains pixel-identical with zero further renders and pointer movement",
+    "PASS reduced-motion-390x844 remains pixel-identical with zero further renders and pointer movement",
+    "PASS explicit ?motion=off static URL"
+  ],
+  "browserVersion": "159.0.8154.6"
+}

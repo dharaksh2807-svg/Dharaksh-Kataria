@@ -15,15 +15,15 @@ entry('toll','Smart Toll Plaza','PYTHON / DESKTOP','ACADEMIC PROJECT','Python ·
 // Preserve the original project numbers after removal: 12,13,14,15,17,18,19 stay absent.
 ['07','08','09','10','11','16'].forEach((n,i)=>{ if(d.archive[i])d.archive[i].num=n; });
 d.credentials=[
-{issuer:'IBM SkillsBuild',name:'Build Your Own Chatbot',date:'June 2026',url:null,recordNote:'ISSUER LINK REQUIRES CORRECTION',code:'IBM / 01'},
-{issuer:'IBM SkillsBuild',name:'AI Fundamentals: Language and Vision in AI',date:'June 2026',url:'https://www.credly.com/go/Z3ePKCky',code:'IBM / 02'},
-{issuer:'Anthropic',name:'Claude Code 101',date:'2026',url:null,code:'ANT / 03'}
+{issuer:'IBM SkillsBuild',name:'Build Your Own Chatbot',date:'30 June 2026',url:null,evidence:{type:'certificate',url:'assets/evidence/certificates/ibm-build-your-own-chatbot.pdf',label:'VIEW CERTIFICATE PDF'},code:'IBM / 01'},
+{issuer:'IBM SkillsBuild',name:'AI Fundamentals: Language and Vision in AI',date:'June 2026',url:'https://www.credly.com/badges/b568356d-2141-4811-a827-b7df76824b75',code:'IBM / 02'},
+{issuer:'Anthropic',name:'Claude Code 101',date:'Completion date not printed',url:null,evidence:{type:'certificate',url:'assets/evidence/certificates/anthropic-claude-code-101.pdf',label:'VIEW CERTIFICATE PDF'},code:'ANT / 03'}
 ];
 d.hackathons=[
-{num:'01',name:'IIT Bombay Techfest / Perceptron',detail:'Team AutonomOS · KV-cache compression research',status:'Research submission'},
-{num:'03',name:'PromptWars × SRMIST ACM',detail:'FairShift · workforce and wage transparency',status:'Reported participation'},
-{num:'04',name:'PromptWars × F.A.S.T SRM',detail:'AI and software prototype development',status:'Reported participation'},
-{num:'05',name:'CodeMerge V2.0',detail:'ReValue · sustainability track',status:'Reported participation'}
+{num:'01',name:'IIT Bombay Techfest / Perceptron',detail:'Team AutonomOS · KV-cache compression research',status:'Research submission',evidence:{type:'repository',url:'https://github.com/dharaksh2807-svg/iitB',label:'VIEW PROJECT REPOSITORY'},recordNote:'Project/code evidence. Participation certificate and ranking evidence pending.'},
+{num:'03',name:'PromptWars × SRMIST ACM',detail:'FairShift · workforce and wage transparency',status:'Owner-reported participation',evidence:{type:'pending'},recordNote:'Participation certificate pending.'},
+{num:'04',name:'PromptWars × F.A.S.T SRM',detail:'AI and software prototype development',status:'Owner-reported participation',evidence:{type:'pending'},recordNote:'Participation certificate pending.'},
+{num:'05',name:'CodeMerge V2.0',detail:'ReValue · sustainability track',status:'Owner-reported participation',evidence:{type:'pending'},recordNote:'Participation certificate pending.'}
 ];
 d.research=[
 {name:'Observation-Guided KV-Cache Compression',detail:'IIT Bombay hackathon project · corrected inference benchmarks',url:'https://github.com/dharaksh2807-svg/iitB'},

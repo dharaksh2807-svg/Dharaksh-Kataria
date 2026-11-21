@@ -4,7 +4,7 @@ window.PORTFOLIO = {
     {
       id: 'srmedu',
       decision: "Offline content access reduces network dependence. Account, document and tutor features still depend on their configured services.",
-      preview: { src: 'assets/media/srmedu-capture-01.webp', alt: 'SRM Smart Study Hub desktop subject catalogue, with semester listings and study tools', label: 'PUBLIC SUBJECT CATALOGUE · 19 NOV 2026', width: 1280, height: 800 }, num: '01', title: 'SRM Smart Study Hub', short: 'Course resources, exam intelligence and study tools in one academic workspace.',
+      preview: { src: 'assets/media/srmedu-dashboard-provided-20261121.jpg', alt: 'SRM Smart Study Hub dashboard showing the semester catalogue and study tools', label: 'OWNER-SUPPLIED DASHBOARD · 21 NOV 2026', width: 1024, height: 666 }, num: '01', title: 'SRM Smart Study Hub', short: 'Course resources, exam intelligence and study tools in one academic workspace.',
       category: 'product', categories: ['EDTECH', 'PRODUCT ENGINEERING'], year: '2026', status: 'LIVE PRODUCT',
       highlights: [['Content', '67 subjects · 6 semesters'], ['Delivery', 'Offline-first PWA'], ['Integrations', 'Firebase · Drive · BYOK tutor']],
       theme: 'study', size: 'wide', role: 'Independent creator & developer',

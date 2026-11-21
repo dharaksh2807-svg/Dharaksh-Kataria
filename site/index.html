@@ -33,17 +33,17 @@
   <link rel="stylesheet" href="v7.css?v=production-review-20261121-2">
   <link rel="stylesheet" href="v8.css?v=production-review-20261121-2">
   <link rel="stylesheet" href="motion-system.css?v=production-review-20261121-2">
-  <link rel="stylesheet" href="visual-polish.css?v=production-review-20261121-2">
-  <link rel="stylesheet" href="rift-home.css?v=production-review-20261121-2">
-  <link rel="stylesheet" href="guide.css?v=production-review-20261121-2">
-  <script defer src="projects.js?v=production-review-20261121-2"></script>
-  <script defer src="content-extra.js?v=production-review-20261121-2"></script>
-  <script defer src="main.js?v=production-review-20261121-2"></script>
+  <link rel="stylesheet" href="visual-polish.css?v=credentials-layout-20261121-5">
+  <link rel="stylesheet" href="rift-home.css?v=interaction-finish-20261121-6">
+  <link rel="stylesheet" href="guide.css?v=interaction-finish-20261121-6">
+  <script defer src="projects.js?v=homepage-polish-20261121-2"></script>
+  <script defer src="content-extra.js?v=credentials-layout-20261121-5"></script>
+  <script defer src="main.js?v=interaction-finish-20261121-6"></script>
   <script defer src="experience.js?v=production-review-20261121-2"></script>
   <script defer src="immersive.js?v=production-review-20261121-2"></script>
-  <script defer src="v4-motion.js?v=production-review-20261121-2"></script>
-  <script defer src="guide.js?v=production-review-20261121-2"></script>
-  <script type="module" src="labs/rift-directors-cut.js?v=production-review-20261121-2"></script>
+  <script defer src="v4-motion.js?v=interaction-finish-20261121-6"></script>
+  <script defer src="guide.js?v=interaction-finish-20261121-6"></script>
+  <script type="module" src="labs/rift-directors-cut.js?v=interaction-finish-20261121-6"></script>
   <script defer src="v6.js?v=production-review-20261121-2"></script>
   <script defer src="world.js?v=production-review-20261121-2"></script>
   <script defer src="world-continuity.js?v=production-review-20261121-2"></script>
@@ -111,7 +111,7 @@
             <h1 class="hero-title" id="heroTitle"><span>Dharaksh</span><span class="serif">Kataria.</span></h1>
             <p class="hero-description">Software with substance. Building thoughtful digital products, applied AI systems and interactive experiences.</p>
             <div class="hero-actions">
-              <a class="hero-action" href="#work">Explore the work</a>
+              <a class="hero-action" href="#work">Explore the work <span class="hero-action-mark" aria-hidden="true">✦</span></a>
             </div>
             <div class="rift-mode-switcher" role="group" aria-label="Choose portal animation style">
               <span class="rift-mode-label">MOTION STYLE <span class="rift-mode-label-suffix">/ OPTIONAL</span></span>
@@ -140,7 +140,7 @@
       <section class="work-section section-light" id="work" aria-labelledby="workTitle">
         <span id="riftProjects" class="work-anchor" aria-hidden="true"></span>
         <div class="wrap">
-          <div class="section-heading work-heading reveal"><div><h2 id="workTitle" tabindex="-1">Selected <em>work.</em></h2></div></div>
+          <div class="section-heading work-heading reveal"><div><h2 id="workTitle" tabindex="-1">Selected <em>work.</em></h2></div><p class="work-intro">Product systems, applied AI and interactive worlds. Explore the decisions behind each build.</p></div>
           <div class="filter-row reveal" role="group" aria-label="Filter projects">
             <div class="filter-list" id="projectFilters"><button class="filter-button is-active" type="button" data-filter="all" aria-pressed="true">All work <span>06</span></button><button class="filter-button" type="button" data-filter="product" aria-pressed="false">Products</button><button class="filter-button" type="button" data-filter="research" aria-pressed="false">Research</button><button class="filter-button" type="button" data-filter="interactive" aria-pressed="false">Interactive</button></div>
             <span class="filter-count mono" id="filterCount" aria-live="polite">SHOWING 06 / 06</span>
@@ -291,7 +291,7 @@
 
     <section class="timeline-section" id="timeline" aria-labelledby="timelineTitle">
       <div class="wrap timeline-head reveal"><span class="eyebrow eyebrow-dark">[ CHRONOLOGY / 2026 ]</span><h2 id="timelineTitle">A year in <em>systems.</em></h2><p>Navigate the work as it developed. Each milestone opens the complete case study.</p></div>
-      <div class="timeline-rail" id="timelineRail" aria-label="Selected project timeline"></div>
+      <div class="timeline-rail" id="timelineRail" role="region" tabindex="0" aria-label="Selected project timeline. Use left and right arrows, Home or End to explore."></div>
       <div class="wrap timeline-controls"><span class="mono">DRAG OR SCROLL TO EXPLORE</span><div><button id="timelinePrev" type="button" aria-label="Scroll timeline left">←</button><button id="timelineNext" type="button" aria-label="Scroll timeline right">→</button></div></div>
     </section>
 
@@ -369,8 +369,8 @@
 
     <section class="recognition-section section-light" id="recognition" aria-labelledby="recognitionTitle">
       <div class="wrap">
-        <div class="recognition-top reveal"><span class="eyebrow eyebrow-dark">[ 06 / THE RECORD ]</span><h2 id="recognitionTitle">Learning &amp; <em>participation.</em></h2><p>Courses, research submissions and hackathon participation. Issuer records are linked where available, and owner-reported entries are identified.</p></div>
-        <div class="recognition-subhead reveal"><span>01 / CREDENTIALS</span><p>Courses and learning credentials, linked wherever there is a public verification page.</p></div>
+        <div class="recognition-top reveal"><span class="eyebrow eyebrow-dark">[ 06 / THE RECORD ]</span><h2 id="recognitionTitle">Learning &amp; <em>participation.</em></h2><p>Course certificates, issuer records and project code. Each entry identifies its evidence, with participation documents marked pending where needed.</p></div>
+        <div class="recognition-subhead reveal"><span>01 / CREDENTIALS</span><p>Open an issuer record or view the supplied course completion certificate.</p></div>
         <div class="credentials-grid" id="credentialGrid"></div>
         <div class="recognition-subhead reveal"><span>02 / HACKATHONS & CHALLENGES</span><p>Selected participation, submissions and reports. Unverified results are not presented as awards.</p></div>
         <div class="challenge-grid" id="challengeGrid"></div>

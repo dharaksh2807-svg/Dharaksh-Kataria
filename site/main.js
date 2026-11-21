@@ -45,6 +45,7 @@
       <figure class="project-media">
         <a class="project-visual visual-${escape(p.theme)}" href="${detailUrl(p)}" aria-label="Read ${escape(p.title)} case study">
           ${visual}
+          <span class="project-preview-hint" aria-hidden="true">View case study</span>
         </a>
         <figcaption class="project-visual-tag">${escape(visualLabel)}</figcaption>
       </figure>
@@ -92,7 +93,20 @@
 
   function applyFilter(filter) {
     let visible = 0;
-    cards.forEach((card) => { const show = filter === 'all' || card.dataset.category === filter; card.hidden = !show; if (show) { visible++; card.classList.add('in-view'); } });
+    cards.forEach((card) => {
+      const show = filter === 'all' || card.dataset.category === filter;
+      card.hidden = !show;
+      const media = $('.project-media',card);
+      media.getAnimations().forEach(animation=>animation.cancel());
+      if(show){
+        visible++;
+        card.classList.add('in-view');
+        if(!window.portfolioMotion.disabled)media.animate([
+          {opacity:.55,transform:'translateY(8px)'},
+          {opacity:1,transform:'translateY(0)'}
+        ],{duration:280,easing:'cubic-bezier(.22,.7,.2,1)'});
+      }
+    });
     $$('.filter-button').forEach((b) => { const active = b.dataset.filter === filter; b.classList.toggle('is-active', active); b.setAttribute('aria-pressed', String(active)); });
     $('#filterCount').textContent = `SHOWING ${String(visible).padStart(2,'0')} / ${String(projects.length).padStart(2,'0')}`;
   }
@@ -114,9 +128,25 @@
   $('#archiveSearch').addEventListener('input',e=>filterArchive(e.target.value));
   filterArchive('');
   const credentials=$('#credentialGrid');
-  data.credentials.forEach((c,i)=>{const el=document.createElement('article');el.className='credential-card reveal';el.innerHTML=`<span class="credential-motif" aria-hidden="true"><span>${escape(c.code)}</span><i>✳</i></span><div class="credential-copy"><span>${escape(c.issuer)} · ${escape(c.date)}</span><h3>${escape(c.name)}</h3></div>${external(c.url)?`<a href="${escape(c.url)}" target="_blank" rel="noopener noreferrer" class="credential-link">OPEN ISSUER RECORD</a>`:`<span class="credential-unlinked">OWNER-REPORTED · ${escape(c.recordNote || 'VERIFICATION LINK PENDING')}</span>`}`;credentials.appendChild(el)});
+  function evidenceLink(entry){
+    const evidence=entry.evidence;
+    if(!evidence?.url)return '';
+    const url=external(evidence.url)||(evidence.type==='certificate'&&/^assets\/evidence\/certificates\/[a-z0-9-]+\.pdf$/.test(evidence.url)?evidence.url:null);
+    return url?`<a href="${escape(url)}" target="_blank" rel="noopener noreferrer" class="evidence-link" aria-label="${escape(evidence.label+' — '+entry.name)}">${escape(evidence.label)}</a>`:'';
+  }
+  data.credentials.forEach(c=>{
+    const el=document.createElement('article');el.className='credential-card reveal';
+    const issuerUrl=external(c.url);
+    const status=c.evidence?.type==='certificate'?'CERTIFICATE PDF':issuerUrl?'ISSUER RECORD':'EVIDENCE PENDING';
+    el.innerHTML=`<div class="credential-meta"><span>${escape(c.code)}</span><p class="evidence-status">${status}</p></div><div class="credential-copy"><span>${escape(c.issuer)}</span><h3>${escape(c.name)}</h3><p class="credential-date">${escape(c.date)}</p></div><div class="credential-evidence">${issuerUrl?`<a href="${escape(issuerUrl)}" target="_blank" rel="noopener noreferrer" class="credential-link" aria-label="Open issuer record — ${escape(c.name)}">OPEN ISSUER RECORD</a>`:''}${evidenceLink(c)}${!issuerUrl&&!c.evidence?.url?`<span class="credential-unlinked">${escape(c.recordNote||'Evidence pending')}</span>`:''}</div>`;
+    credentials.appendChild(el);
+  });
   const challenges=$('#challengeGrid');
-  data.hackathons.forEach((c,i)=>{const el=document.createElement('article');el.className='challenge-card reveal';el.innerHTML=`<span class="challenge-index mono">${escape(c.num||String(i+1).padStart(2,'0'))}</span><div><strong>${escape(c.name)}</strong><p>${escape(c.detail)}</p></div><span class="challenge-status">${escape(c.status)}</span>`;challenges.appendChild(el)});
+  data.hackathons.forEach((c,i)=>{
+    const el=document.createElement('article');el.className='challenge-card reveal';
+    el.innerHTML=`<span class="challenge-index mono">${escape(c.num||String(i+1).padStart(2,'0'))}</span><div class="challenge-copy"><h3>${escape(c.name)}</h3><p>${escape(c.detail)}</p></div><span class="challenge-status">${escape(c.status)} · ${c.evidence?.type==='repository'?'PROJECT REPOSITORY':'EVIDENCE PENDING'}</span><div class="challenge-evidence">${evidenceLink(c)}<p>${escape(c.recordNote||'Participation certificate pending.')}</p></div>`;
+    challenges.appendChild(el);
+  });
   const research=$('#researchGrid');
   data.research.forEach((c,i)=>{const el=document.createElement('article');el.className='research-card reveal';el.innerHTML=`<span class="mono">RESEARCH / ${String(i+1).padStart(2,'0')}</span><h3>${escape(c.name)}</h3><p>${escape(c.detail)}</p>${external(c.url)?`<a href="${escape(c.url)}" target="_blank" rel="noopener noreferrer">VIEW RESEARCH ↗</a>`:'<span class="research-private">ACADEMIC WORK / NO PUBLIC LINK</span>'}`;research.appendChild(el)});
   const atlasTabs=$('#atlasTabs'),atlasDetail=$('#atlasDetail');
@@ -131,12 +161,47 @@
   const timelineRail=$('#timelineRail');
   data.timeline.forEach((e,i)=>{
     const el=document.createElement('article');el.className='timeline-event';
+    el.id='timeline-'+e.id;
     el.innerHTML=`<span class="timeline-dot" aria-hidden="true"></span><span class="timeline-date mono">${escape(e.date)}</span><div class="timeline-feature"><span>${escape(e.tag)}</span><h3>${escape(e.title)}</h3><p>${escape(e.detail)}</p><button type="button">OPEN THE CASE STUDY ↗</button></div>`;
     $('button',el).addEventListener('click',()=>navigateToDetail(projects.find(p=>p.id===e.id)));
     timelineRail.appendChild(el);
   });
-  $('#timelinePrev').addEventListener('click',()=>timelineRail.scrollBy({left:-340,behavior:reduceMotion?'instant':'smooth'}));
-  $('#timelineNext').addEventListener('click',()=>timelineRail.scrollBy({left:340,behavior:reduceMotion?'instant':'smooth'}));
+  function moveTimeline(direction){
+    const gutter=parseFloat(getComputedStyle(timelineRail).paddingLeft);
+    const end=timelineRail.scrollWidth-timelineRail.clientWidth;
+    const stops=[...timelineRail.children].map(event=>Math.min(end,Math.max(0,event.offsetLeft-gutter)));
+    const destination=direction>0?stops.find(stop=>stop>timelineRail.scrollLeft+2)??end:stops.reverse().find(stop=>stop<timelineRail.scrollLeft-2)??0;
+    timelineRail.scrollTo({left:destination,behavior:window.portfolioMotion.disabled?'instant':'smooth'});
+  }
+  $('#timelinePrev').addEventListener('click',()=>moveTimeline(-1));
+  $('#timelineNext').addEventListener('click',()=>moveTimeline(1));
+  timelineRail.addEventListener('keydown',event=>{
+    if(event.target!==timelineRail)return;
+    if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+    event.preventDefault();
+    if(event.key==='Home'||event.key==='End')timelineRail.scrollTo({left:event.key==='Home'?0:timelineRail.scrollWidth,behavior:'instant'});
+    else moveTimeline(event.key==='ArrowRight'?1:-1);
+  });
+  // Touch retains native panning. Mouse dragging starts after a small threshold.
+  let timelineDrag=null;
+  timelineRail.addEventListener('pointerdown',event=>{
+    if(event.pointerType!=='mouse'||event.button!==0||event.target.closest('button,a'))return;
+    timelineDrag={id:event.pointerId,x:event.clientX,scroll:timelineRail.scrollLeft,active:false};
+  });
+  timelineRail.addEventListener('pointermove',event=>{
+    if(!timelineDrag||event.pointerId!==timelineDrag.id)return;
+    const distance=event.clientX-timelineDrag.x;
+    if(!timelineDrag.active&&Math.abs(distance)<5)return;
+    timelineDrag.active=true;
+    timelineRail.setPointerCapture(event.pointerId);
+    timelineRail.classList.add('is-dragging');
+    timelineRail.scrollLeft=timelineDrag.scroll-distance;
+  });
+  function finishTimelineDrag(){timelineDrag=null;timelineRail.classList.remove('is-dragging');}
+  timelineRail.addEventListener('pointerup',finishTimelineDrag);
+  timelineRail.addEventListener('pointercancel',finishTimelineDrag);
+  timelineRail.addEventListener('lostpointercapture',finishTimelineDrag);
+  timelineRail.addEventListener('pointerleave',()=>{if(!timelineDrag?.active)finishTimelineDrag();});
   const overlay = $('#caseOverlay');
   const caseDialog = $('.case-dialog');
   function openCase(p, { updateUrl = true } = {}) {
