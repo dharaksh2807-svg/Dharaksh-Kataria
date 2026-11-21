@@ -79,59 +79,7 @@
   .world-sector-story small{font-size:8px}
 }
 
-/* Kio: closed panel is an unobtrusive floating character instead of invisible.
-   Opening the guide retains the existing inline, accessible two-column layout. */
-#kioGuide.kio-shell:not(.kio-open):not(.kio-suppressed){
-  display:block;position:fixed;z-index:83;right:max(14px,env(safe-area-inset-right));
-  bottom:max(14px,env(safe-area-inset-bottom));
-  width:112px;height:156px;margin:0;pointer-events:none;filter:none;
-}
-#kioGuide:not(.kio-open) .kio-launch{
-  position:absolute;inset:auto 0 0 auto;display:block;width:112px;height:151px;
-  pointer-events:auto;grid-column:auto;grid-row:auto;
-}
-#kioGuide:not(.kio-open) .kio-person{width:103px;height:123px}
-#kioGuide:not(.kio-open) .kio-aura{height:122px}
-#kioGuide:not(.kio-open) .kio-launch-label{display:flex;min-height:35px}
-#kioGuide:not(.kio-open) .kio-hint{display:none!important}
-#kioGuide.kio-compact:not(.kio-open){width:86px;height:116px}
-#kioGuide.kio-compact:not(.kio-open) .kio-launch{width:86px;height:112px}
-#kioGuide.kio-compact:not(.kio-open) .kio-person{width:78px;height:93px}
-#kioGuide.kio-compact:not(.kio-open) .kio-launch-label{min-height:24px}
-#kioGuide:not(.kio-reduced) .kio-person{
-  animation:kio-float 4.4s ease-in-out infinite;
-}
-#kioGuide:not(.kio-reduced) .kio-figure{
-  animation:kio-breathe 3s ease-in-out infinite;
-}
-#kioGuide:not(.kio-reduced) .kio-eyes{animation:kio-blink 6.1s linear infinite}
-#kioGuide:not(.kio-reduced) .kio-leg-front,
-#kioGuide:not(.kio-reduced) .kio-leg-back{animation:kio-foot 4.5s ease-in-out infinite}
-#kioGuide:not(.kio-reduced) .kio-arm-left{animation:kio-arm-sway 3.2s ease-in-out infinite}
-#kioGuide:not(.kio-reduced) .kio-arm-right{animation:kio-wave 3.8s ease-in-out infinite}
-#kioGuide[data-mood="wave"]:not(.kio-reduced) .kio-arm-right{
-  animation:kio-wave-hello .65s ease-in-out infinite alternate;
-}
-#kioGuide:not(.kio-reduced) .kio-aura{animation:kio-aura 5.5s ease-in-out infinite}
-#kioGuide:not(.kio-reduced) .kio-ground{animation:kio-shadow 4.4s ease-in-out infinite}
-#kioGuide:not(.kio-reduced) .kio-sparkles{animation:kio-sparkle 3.8s ease-in-out infinite}
-#kioGuide.kio-reduced .kio-person,#kioGuide.kio-reduced .kio-figure,
-#kioGuide.kio-reduced .kio-eyes,#kioGuide.kio-reduced .kio-arm-right,
-#kioGuide.kio-reduced .kio-arm-left,#kioGuide.kio-reduced .kio-leg-front,
-#kioGuide.kio-reduced .kio-leg-back{animation:none!important}
-@media(max-width:760px){
-  #kioGuide.kio-shell:not(.kio-open):not(.kio-suppressed){
-    width:82px;height:115px;right:8px;bottom:max(9px,env(safe-area-inset-bottom));
-  }
-  #kioGuide:not(.kio-open) .kio-launch{width:82px;height:111px}
-  #kioGuide:not(.kio-open) .kio-person{width:75px;height:90px}
-  #kioGuide:not(.kio-open) .kio-launch-label{display:none}
-}
-@media(prefers-reduced-motion:reduce){
-  #kioGuide *,#kioGuide *:before,#kioGuide *:after{animation:none!important;transition:none!important}
-}
-html.motion-off #kioGuide *,html.motion-off #kioGuide *:before,
-html.motion-off #kioGuide *:after{animation:none!important}
+
 
 /* Return navigation stays visible throughout long-form case studies. */
 .cp-chapters-back{
@@ -156,10 +104,6 @@ html.motion-off .hero-line>span{opacity:1!important;transform:none!important;fil
  .hero-line>span{opacity:1!important;transform:none!important;filter:none!important}
 }
 
-#kioGuide:not(.kio-reduced) .kio-head{
-  animation:kio-nod 5.4s ease-in-out infinite;
-}
-
 /* Entire district-tile background follows the story link. The intentional 3D-focus
    button remains separately clickable above that link's transparent hit area. */
 .world-sector-story{cursor:pointer}
@@ -167,4 +111,23 @@ html.motion-off .hero-line>span{opacity:1!important;transform:none!important;fil
 .world-sector-tile .world-sector{position:relative;z-index:2}
 .world-sector-tile:has(.world-sector-story:focus-visible){
   outline:3px solid #e9b18d;outline-offset:-3px;
+}
+
+/* Shared editorial hierarchy around the existing technical demonstrations. */
+:is(#journey,#motion-lab,#universe,#prooflab,#timeline,#dimensions,#capabilities){scroll-margin-top:16px}
+:is(.world-top,.proof-headline-row,.timeline-head,.capabilities-header) h2{font-family:var(--font-sans);font-size:clamp(42px,5.4vw,80px);line-height:1.08;letter-spacing:-.055em;overflow:visible}
+:is(.world-top,.proof-headline-row,.capabilities-header)>p{font-size:1rem;line-height:1.75}
+.motion-lab,.dimension-section{padding-block:40px;background:#101b18;color:#f1eee5;border-top:1px solid #60705b66}
+.render-study>summary{cursor:pointer;list-style:none;padding-block:12px}
+.render-study>summary::-webkit-details-marker{display:none}
+.render-study>summary h2{display:flex;justify-content:space-between;align-items:center;gap:24px;font-size:clamp(28px,3.4vw,44px);font-weight:500;line-height:1.15;letter-spacing:-.045em;margin:0}
+.render-study>summary h2>span{font:300 30px var(--font-sans);color:#e0ae87;flex:none}
+.render-study[open]>summary h2>span{rotate:45deg}
+.render-study>summary:focus-visible{outline:2px solid #e0ae87;outline-offset:6px}
+.render-study-description{max-width:650px;font-size:1rem;line-height:1.75;color:#bcc7b6;margin:20px 0 32px}
+#dimensions .dimension-frame{width:100%}
+@media(max-width:760px){
+ :is(.world-top,.proof-headline-row,.timeline-head,.capabilities-header) h2{font-size:clamp(38px,9vw,54px)}
+ .motion-lab,.dimension-section{padding-block:28px}
+ .render-study>summary h2{font-size:28px}
 }

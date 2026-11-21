@@ -2,24 +2,29 @@
 window.PORTFOLIO = {
   projects: [
     {
-      id: 'srmedu', preview: { src: 'assets/media/srmedu-capture-01.webp', alt: 'SRM Smart Study Hub subject catalogue', label: 'PUBLIC INTERFACE CAPTURE' }, num: '01', title: 'SRM Smart Study Hub', short: 'The campus study companion I wanted to exist.',
+      id: 'srmedu',
+      decision: "Offline content access reduces network dependence. Account, document and tutor features still depend on their configured services.",
+      preview: { src: 'assets/media/srmedu-capture-01.webp', alt: 'SRM Smart Study Hub desktop subject catalogue, with semester listings and study tools', label: 'PUBLIC SUBJECT CATALOGUE · 19 NOV 2026', width: 1280, height: 800 }, num: '01', title: 'SRM Smart Study Hub', short: 'Course resources, exam intelligence and study tools in one academic workspace.',
       category: 'product', categories: ['EDTECH', 'PRODUCT ENGINEERING'], year: '2026', status: 'LIVE PRODUCT',
+      highlights: [['Content', '67 subjects · 6 semesters'], ['Delivery', 'Offline-first PWA'], ['Integrations', 'Firebase · Drive · BYOK tutor']],
       theme: 'study', size: 'wide', role: 'Independent creator & developer',
       link: 'https://www.srmedu.in/', linkLabel: 'Visit live platform', source: null,
       lead: 'Making university learning less fragmented, more focused, and actually useful.',
       problem: 'Notes, slides, exam papers and study tools often live in disconnected folders and apps. Finding the right material — and figuring out what matters — takes time students do not have.',
       solution: 'An independent academic workspace organizing 67 listed subjects across six semesters, with previous-year question analysis, topic heatmaps, an embedded compiler, formula tools, active recall and subject-aware AI support.',
       architecture: 'Modular vanilla JavaScript, offline-first PWA caching, Firebase Auth / Firestore modules, cloud document integration and a BYOK multi-model tutor. Some cloud features may vary by production rollout.',
-      proof: '67 subjects catalogued · Reported 802 active users during 2 Oct–10 Nov 2026 · 7,853 events in the same reported analytics window',
+      proof: 'Reported 802 active users and 7,853 events during 2 Oct–10 Nov 2026. Analytics figures are owner-reported.',
       note: 'Student-built, independent and not officially affiliated with SRMIST. Usage figures are from project analytics as reported in the CV.',
       technologies: ['JavaScript', 'Firebase', 'PWA', 'Google Drive API', 'Gemini / Claude', 'HTML / CSS'],
       concepts: ['Exam-intelligence architecture', 'Offline-first content access', 'Study workflows', 'Multi-model learning assistance']
     },
     {
-      id: 'kv', num: '02', title: 'Less memory. More context.', short: 'Researching KV-cache compression for long-context LLMs.',
+      id: 'kv',
+      decision: "Retaining fewer KV states lowers retained-cache size. The documented recall difference and unresolved consistency issues constrain the result.",
+      num: '02', title: 'Less memory. More context.', short: 'Researching KV-cache compression for long-context LLMs.',
       category: 'research', categories: ['LLM SYSTEMS', 'RESEARCH'], year: '2026', status: 'EXPERIMENTAL',
       theme: 'kv', size: 'normal', role: 'Research contributor · Team AutonomOS',
-      link: 'https://github.com/dharaksh2807-svg/iitB', linkLabel: 'Explore the research', source: 'https://github.com/dharaksh2807-svg/iitB',
+      link: 'https://github.com/dharaksh2807-svg/iitB/blob/main/PHASE3_RESEARCH_REPORT.md', linkLabel: 'Explore the research', source: 'https://github.com/dharaksh2807-svg/iitB',
       lead: 'What can a language model remember when its working memory is constrained?',
       problem: 'Autoregressive inference retains key/value states that grow with context length. Reducing retained states without collapsing recall requires careful selection and correct decoding.',
       solution: 'Built and evaluated an observation-guided cache retention pipeline, comparing record-aware selection against sliding-window, StreamingLLM-style and static H2O-style baselines on synthetic long-context questions.',
@@ -30,7 +35,9 @@ window.PORTFOLIO = {
       concepts: ['Memory-efficient inference', 'Retention policies', 'Reproducible evaluation', 'Failure analysis']
     },
     {
-      id: 'projectmatch', preview: { src: 'assets/media/projectmatch-capture-01.webp', alt: 'ProjectMatch public collaboration platform', label: 'PUBLIC INTERFACE CAPTURE' }, num: '03', title: 'ProjectMatch', short: 'Find collaborators by what they can build, not who they know.',
+      id: 'projectmatch',
+      decision: "Weighted compatibility makes ranking explicit. Its usefulness still needs evaluation with real teams and configured provider services.",
+      preview: { src: 'assets/media/projectmatch-capture-01.webp', alt: 'ProjectMatch public collaboration platform', label: 'PUBLIC INTERFACE · 19 NOV 2026', width: 1280, height: 800 }, num: '03', title: 'ProjectMatch', short: 'Skills-based team matching and project collaboration.',
       category: 'product', categories: ['FULL STACK', 'COLLABORATION'], year: '2026', status: 'LIVE DEMO',
       theme: 'match', size: 'normal', role: 'Independent developer',
       link: 'https://projectmatch-phi.vercel.app/', linkLabel: 'Explore the app', source: 'https://github.com/dharaksh2807-svg/projectmatch',
@@ -44,9 +51,11 @@ window.PORTFOLIO = {
       concepts: ['Weighted ranking', 'Relational data modeling', 'Authentication', 'Project collaboration']
     },
     {
-      id: 'metro', num: '04', title: 'Metro Runner 3D', short: 'An endless runner built from geometry, systems and timing.',
+      id: 'metro',
+      decision: "Procedural generation creates variety. Solvability and collision behavior need gameplay regression evidence across generated sequences.",
+      num: '04', title: 'Metro Runner 3D', short: 'An endless runner built from geometry, systems and timing.',
       category: 'interactive', categories: ['REAL-TIME 3D', 'GAME DEVELOPMENT'], year: '2026', status: 'IN DEVELOPMENT',
-      theme: 'metro', size: 'wide', role: 'Independent developer',
+      theme: 'metro', size: 'compact', role: 'Independent developer',
       link: null, linkLabel: null, source: null,
       lead: 'Designing the kind of moment-to-moment play that feels good before it looks impressive.',
       problem: 'Procedural runners are deceptively complex: movement, train geometry, collisions and generated obstacles must stay synchronized at increasingly high speeds.',
@@ -58,9 +67,11 @@ window.PORTFOLIO = {
       concepts: ['Collision engineering', 'Procedural solvability', 'World generation', 'Performance']
     },
     {
-      id: 'oodp', preview: { src: 'assets/media/oodp-capture-01.webp', alt: 'OODP Mastery public learning interface', label: 'PUBLIC INTERFACE CAPTURE' }, num: '05', title: 'OODP Mastery', short: 'A deeper way to learn C++ and object-oriented programming.',
+      id: 'oodp',
+      decision: "Embedded execution supports experimentation. External compiler and AI integrations introduce service dependencies.",
+      preview: { src: 'assets/media/oodp-capture-01.webp', alt: 'OODP Mastery public learning interface', label: 'PUBLIC INTERFACE · 19 NOV 2026', width: 1280, height: 800 }, num: '05', title: 'OODP Mastery', short: 'C++ learning through explanations, runtime models and executable examples.',
       category: 'product', categories: ['EDTECH', 'C++ LEARNING'], year: '2026', status: 'LIVE PRODUCT',
-      theme: 'oodp', size: 'normal', role: 'Independent creator & developer',
+      theme: 'oodp', size: 'compact', role: 'Independent creator & developer',
       link: 'https://oops-mastery.netlify.app/', linkLabel: 'Explore learning platform', source: 'https://github.com/dharaksh2807-svg/oops-mastery.',
       lead: 'Helping students understand what their code does — not just memorize definitions.',
       problem: 'Many students study object-oriented programming as vocabulary, without grasping memory behavior, dispatch, exception flow or why a design works.',
@@ -72,9 +83,11 @@ window.PORTFOLIO = {
       concepts: ['Learning design', 'Runtime reasoning', 'Exam workflows', 'Interactive examples']
     },
     {
-      id: 'fairshift', num: '06', title: 'FairShift', short: 'Making work hours, wages and disputes easier to understand.',
+      id: 'fairshift',
+      decision: "Database transactions and row-level security centralize correctness constraints. The documented local tests leave production readiness unverified.",
+      num: '06', title: 'FairShift', short: 'Making work hours, wages and disputes easier to understand.',
       category: 'product', categories: ['FULL STACK', 'HACKATHON'], year: '2026', status: 'HACKATHON PROTOTYPE',
-      theme: 'fair', size: 'normal', role: 'Independent developer',
+      theme: 'fair', size: 'compact', role: 'Independent developer',
       link: null, linkLabel: null, source: 'https://github.com/dharaksh2807-svg/hackathon',
       lead: 'The details of a payslip should never be a mystery.',
       problem: 'Workers and employers need understandable records of shifts, overtime, breaks and disagreements over calculated wages.',

@@ -3,7 +3,6 @@
   "use strict";
   const root = document.documentElement;
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-  const fine = matchMedia("(hover:hover) and (pointer:fine)");
   let savedMuted = false,
     frame = 0;
   try {
@@ -31,7 +30,6 @@
         document
           .querySelectorAll("[data-motion]")
           .forEach((node) => node.classList.add("motion-visible"));
-        document.querySelectorAll(".project-card").forEach(resetCard);
       }
       schedule();
     }
@@ -54,13 +52,19 @@
       get disabled() {
         return disabled();
       },
-      navigate(url, id) {
+      navigate(url, id, focusClass = "project-case-open") {
         const card = document.querySelector(
           `[data-project="${CSS.escape(id)}"] .project-visual`,
         );
         if (card)
           try {
             sessionStorage.setItem("dk-return-project", id);
+            sessionStorage.setItem("dk-return-work", JSON.stringify({
+              filter: document.querySelector("#projectFilters .is-active")?.dataset.filter || "all",
+              expanded: [...document.querySelectorAll(".project-decisions[open]")]
+                .map(details => details.closest(".project-card").dataset.project),
+              focusClass,
+            }));
           } catch {}
         location.assign(url);
       },
@@ -122,33 +126,7 @@
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
     document.addEventListener("visibilitychange", schedule);
-    function resetCard(card) {
-      card.style.setProperty("--art-x", "0px");
-      card.style.setProperty("--art-y", "0px");
-      card.style.setProperty("--tilt-x", "0deg");
-      card.style.setProperty("--tilt-y", "0deg");
-    }
     const grid = document.getElementById("projectsGrid");
-    grid?.addEventListener(
-      "pointermove",
-      (event) => {
-        if (disabled() || !fine.matches) return;
-        const card = event.target.closest(".project-card");
-        if (!card) return;
-        const box = card.getBoundingClientRect(),
-          x = (event.clientX - box.left) / box.width - 0.5,
-          y = (event.clientY - box.top) / box.height - 0.5;
-        card.style.setProperty("--tilt-x", -y * 3 + "deg");
-        card.style.setProperty("--tilt-y", x * 3 + "deg");
-        card.style.setProperty("--art-x", x * 7 + "px");
-        card.style.setProperty("--art-y", y * 7 + "px");
-      },
-      { passive: true },
-    );
-    grid?.addEventListener("pointerout", (event) => {
-      const card = event.target.closest(".project-card");
-      if (card && !card.contains(event.relatedTarget)) resetCard(card);
-    });
     grid?.addEventListener("focusin", (event) => {
       const card = event.target.closest(".project-card");
       if (card)
@@ -174,21 +152,26 @@
     });
     window.addEventListener("pageshow", (event) => {
       document.body.classList.remove("v8-leaving");
-      if (
-        event.persisted ||
-        performance.getEntriesByType("navigation")[0]?.type === "back_forward"
-      ) {
-        let id;
+      if(grid){
+        const returning=event.persisted || performance.getEntriesByType("navigation")[0]?.type === "back_forward";
+        let id, work;
         try {
-          id = sessionStorage.getItem("dk-return-project");
+          id=sessionStorage.getItem("dk-return-project");
+          work=JSON.parse(sessionStorage.getItem("dk-return-work") || "null");
           sessionStorage.removeItem("dk-return-project");
+          sessionStorage.removeItem("dk-return-work");
         } catch {}
-        if (id)
-          document
-            .querySelector(
-              `[data-project="${CSS.escape(id)}"] .project-case-open`,
-            )
-            ?.focus({ preventScroll: true });
+        if(returning && id){
+          if(work){
+            document.querySelector(`#projectFilters [data-filter="${CSS.escape(work.filter || 'all')}"]`)?.click();
+            document.querySelectorAll(".project-decisions").forEach(details=>{
+              details.open=Array.isArray(work.expanded) && work.expanded.includes(details.closest(".project-card").dataset.project);
+            });
+          }
+          const focusTargets=["project-case-open","project-evidence-link","project-visual"];
+          const focusClass=focusTargets.includes(work?.focusClass)?work.focusClass:"project-case-open";
+          document.querySelector(`[data-project="${CSS.escape(id)}"] .${focusClass}`)?.focus({preventScroll:true});
+        }
       }
       schedule();
     });

@@ -14,6 +14,7 @@ fs.mkdirSync(out, { recursive: true });
 const report = { url, checks: [], sceneDifferences: [], transitionCancellations: [], errors: [], limitations: ['Viewport emulation does not replace physical device testing.'] };
 const modes = ['director', 'kinetic', 'fracture', 'infinite', 'ascension'];
 const positions = [0, .25, .5, .75, .9];
+const captureScreenshots = process.env.PORTFOLIO_SCREENSHOTS !== '0';
 async function seek(page, progress) {
   await page.evaluate(progress => {
     const intro = document.querySelector('.rift-home .intro');
@@ -65,7 +66,7 @@ async function layout(page, width, height) {
   assert(state.title.right <= width, `Clipped title at ${width}×${height}`);
   assert(state.actions.bottom <= state.modes.top, `Action overlaps style controls at ${width}×${height}`);
   assert(state.modes.bottom <= height - 35, `Style controls clipped at ${width}×${height}`);
-  await page.screenshot({ path: path.join(out, `opening-${width}-${height}.png`) });
+  if (captureScreenshots) await page.screenshot({ path: path.join(out, `opening-${width}-${height}.png`) });
   report.checks.push(`Layout ${width}×${height}`);
 }
 (async () => {
@@ -80,48 +81,63 @@ async function layout(page, width, height) {
     assert.equal(await page.locator('.hero-action').count(), 1);
     assert.equal(await page.locator('.motion-button').count(), 0);
     assert((await page.locator('#kioGuide').boundingBox()).width <= 80);
-    for (const [width, height] of [[1440,900],[1280,720],[1024,768],[768,1024],[390,844],[360,640],[320,568]])
-      await layout(page, width, height);
-    await page.setViewportSize({ width: 1440, height: 900 });
-    const samples = new Map();
-    for (const progress of positions) {
-      await seek(page, progress);
-      const scroll = await page.evaluate(() => scrollY);
-      for (const mode of modes) {
-        // Exercise the real buttons at opening and mid-scroll. At the exit,
-        // hero controls yield to work, so use their shared controller directly.
-        if (progress <= .5) await page.locator(`button[data-rift-mode="${mode}"]`).click();
-        else await page.evaluate(mode => window.__riftDirector.setMode(mode), mode);
-        await page.waitForTimeout(100);
-        assert.equal((await page.evaluate(() => window.__riftDirector.getState())).mode, mode);
-        assert.equal(await page.evaluate(() => scrollY), scroll, 'Mode switch resets scroll');
-        samples.set(`${mode}-${progress}`, await scenePixels(page));
-        const style = await page.addStyleTag({ content: '.rift-home #work,.stage>:not(canvas),.site-header,#kioGuide{visibility:hidden!important}' });
-        await page.screenshot({ path: path.join(out, `scene-${mode}-${progress * 100}.png`) });
-        await style.evaluate(node => node.remove());
-      }
-    }
-    for (const progress of positions) {
-      for (let first = 0; first < modes.length; first++) {
-        for (let second = first + 1; second < modes.length; second++) {
-          const delta = difference(samples.get(`${modes[first]}-${progress}`), samples.get(`${modes[second]}-${progress}`));
-          report.sceneDifferences.push({ progress, first: modes[first], second: modes[second], meanPixelDifference: delta });
-          assert(delta > 2, `Scenes too similar at ${progress}: ${modes[first]} / ${modes[second]} (${delta})`);
+    if (process.env.RIFT_QA_SCENES !== '0') {
+      for (const [width, height] of [[1440,900],[1280,720],[1024,768],[768,1024],[390,844],[360,640],[320,568]])
+        await layout(page, width, height);
+      await page.setViewportSize({ width: 1440, height: 900 });
+      const samples = new Map();
+      for (const progress of positions) {
+        await seek(page, progress);
+        const scroll = await page.evaluate(() => scrollY);
+        for (const mode of modes) {
+          // Exercise the real buttons at opening and mid-scroll. At the exit,
+          // hero controls yield to work, so use their shared controller directly.
+          if (progress <= .5) await page.locator(`button[data-rift-mode="${mode}"]`).click();
+          else await page.evaluate(mode => window.__riftDirector.setMode(mode), mode);
+          await page.waitForTimeout(100);
+          assert.equal((await page.evaluate(() => window.__riftDirector.getState())).mode, mode);
+          assert.equal(await page.evaluate(() => scrollY), scroll, 'Mode switch resets scroll');
+          samples.set(`${mode}-${progress}`, await scenePixels(page));
+          if (captureScreenshots) {
+            const style = await page.addStyleTag({ content: '.rift-home #work,.stage>:not(canvas),.site-header,#kioGuide{visibility:hidden!important}' });
+            await page.screenshot({ path: path.join(out, `scene-${mode}-${progress * 100}.png`) });
+            await style.evaluate(node => node.remove());
+          }
         }
       }
+      for (const progress of positions) {
+        for (let first = 0; first < modes.length; first++) {
+          for (let second = first + 1; second < modes.length; second++) {
+            const delta = difference(samples.get(`${modes[first]}-${progress}`), samples.get(`${modes[second]}-${progress}`));
+            report.sceneDifferences.push({ progress, first: modes[first], second: modes[second], meanPixelDifference: delta });
+            if (progress < .86) assert(delta > 2, `Scenes too similar at ${progress}: ${modes[first]} / ${modes[second]} (${delta})`);
+          }
+        }
+      }
+      report.checks.push('25 rendered mode/progress states, 40 pre-finale scene comparisons exceed 2/255; final aperture converges');
     }
-    report.checks.push('25 rendered mode/progress states, all 50 pairwise scene differences exceed 2/255');
     await page.evaluate(() => window.__riftDirector.setMode('director'));
-    for (const progress of [.6,.7,.75,.8,.9,1]) {
+    for (const progress of [.8,.86,.9,.919,.94,.99,1,.94,.9,.8,1]) {
       await seek(page, progress);
-      await page.screenshot({ path: path.join(out, `handoff-${progress * 100}.png`) });
-      if (progress >= .9) {
-        assert(Number(await page.locator('#work').evaluate(node => getComputedStyle(node).opacity)) > .99);
+      const state = await page.locator('#work').evaluate(node => ({
+        visibility: getComputedStyle(node).visibility,
+        clip: getComputedStyle(node).clipPath,
+        inert: node.inert
+      }));
+      if (progress < .92) assert.equal(state.visibility, 'hidden', 'Premature project reveal');
+      if (progress >= .99) {
+        assert.equal(state.visibility, 'visible');
+        assert.equal(state.clip, 'none');
+        assert.equal(state.inert, false);
         const first = await page.locator('.project-visual').first().boundingBox();
         assert(first.y < 600, 'Real work missing at end of fly-through');
-        assert.equal(await page.locator('#kioLaunch').isVisible(), false, 'Kio covers showcase');
       }
+      if (captureScreenshots) await page.screenshot({ path: path.join(out, `handoff-${progress * 100}.png`) });
     }
+    const settledFrames = (await page.evaluate(() => __riftDirector.getState())).renderedFrames;
+    await page.waitForTimeout(250);
+    assert((await page.evaluate(() => __riftDirector.getState())).renderedFrames <= settledFrames + 1, 'Covered Rift keeps rendering');
+    report.checks.push('Aperture completion precedes reveal, reverse/rapid seeks stay consistent, covered renderer sleeps');
     await seek(page, .25);
     assert(Number(await page.locator('.title-wrap').evaluate(node => getComputedStyle(node).opacity)) > .99);
     await seek(page, 0);
@@ -165,6 +181,18 @@ async function layout(page, width, height) {
     assert.equal(await page.locator('.intro').evaluate(node => node.offsetHeight), 900);
     await page.locator('#motionSwitch').click();
     report.checks.push('Both work deep links, reverse scroll, Kio, search and global motion toggle');
+    await page.evaluate(() => {
+      const canvas = document.getElementById('riftCanvas');
+      window.__qaContextLoss = canvas.getContext('webgl2').getExtension('WEBGL_lose_context');
+      if (!window.__qaContextLoss) throw new Error('Context-loss simulation unavailable');
+      window.__qaContextLoss.loseContext();
+    });
+    await page.waitForFunction(() => __riftDirector.getState().contextLost);
+    assert.equal(await page.locator('.portal-fallback').isVisible(), true);
+    await page.evaluate(() => window.__qaContextLoss.restoreContext());
+    await page.waitForFunction(() => __riftDirector.getState().webglReady && !__riftDirector.getState().contextLost);
+    await page.evaluate(() => delete window.__qaContextLoss);
+    report.checks.push('WebGL context loss exposes fallback and restoration resumes the renderer');
     await desktop.close();
     const mobile = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
     const phone = await open(mobile);
@@ -176,8 +204,8 @@ async function layout(page, width, height) {
     await phone.locator('#menuToggle').click();
     await phone.locator('#mobileMenu a[href="#work"]').click();
     await phone.waitForTimeout(800);
-    assert.equal(await phone.locator('#kioLaunch').isVisible(), false);
-    await phone.screenshot({ path: path.join(out, 'mobile-work.png') });
+    assert((await phone.locator('#kioGuide').boundingBox()).width <= 80);
+    if (captureScreenshots) await phone.screenshot({ path: path.join(out, 'mobile-work.png') });
     await phone.locator('.project-case-open').first().click();
     await phone.waitForURL('**/projects/srmedu.html');
     await phone.goBack();
@@ -192,7 +220,7 @@ async function layout(page, width, height) {
     assert.equal(await still.locator('.intro').evaluate(node => node.offsetHeight), 900);
     await still.locator('.hero-action').click();
     assert.equal(await still.locator('.project-card:visible').count(), 6);
-    await still.screenshot({ path: path.join(out, 'reduced-work.png') });
+    if (captureScreenshots) await still.screenshot({ path: path.join(out, 'reduced-work.png') });
     await reduced.close();
     const staticContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
     const staticPage = await open(staticContext, '/?motion=off');

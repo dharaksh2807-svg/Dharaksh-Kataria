@@ -28,7 +28,7 @@
   const grid = $('#projectsGrid');
   const cards = projects.map((p) => {
     const card = document.createElement('article');
-    card.className = `project-card ${p.size === 'wide' ? 'is-wide' : ''} reveal`;
+    card.className = `project-card ${p.size === 'wide' ? 'is-wide is-featured' : p.size === 'compact' ? 'is-compact' : ''} reveal`;
     card.dataset.category = p.category;
     card.dataset.project = p.id;
     const live = external(p.link);
@@ -39,19 +39,53 @@
     card.style.setProperty('--v8-vt-name',`project-${p.id}`);
     card.style.setProperty('--project-title-name',`project-title-${p.id}`);
     const preview = p.preview;
-    const visual = preview ? `<img class="project-screenshot" src="${escape(preview.src)}" alt="${escape(preview.alt)}" width="1280" height="800" loading="${p.id === 'srmedu' ? 'eager' : 'lazy'}" decoding="async">` : artFor(p.theme);
-    const visualLabel = preview ? preview.label : 'ORIGINAL SYSTEM VISUAL';
-    card.innerHTML = `<div class="project-visual visual-${escape(p.theme)}"><span class="project-kicker">${escape(p.categories.join(' / '))}</span>${visual}<span class="project-visual-tag">${escape(visualLabel)}</span></div><div class="project-info"><div class="project-info-left"><div class="project-num">${escape(p.num)} — ${escape(p.status)}</div><h3 class="project-title">${escape(p.title)}</h3><p class="project-summary">${escape(p.short)}</p><p class="project-technical">${escape(p.architecture)}</p><div class="project-stack">${p.technologies.slice(0, 4).map(technology => `<span>${escape(technology)}</span>`).join('')}</div></div><div class="project-arrow-wrap"><span class="project-open" aria-hidden="true">↗</span></div></div><div class="project-linkbar"><a class="project-case-open" href="${detailUrl(p)}" aria-label="Read ${escape(p.title)} case study">Read case study</a>${linkHtml}${sourceHtml}${!live&&!source?'<span class="private-pill">NO PUBLIC DEMO</span>':''}</div>`;
-    $('.project-case-open',card).addEventListener('click', event => {
-      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const visual = preview ? `<img class="project-screenshot" src="${escape(preview.src)}" alt="${escape(preview.alt)}" width="${preview.width}" height="${preview.height}" loading="${p.id === 'srmedu' ? 'eager' : 'lazy'}" decoding="async">` : artFor(p.theme);
+    const visualLabel = preview ? preview.label : p.id === 'metro' ? 'ORIGINAL CONCEPT ART · IN DEVELOPMENT' : 'ORIGINAL SYSTEM VISUAL';
+    card.innerHTML = `
+      <figure class="project-media">
+        <a class="project-visual visual-${escape(p.theme)}" href="${detailUrl(p)}" aria-label="Read ${escape(p.title)} case study">
+          ${visual}
+        </a>
+        <figcaption class="project-visual-tag">${escape(visualLabel)}</figcaption>
+      </figure>
+      <div class="project-info">
+        <div class="project-info-left">
+          <div class="project-num">${escape(p.num)} — ${p.size === 'wide' ? 'FEATURED · ' : ''}${escape(p.status)}</div>
+          <h3 class="project-title">${escape(p.title)}</h3>
+          <p class="project-summary">${escape(p.short)}</p>
+          ${p.size === 'wide' ? `<p class="project-role">${escape(p.role)}</p>` : ''}
+          ${p.highlights ? `<dl class="project-highlights">${p.highlights.map(([label, value]) => `<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl>` : `<div class="project-stack">${p.technologies.slice(0, 4).map(technology => `<span>${escape(technology)}</span>`).join('')}</div>`}
+          ${p.size === 'wide' ? `<div class="project-result"><h4>Evidence</h4><p>${escape(p.proof)}</p></div>` : ''}
+          <details class="project-decisions">
+            <summary>${p.size === 'wide' ? 'Architecture &amp; decisions' : 'Engineering &amp; evidence'}</summary>
+            ${p.size === 'wide' ? '' : `<h4>Evidence</h4><p>${escape(p.proof)}</p>`}
+            <h4>Architecture</h4><p>${escape(p.architecture)}</p>
+            <h4>Challenge</h4><p>${escape(p.problem)}</p>
+            <h4>Trade-off</h4><p>${escape(p.decision || p.solution)}</p>
+            <p class="project-scope">${escape(p.note)}</p>
+            <a class="project-evidence-link" href="${detailUrl(p)}#cp-chapter-cp-results">Read evidence and limitations</a>
+          </details>
+        </div>
+        <div class="project-arrow-wrap"><span class="project-open" aria-hidden="true">↗</span></div>
+      </div>
+      <div class="project-linkbar">
+        <a class="project-case-open" href="${detailUrl(p)}" aria-label="Read ${escape(p.title)} case study">Read case study</a>
+        ${linkHtml}${sourceHtml}${!live&&!source?'<span class="private-pill">NO PUBLIC DEMO</span>':''}
+      </div>`;
+    card.addEventListener('click', event => {
+      const link=event.target.closest('.project-case-open,.project-evidence-link,.project-visual');
+      if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
-      navigateToDetail(p);
+      window.portfolioMotion.navigate(link.getAttribute('href'),p.id,
+        link.classList.contains('project-evidence-link')?'project-evidence-link':link.classList.contains('project-visual')?'project-visual':'project-case-open');
     });
-    $('.project-visual',card).addEventListener('click', () => navigateToDetail(p));
-    $('.project-visual',card).setAttribute('role','button');
-    $('.project-visual',card).setAttribute('tabindex','0');
-    $('.project-visual',card).setAttribute('aria-label',`Open ${p.title} case study`);
-    $('.project-visual',card).addEventListener('keydown',(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();navigateToDetail(p)}});
+    const screenshot=$('.project-screenshot',card);
+    screenshot?.addEventListener('error',()=>{
+      const fallback=document.createElement('p');
+      fallback.className='project-media-unavailable';
+      fallback.textContent='Interface capture unavailable. Open the case study for project documentation.';
+      $('.project-visual',card).replaceChildren(fallback);
+    },{once:true});
     grid.appendChild(card);
     return card;
   });
@@ -60,7 +94,7 @@
     let visible = 0;
     cards.forEach((card) => { const show = filter === 'all' || card.dataset.category === filter; card.hidden = !show; if (show) { visible++; card.classList.add('in-view'); } });
     $$('.filter-button').forEach((b) => { const active = b.dataset.filter === filter; b.classList.toggle('is-active', active); b.setAttribute('aria-pressed', String(active)); });
-    $('#filterCount').textContent = `SHOWING ${String(visible).padStart(2,'0')} / 06`;
+    $('#filterCount').textContent = `SHOWING ${String(visible).padStart(2,'0')} / ${String(projects.length).padStart(2,'0')}`;
   }
   $$('.filter-button').forEach((btn) => btn.addEventListener('click', () => applyFilter(btn.dataset.filter)));
   $('#allProjectsButton').addEventListener('click', () => $('#archive').scrollIntoView({behavior: reduceMotion ? 'instant' : 'smooth'}));
@@ -80,7 +114,7 @@
   $('#archiveSearch').addEventListener('input',e=>filterArchive(e.target.value));
   filterArchive('');
   const credentials=$('#credentialGrid');
-  data.credentials.forEach((c,i)=>{const el=document.createElement('article');el.className='credential-card reveal';el.innerHTML=`<span class="credential-motif" aria-hidden="true"><span>${escape(c.code)}</span><i>✳</i></span><div class="credential-copy"><span>${escape(c.issuer)} · ${escape(c.date)}</span><h3>${escape(c.name)}</h3></div>${external(c.url)?`<a href="${escape(c.url)}" target="_blank" rel="noopener noreferrer" class="credential-link">VERIFY CREDENTIAL ↗</a>`:'<span class="credential-unlinked">CERTIFICATE LINK NOT AVAILABLE</span>'}`;credentials.appendChild(el)});
+  data.credentials.forEach((c,i)=>{const el=document.createElement('article');el.className='credential-card reveal';el.innerHTML=`<span class="credential-motif" aria-hidden="true"><span>${escape(c.code)}</span><i>✳</i></span><div class="credential-copy"><span>${escape(c.issuer)} · ${escape(c.date)}</span><h3>${escape(c.name)}</h3></div>${external(c.url)?`<a href="${escape(c.url)}" target="_blank" rel="noopener noreferrer" class="credential-link">OPEN ISSUER RECORD</a>`:`<span class="credential-unlinked">OWNER-REPORTED · ${escape(c.recordNote || 'VERIFICATION LINK PENDING')}</span>`}`;credentials.appendChild(el)});
   const challenges=$('#challengeGrid');
   data.hackathons.forEach((c,i)=>{const el=document.createElement('article');el.className='challenge-card reveal';el.innerHTML=`<span class="challenge-index mono">${escape(c.num||String(i+1).padStart(2,'0'))}</span><div><strong>${escape(c.name)}</strong><p>${escape(c.detail)}</p></div><span class="challenge-status">${escape(c.status)}</span>`;challenges.appendChild(el)});
   const research=$('#researchGrid');

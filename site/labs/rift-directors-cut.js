@@ -14,9 +14,11 @@
   const integrated = !!stage?.closest('.rift-home');
   const handoff = stage?.querySelector('.rift-handoff');
   const readout = document.getElementById('cameraState');
+  const work = integrated ? document.getElementById('work') : null;
   if (!stage || !intro || !canvas) return;
 
   const motionPref = matchMedia('(prefers-reduced-motion: reduce)');
+  const compactViewport = matchMedia('(max-height:500px), (orientation:landscape) and (max-height:650px)');
   const params = new URLSearchParams(location.search);
   const motionDisabledByUrl = params.get('motion') === 'off';
   // Side-by-side inspection: ?opening=original restores the previous opening pose and materials.
@@ -40,7 +42,7 @@
   let globalMuted = integrated && html.classList.contains('motion-off');
   let paused = reduced || motionDisabledByUrl || globalMuted;
   let inView = true, raf = 0, disposed = false, lastFrame = 0, elapsed = 0;
-  let progress = 0, pointerX = 0, pointerY = 0, targetX = 0, targetY = 0;
+  let progress = 0, scrollSpan = 1, pointerX = 0, pointerY = 0, targetX = 0, targetY = 0;
   let renderer = null, scene = null, camera = null, portal = null;
   let rings = [], fracturePieces = [], lights = {}, envRenderTarget = null;
   let materials = [], geometries = [], textures = [], frameIntervals = [], renderedFrames = 0;
@@ -52,6 +54,8 @@
   const pulse = (v,a,b,c) => range(v,a,b)*(1-range(v,b,c));
   const css = (key,val) => html.style.setProperty(key, String(val));
   const deg = Math.PI / 180;
+  const finale = {cameraEnd:.86, pulseStart:.86, pulsePeak:.90, pulseEnd:.98, revealStart:.92, revealEnd:.98};
+  const exitEnergy = p => pulse(p,finale.pulseStart,finale.pulsePeak,finale.pulseEnd);
 
   html.classList.add('js-active');
   const modeButtons=integrated?[...stage.querySelectorAll('[data-rift-mode]')]:[];
@@ -297,6 +301,19 @@
     const glowMesh=new THREE.Mesh(glowGeo,glowMat);
     glowMesh.position.set(0,0,-10.8);group.add(glowMesh);
 
+    // One exit aperture reuses the existing glow texture and geometry.
+    // Its expansion and intensity come from scroll, including on reversal.
+    if(integrated){
+      const apertureMaterial=glowMat.clone();
+      apertureMaterial.opacity=0;
+      apertureMaterial.fog=false;
+      materials.push(apertureMaterial);
+      animObjects.aperture=new THREE.Mesh(glowGeo,apertureMaterial);
+      animObjects.aperture.visible=false;
+      animObjects.apertureDirection=new THREE.Vector3();
+      scene.add(animObjects.aperture);
+    }
+
     lights.ambient=new THREE.AmbientLight(0xb3ad9f,.25);scene.add(lights.ambient);
     lights.key=new THREE.DirectionalLight(0xffe1ba,3.4);
     lights.key.position.set(3.5,7,8);
@@ -344,11 +361,10 @@
   }
 
   function readProgress(){
-    const max=Math.max(1,intro.offsetHeight-innerHeight);
-    progress=clamp(-intro.getBoundingClientRect().top/max);
+    scrollSpan=Math.max(1,intro.offsetHeight-innerHeight);
+    progress=clamp(-intro.getBoundingClientRect().top/scrollSpan);
     if(integrated){
-      const work=document.getElementById('work').getBoundingClientRect();
-      html.classList.toggle('rift-work-active',work.top<innerHeight);
+      html.classList.toggle('rift-work-active',work.getBoundingClientRect().top<innerHeight);
     }
   }
 
@@ -359,13 +375,22 @@
       stage.querySelector('.title-wrap').inert=exit>=1;
       css('--title-opacity',(1-exit).toFixed(3));
       css('--title-y',(-exit*40).toFixed(2)+'px');
-      // Reveal the real, normal-flow showcase as the camera clears the portal.
-      // Anchor navigation and reverse scrolling use this same scroll-derived state.
-      const workReveal=range(p,.62,.79);
-      css('--work-alpha',workReveal.toFixed(3));
-      document.getElementById('work').style.pointerEvents=workReveal>0?'auto':'none';
+      const cinematic=!paused&&!reduced&&!compactViewport.matches;
+      const reveal=cinematic?range(p,finale.revealStart,finale.revealEnd):1;
+      const offset=cinematic&&reveal>0?-(1-p)*scrollSpan:0;
+      const active=reveal>=.94;
+      // Keep the section's anchor in normal flow. Only its content compensates
+      // for the remaining sticky scroll, converging to zero at the handoff.
+      css('--work-offset',offset.toFixed(2)+'px');
+      css('--work-clip',reveal>=1?'none':`circle(${(reveal*76).toFixed(3)}vmax at 50% calc(50svh + var(--work-offset)))`);
+      css('--work-visibility',reveal>0?'visible':'hidden');
+      css('--exit-energy',cinematic?exitEnergy(p).toFixed(4):'0');
+      css('--exit-veil',cinematic?range(p,.90,finale.revealEnd).toFixed(4):'0');
+      css('--exit-arrival',cinematic?range(p,.70,finale.cameraEnd).toFixed(4):'0');
+      if(work.inert!==!active)work.inert=!active;
+      work.style.pointerEvents=active?'auto':'none';
       const word=mode==='ascension' ? .82 : .18*range(p,.24,.42);
-      css('--substance-alpha',(word*(1-range(p,.72,.9))).toFixed(3));
+      css('--substance-alpha',(word*(1-range(p,.70,.84))).toFixed(3));
       css('--rift-scroll',p.toFixed(4));
       css('--substance-scale',(mode==='ascension'?1+p*.25:1+p*.65).toFixed(3));
       css('--substance-shift',(mode==='ascension'?0:-p*185).toFixed(1)+'px');
@@ -421,7 +446,11 @@
     const fracture=broken
       ? .48*(1-range(p,.55,.80))+1.05*pulse(p,.02,.40,.73)
       : (kinetic||infinite||ascension?0:pulse(p,.37,.51,.65));
-    const travel=range(p,infinite?.12:ascension?.40:.56,.98);
+    const travel=range(p,infinite?.12:ascension?.40:.56,integrated?finale.cameraEnd:.98);
+    const energy=integrated?exitEnergy(p):0;
+    const settle=integrated?range(p,.70,finale.cameraEnd):0;
+    const opening=integrated?range(p,finale.cameraEnd,finale.pulsePeak):0;
+    const reveal=integrated?range(p,finale.revealStart,finale.revealEnd):0;
     const openingPose=cinematicOpening?(1-range(p,.035,.30)):0;
     const drift=paused||reduced?0:Math.sin(t*.28)*.012;
     const group=animObjects.group;
@@ -429,9 +458,11 @@
       kinetic?.30:broken?-.42:infinite?.02:-.11-openingPose*.34,
       ascension?-.08:broken?.08:kinetic?-.20:openingPose*.07);
 
+    group.rotation.x*=1-settle;group.rotation.y*=1-settle;group.rotation.z*=1-settle;
+
     for(let i=0;i<rings.length;i++){
       const node=rings[i],layer=node.group;
-      layer.visible=!broken||i<4;
+      layer.visible=(!broken||i<4)&&opening<.999;
       const beat=range(p,Math.min(.42,i*.035),Math.min(.9,.30+i*.055));
       let spin=i*.035+p*(.12+i*.07)+twist*i*.082;
       if(kinetic)spin=.12+i*.24+beat*Math.PI*(i%2?1:-1);
@@ -442,12 +473,14 @@
         kinetic?(i%2?-.18:.18):broken?0:twist*(i%2?-.17:.13),
         -spin-(mode==='director'?openingPose*(.19+.045*Math.sin(i*.82)):0)+drift*.2);
       const scale=infinite?Math.pow(.92,i):kinetic?Math.pow(.87,i):node.baseScale*(1-twist*.11);
-      layer.scale.setScalar(scale);
+      layer.rotation.x*=1-settle;layer.rotation.y*=1-settle;layer.rotation.z*=1-settle;
+      layer.scale.setScalar(scale*(1+opening*3.4));
       layer.position.set(
         broken?i*.13:mode==='director'?openingPose*(Math.sin(i*.79)*.075+i*.021):0,
         ascension?i*.24:broken?-i*.10:0,
         -i*(infinite?2.25:kinetic?.42:broken?1.25:.86)-p*.32
       );
+      layer.position.x*=1-settle;layer.position.y*=1-settle;
       if(i===0)node.frontMat.opacity=clamp(1-fracture*2.1);
     }
     fracturePieces.forEach((part,i)=>{
@@ -464,23 +497,43 @@
     const cx=2.25;
     const aimX=innerWidth<700?cx:cx*travel;
     const rise=ascension?p*3.2:0;
+    const lastIndex=broken?3:rings.length-1;
+    const layerDepth=infinite?2.25:kinetic?.42:broken?1.25:.86;
+    const finalScale=infinite?Math.pow(.92,lastIndex):kinetic?Math.pow(.87,lastIndex):rings[lastIndex].baseScale;
+    const portalScale=innerWidth<700?.48:1;
+    // Arrive in front of the final aperture, framed at 75% of viewport height.
+    // The final opening expands the same portal beyond the view before reveal.
+    const apertureDistance=4.94*finalScale*portalScale/(2*Math.tan(camera.fov*deg/2)*.75);
+    const endZ=-(lastIndex*layerDepth+.32)*portalScale+apertureDistance;
+    const distance=integrated?(infinite?9:10.6)-endZ:(infinite?30:kinetic?14:broken?11.5:ascension?15:17.5);
     camera.position.set(aimX+pointerX*.04*(1-travel)-(mode==='director'?openingPose*.44:0),
       -.05+rise+pointerY*.04*(1-travel),
-      (infinite?9:10.6)-travel*(infinite?30:kinetic?14:broken?11.5:ascension?15:17.5));
-    camera.lookAt(aimX,ascension?rise+1.2:0,infinite?-34:-15);
+      (infinite?9:10.6)-travel*distance);
+    camera.lookAt(aimX,ascension?rise+1.2*(1-settle):0,infinite?-34:integrated?-18:-15);
     camera.rotateZ(kinetic?-.08*range(p,.1,.7):infinite?-travel*.08:ascension?0:-travel*.105);
-    portal.rotation.set(pointerY*.02*(1-travel),-.05+pointerX*.03*(1-travel),0);
+    portal.rotation.set(pointerY*.02*(1-travel),(-.05+pointerX*.03*(1-travel))*(1-settle),0);
     portal.position.x=cx;
+    portal.position.y=(innerWidth<700?1.9:.03)*(1-settle)+rise*settle;
     lights.sweep.position.set(ascension?cx-2:2+Math.sin(p*7+t*.2)*4,
       ascension?7-p*10:1.5+Math.cos(p*5)*2.5,6-p*3);
-    lights.sweep.intensity=ascension?85:broken?55:43+twist*22;
+    lights.sweep.intensity=(ascension?85:broken?55:43+twist*22)+energy*14;
+    lights.key.intensity=3.4+(integrated?range(p,.78,finale.cameraEnd)*.25:0)+energy*.8;
     lights.key.position.set(ascension?-3:3.5,ascension?10:7,ascension?2:8);
     lights.rim.intensity=kinetic?4:infinite?1.4:2.4;
     lights.core.opacity=infinite?.55:ascension?.35:.84+fracture*.26;
     animObjects.orbit.visible=mode==='director';
-    animObjects.wordMat.opacity=ascension?.9*(1-range(p,.88,.98)):.6*range(p,.31,.48)*(1-range(p,.85,.98));
+    animObjects.wordMat.opacity=ascension?.9*(1-range(p,integrated?.72:.88,integrated?.84:.98)):.6*range(p,.31,.48)*(1-range(p,integrated?.72:.85,integrated?.84:.98));
     animObjects.wordPlane.position.y=ascension?1.3+p*3:0;
-    renderer.toneMappingExposure=(cinematicOpening?(1.01+openingPose*.06):1.13)+range(p,.80,.96)*.24;
+    if(animObjects.aperture){
+      const aperture=animObjects.aperture;
+      camera.getWorldDirection(animObjects.apertureDirection);
+      aperture.position.copy(camera.position).addScaledVector(animObjects.apertureDirection,6);
+      aperture.quaternion.copy(camera.quaternion);
+      aperture.scale.setScalar(.18+range(p,.73,finale.pulseEnd)*2.5);
+      aperture.material.opacity=(.18*range(p,.73,finale.cameraEnd)+energy*.7)*(1-reveal);
+      aperture.visible=p>.73&&reveal<1;
+    }
+    renderer.toneMappingExposure=(cinematicOpening?(1.01+openingPose*.06):1.13)+(integrated?energy*.10:range(p,.80,.96)*.24);
   }
 
   function resize(){
@@ -536,7 +589,7 @@
     if(!paused&&!reduced)elapsed+=dt;
     pointerX+=(targetX-pointerX)*.075;
     pointerY+=(targetY-pointerY)*.075;
-    const p=(reduced||paused)?0:progress;
+    const p=(reduced||paused||(integrated&&compactViewport.matches))?0:progress;
     // The name must be fully readable on the first paint. Camera/portal still animate in.
     const entry=1;
     updateText(p,entry);
@@ -552,7 +605,9 @@
         console.warn('Rift render failed; returning to CSS fallback.',error);
       }
     }
-    if(!paused&&!reduced)schedule();
+    // The real work fully covers the stage after the aperture reveal.
+    // Scroll events restart rendering when the visitor reverses into the scene.
+    if(!paused&&!reduced&&(!integrated||progress<finale.revealEnd))schedule();
   }
 
   function schedule(){
@@ -564,14 +619,27 @@
     readProgress();
     // Keep the title-to-project handoff reliable even when the scene is no longer
     // submitting WebGL frames (visibility observer, slow device or manual pause).
-    if(!reduced&&!paused)updateText(progress,1);
+    if(!reduced&&!paused)updateText(integrated&&compactViewport.matches?0:progress,1);
     schedule();
   }
-  function onResize(){readProgress();resize();if(!reduced&&!paused)updateText(progress,1);schedule();}
+  function onResize(){readProgress();resize();if(!reduced&&!paused)updateText(integrated&&compactViewport.matches?0:progress,1);schedule();}
   function onPointer(e){
     if(paused||reduced||e.pointerType==='touch')return;
     targetX=clamp(e.clientX/innerWidth*2-1,-1,1);
     targetY=clamp(e.clientY/innerHeight*2-1,-1,1);
+  }
+
+  if(integrated){
+    document.querySelectorAll('a[href="#work"],a[href="#riftProjects"]').forEach(link=>{
+      link.addEventListener('click',event=>{
+        if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+        event.preventDefault();
+        if(location.hash!==link.hash)history.pushState(history.state,'',link.hash);
+        work.scrollIntoView({behavior:'instant',block:'start'});
+        onScroll();
+        document.getElementById('workTitle')?.focus({preventScroll:true});
+      });
+    });
   }
 
   window.addEventListener('scroll',onScroll,{passive:true});
@@ -620,7 +688,7 @@
   });
 
   window.__riftDirector={
-    getState:()=>({webglReady,reduced,paused,mode,adaptiveLow,contextLost,scroll:progress,elapsedMs:elapsed,renderedFrames}),
+    getState:()=>({webglReady,reduced,paused,compact:integrated&&compactViewport.matches,mode,adaptiveLow,contextLost,scroll:progress,elapsedMs:elapsed,renderedFrames}),
     setMode:next=>selectMode(next,true),
     getFrameStats:()=>{
       const a=[...frameIntervals].sort((x,y)=>x-y),mid=a.length? a[Math.floor(a.length/2)]:null;
@@ -632,7 +700,7 @@
 
   prepareProjects();
   readProgress();
-  updateText(0,1);
+  updateText(reduced||paused||compactViewport.matches?0:progress,1);
   try{
     // Import only when a browser can render a real WebGL environment.
     const THREE=await loadThree();
@@ -642,7 +710,7 @@
     webglReady=true;
     resize();
     // First successful frame before retiring the approved CSS fallback.
-    animate3D(reduced?0:progress,0);
+    animate3D(reduced||(integrated&&compactViewport.matches)?0:progress,0);
     renderer.render(scene,camera);
     html.classList.add('webgl-ready');
     if(readout)readout.textContent='LIVE THREE.JS / PHYSICAL MATERIALS';

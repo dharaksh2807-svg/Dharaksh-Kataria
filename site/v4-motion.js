@@ -93,8 +93,8 @@
       const key=button.dataset.dimension,m=modes[key];if(!m)return;
       frame.dataset.dimensionMode=key;
       if(number)number.textContent=m.number;
-      if(heading){heading.innerHTML=m.heading;if(!paused)heading.animate?.([{opacity:.35,transform:'translateY(13px)',filter:'blur(8px)'},{opacity:1,transform:'translateY(0)',filter:'blur(0)'}],{duration:480,easing:'cubic-bezier(.19,1,.22,1)'})}
-      if(description){description.textContent=m.description;if(!paused)description.animate?.([{opacity:.2},{opacity:1}],{duration:390})}
+      if(heading){heading.innerHTML=m.heading;if(!paused)heading.animate?.([{opacity:.35,transform:'translateY(6px)'},{opacity:1,transform:'translateY(0)'}],{duration:280,easing:'cubic-bezier(.19,1,.22,1)'})}
+      if(description){description.textContent=m.description;if(!paused)description.animate?.([{opacity:.2},{opacity:1}],{duration:220})}
       actions.forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
       targetYaw=key==='product'?-22:key==='intelligence'?24:-40;
       targetPitch=key==='product'?14:key==='intelligence'?-10:31;
@@ -121,21 +121,6 @@
     });
   };
   addEventListener('scroll',onScroll,{passive:true});onScroll();
-
-  // Tap / click feedback. Avoid hijacking navigation or focus; visual only.
-  document.addEventListener('pointerdown',e=>{
-    if(paused || reduced.matches)return;
-    const el=e.target.closest('a,button');
-    if(!el || el.matches('.search-trigger,.menu-toggle') || el.closest('.palette-dialog'))return;
-    const rect=el.getBoundingClientRect();if(!rect.width||!rect.height)return;
-    const css=getComputedStyle(el);
-    if(css.position==='static')el.style.position='relative';
-    // Only add ripple inside modest-sized buttons; never span a whole project card.
-    if(rect.width>350||rect.height>120)return;
-    const circle=document.createElement('span');circle.className='v4-ripple';
-    circle.style.left=`${e.clientX-rect.left}px`;circle.style.top=`${e.clientY-rect.top}px`;
-    el.appendChild(circle);circle.addEventListener('animationend',()=>circle.remove(),{once:true});
-  },{passive:true});
 
   document.addEventListener('portfolio:motion',e=>{
     paused=reduced.matches||Boolean(e.detail?.muted);

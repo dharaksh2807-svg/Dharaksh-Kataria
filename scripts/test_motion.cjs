@@ -62,6 +62,7 @@ const server = http.createServer((req, res) => {
     return page;
   }
   async function test(name, run) {
+    if (process.env.PORTFOLIO_TEST_FILTER && !new RegExp(process.env.PORTFOLIO_TEST_FILTER).test(name)) return;
     try {
       await run();
       results.push({ name, status: "passed" });
@@ -177,6 +178,22 @@ const server = http.createServer((req, res) => {
         await page.close();
       }
     });
+    await test("project media links restore keyboard focus on Back", async () => {
+      const page=await pageFor();
+      try {
+        await page.locator('.hero-action').click();
+        const visual=page.locator('[data-project="srmedu"] .project-visual');
+        await visual.focus();
+        await page.keyboard.press('Enter');
+        await page.waitForURL('**/projects/srmedu.html');
+        await page.goBack();
+        await page.waitForFunction(()=>document.activeElement?.classList.contains('project-visual'));
+        assert.equal(await visual.evaluate(node=>node===document.activeElement),true);
+        const skipped='Transition was aborted because of invalid state. ViewTransition opt-in disabled';
+        transitionCancellations.push(...page.errors.filter(message=>message===skipped));
+        assert.deepEqual(page.errors.filter(message=>message!==skipped),[]);
+      } finally {await page.close();}
+    });
     await test("motion preference persists through case navigation and reload", async () => {
       const page = await pageFor();
       try {
@@ -243,7 +260,7 @@ const server = http.createServer((req, res) => {
       }
     });
     for (const width of [390, 1440])
-      await test(`Kio inline tour, focus and persistence ${width}`, async () => {
+      await test(`Kio pop-out, focus and persistence ${width}`, async () => {
         const page = await pageFor(width, "reduce");
         try {
           const toggle = page.locator("#v6GuideToggle");
@@ -252,7 +269,7 @@ const server = http.createServer((req, res) => {
           const guide = page.locator("#kioGuide");
           assert.equal(
             await guide.evaluate((node) => getComputedStyle(node).position),
-            "relative",
+            "fixed",
           );
           await page.locator('[data-kio-jump="work"]').click();
           await page.waitForTimeout(100);
@@ -260,16 +277,14 @@ const server = http.createServer((req, res) => {
             await page.evaluate(() => portfolioGuide.state.step),
             "work",
           );
-          const guideBox = await guide.boundingBox(),
-            card = await page.locator(".project-card").first().boundingBox();
-          assert.ok(guideBox.y + guideBox.height <= card.y);
+          assert.equal(await guide.evaluate(node=>node.parentElement===document.body),true);
+          const guideBox=await page.locator("#kioPanel").boundingBox();
+          assert.ok(guideBox.x>=0 && guideBox.y>=69 && guideBox.x+guideBox.width<=width && guideBox.y+guideBox.height<=1000);
+          const initiallyCompact=await guide.evaluate(node=>node.classList.contains("kio-compact"));
           await page.locator("#kioSize").click();
-          assert.ok(
-            await guide.evaluate((node) =>
-              node.classList.contains("kio-compact"),
-            ),
-          );
-          await guide.screenshot({
+          const compact=await guide.evaluate(node=>node.classList.contains("kio-compact"));
+          assert.equal(compact,!initiallyCompact);
+          if (process.env.PORTFOLIO_SCREENSHOTS !== "0") await guide.screenshot({
             path: path.join(output, `kio-${width}.png`),
           });
           await page.keyboard.press("Escape");
@@ -290,11 +305,7 @@ const server = http.createServer((req, res) => {
             await page.evaluate(() => portfolioGuide.state.hidden),
             true,
           );
-          assert.ok(
-            await guide.evaluate((node) =>
-              node.classList.contains("kio-compact"),
-            ),
-          );
+          assert.equal(await guide.evaluate(node=>node.classList.contains("kio-compact")),compact);
           assert.deepEqual(page.errors, []);
         } finally {
           await page.close();

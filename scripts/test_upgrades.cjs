@@ -30,6 +30,7 @@ async function pageFor(width=1440, motion="reduce") {
   return page;
 }
 async function test(name,fn){
+    if (process.env.PORTFOLIO_TEST_FILTER && !new RegExp(process.env.PORTFOLIO_TEST_FILTER).test(name)) return;
  try {await fn();tests.push({name,result:"PASS"});console.log("PASS",name)}
  catch(err){tests.push({name,result:"FAIL",error:err.message});failures.push(name+": "+err.message);console.error("FAIL",name,err.message)}
 }
@@ -49,22 +50,22 @@ try {
       assert.deepEqual(page.errors,[]);
     }finally{await page.close()}
   });
-  await test("Kio animates when enabled and respects reduced motion",async()=>{
+  await test("Kio blinks when enabled and respects reduced motion",async()=>{
     const normal=await pageFor(1440,"no-preference");
     try {
       await normal.goto(origin+"/");
       await normal.waitForSelector("#kioGuide");
-      const live=await normal.locator("#kioGuide .kio-person").evaluate(
+      const live=await normal.locator("#kioGuide .kio-eyes").evaluate(
         node=>getComputedStyle(node).animationName
       );
-      assert.match(live,/kio-float/);
+      assert.match(live,/kio-blink/);
       assert.equal(await normal.locator("#kioLaunch").isVisible(),true);
     }finally{await normal.close()}
     const reduced=await pageFor(1440,"reduce");
     try{
       await reduced.goto(origin+"/");
       await reduced.waitForSelector("#kioGuide");
-      const dormant=await reduced.locator("#kioGuide .kio-person").evaluate(
+      const dormant=await reduced.locator("#kioGuide .kio-eyes").evaluate(
         node=>getComputedStyle(node).animationName
       );
       assert.equal(dormant,"none");
@@ -136,6 +137,77 @@ try {
       });
       assert.equal(answer.ok,true); assert.equal(answer.selected,2);
       assert.equal(answer.radius,22); assert.equal(answer.invalid,false);
+      assert.deepEqual(page.errors,[]);
+    }finally{await page.close()}
+  });
+  await test("Rift covered renderer sleeps and resumes on reverse",async()=>{
+    const page=await pageFor(1440,"no-preference");
+    try{
+      await page.goto(origin);
+      await page.waitForFunction(()=>window.__riftDirector?.getState().webglReady);
+      await page.evaluate(()=>scrollTo({top:document.querySelector('.intro').offsetHeight-innerHeight,behavior:'instant'}));
+      await page.waitForFunction(()=>window.__riftDirector.getState().scroll>=.99);
+      await page.waitForTimeout(100);
+      const frames=await page.evaluate(()=>__riftDirector.getState().renderedFrames);
+      await page.waitForTimeout(200);
+      assert.ok((await page.evaluate(()=>__riftDirector.getState().renderedFrames))<=frames+1);
+      await page.evaluate(()=>scrollTo({top:(document.querySelector('.intro').offsetHeight-innerHeight)*.75,behavior:'instant'}));
+      await page.waitForFunction(before=>__riftDirector.getState().renderedFrames>before,frames);
+      assert.deepEqual(page.errors,[]);
+    }finally{await page.close()}
+  });
+  await test("Journey shared state and static portrait controls",async()=>{
+    const page=await pageFor(1440,"no-preference");
+    try{
+      await page.goto(origin);
+      await page.waitForFunction(()=>document.querySelector('#journeySticky').dataset.chapter!==undefined);
+      for(const progress of [.1,.32,.34,.5,.65,.68,.9,.34,.32]){
+        const expected=Math.min(2,Math.floor(progress*3));
+        await page.evaluate(p=>{
+          const story=document.getElementById('journeyScroll');
+          scrollTo({top:scrollY+story.getBoundingClientRect().top+(story.offsetHeight-innerHeight)*p,behavior:'instant'});
+        },progress);
+        await page.waitForFunction(chapter=>document.querySelector('#journeySticky').dataset.chapter===String(chapter),expected);
+        assert.equal(await page.locator('.journey-panel.is-current').count(),1);
+        assert.equal(await page.locator('.journey-panel:not(.is-current)').evaluateAll(nodes=>nodes.every(node=>node.inert&&getComputedStyle(node).display==='none')),true);
+      }
+      await page.setViewportSize({width:390,height:844});
+      await page.locator('#motionSwitch').click();
+      await page.locator('[data-journey-jump="1"]').press('Enter');
+      await page.waitForFunction(()=>document.querySelector('#journeySticky').dataset.chapter==='1');
+      const layout=await page.evaluate(()=>{
+        const art=document.querySelector('.journey-art').getBoundingClientRect();
+        const text=document.querySelector('.journey-panel.is-current').getBoundingClientRect();
+        return {separated:art.bottom<=text.top,overflow:document.documentElement.scrollWidth>innerWidth,position:getComputedStyle(document.querySelector('#journeySticky')).position};
+      });
+      assert.deepEqual(layout,{separated:true,overflow:false,position:'relative'});
+      assert.deepEqual(page.errors,[]);
+    }finally{await page.close()}
+  });
+  await test("Rendering disclosures, guided access and keyboard models",async()=>{
+    const page=await pageFor(390);
+    try{
+      await page.goto(origin+'/#motion-lab');
+      await page.waitForFunction(()=>document.querySelector('#motion-lab details').open);
+      await page.locator('.signal-tab[data-scene="memory"]').click();
+      assert.equal(await page.locator('#signalTitle').textContent(),'Selective memory.');
+      await page.locator('#v6GuideToggle').click();
+      await page.locator('[data-kio-jump="dimensions"]').click();
+      assert.equal(await page.locator('#dimensions details').evaluate(node=>node.open),true);
+      await page.keyboard.press('Escape');
+      await page.locator('#dimensionFlip').click();
+      assert.equal(await page.locator('#dimensionFlip').getAttribute('aria-pressed'),'true');
+      await page.locator('#proofTabStudy').focus();
+      await page.keyboard.press('ArrowRight');
+      assert.equal(await page.locator('#proofTabMatch').getAttribute('aria-selected'),'true');
+      const score=await page.locator('#proofMatchScore').textContent();
+      await page.locator('#proofMatch input[type="range"]').first().focus();
+      await page.keyboard.press('End');
+      assert.notEqual(await page.locator('#proofMatchScore').textContent(),score);
+      await page.locator('#proofTabMatch').focus();
+      await page.keyboard.press('End');
+      await page.locator('[data-budget="1028"]').click();
+      assert.equal(await page.locator('#proofKvValue').textContent(),'28.11');
       assert.deepEqual(page.errors,[]);
     }finally{await page.close()}
   });
