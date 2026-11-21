@@ -54,7 +54,7 @@
   const pulse = (v,a,b,c) => range(v,a,b)*(1-range(v,b,c));
   const css = (key,val) => html.style.setProperty(key, String(val));
   const deg = Math.PI / 180;
-  const finale = {cameraEnd:.86, openingEnd:.90, pulseStart:.885, pulsePeak:.92, pulseEnd:.985, revealStart:.92, revealEnd:.985};
+  const finale = {cameraEnd:.86, openingEnd:.90, pulseStart:.90, pulsePeak:.925, pulseEnd:.985, revealStart:.92, revealEnd:.985};
   const exitEnergy = p => pulse(p,finale.pulseStart,finale.pulsePeak,finale.pulseEnd);
 
   html.classList.add('js-active');
@@ -312,6 +312,17 @@
       animObjects.aperture.visible=false;
       animObjects.apertureDirection=new THREE.Vector3();
       scene.add(animObjects.aperture);
+      // Camera-facing physical shockwave shares the aperture's scroll clock.
+      const waveGeometry = new THREE.RingGeometry(.94, 1, 128);
+      geometries.push(waveGeometry);
+      const waveMaterial = new THREE.MeshBasicMaterial({
+        color: 0xf3c99b, transparent: true, opacity: 0,
+        depthWrite: false, depthTest: false, fog: false,
+        blending: THREE.AdditiveBlending, side: THREE.DoubleSide
+      });
+      materials.push(waveMaterial);
+      animObjects.shockwave = new THREE.Mesh(waveGeometry, waveMaterial);
+      scene.add(animObjects.shockwave);
     }
 
     lights.ambient=new THREE.AmbientLight(0xb3ad9f,.25);scene.add(lights.ambient);
@@ -385,7 +396,10 @@
       css('--work-clip',reveal>=1?'none':`circle(${(reveal*76).toFixed(3)}vmax at 50% calc(50svh + var(--work-offset)))`);
       css('--work-visibility',reveal>0?'visible':'hidden');
       css('--exit-energy',cinematic?exitEnergy(p).toFixed(4):'0');
-      css('--exit-release',(.72+range(p,finale.pulseStart,finale.pulseEnd)*.85).toFixed(4));
+      css('--exit-release',(.18+range(p,finale.pulseStart,finale.pulseEnd)*2.8).toFixed(4));
+      css('--exit-wave',range(p,finale.openingEnd,finale.pulseEnd).toFixed(4));
+      css('--aperture-rim',cinematic?pulse(p,.82,.88,.94).toFixed(4):'0');
+      css('--aperture-radius',(.56+range(p,.82,finale.openingEnd)*.56+range(p,finale.openingEnd,finale.revealEnd)*1.8).toFixed(4));
       css('--exit-veil',cinematic?range(p,finale.openingEnd,finale.revealEnd).toFixed(4):'0');
       css('--exit-arrival',cinematic?range(p,.70,finale.cameraEnd).toFixed(4):'0');
       if(work.inert!==!active)work.inert=!active;
@@ -533,6 +547,12 @@
       aperture.scale.setScalar(.18+range(p,.73,finale.pulseEnd)*2.5);
       aperture.material.opacity=(.24*range(p,.73,finale.cameraEnd)+energy*.82)*(1-reveal);
       aperture.visible=p>.73&&reveal<1;
+      const wave = animObjects.shockwave;
+      wave.position.copy(aperture.position);
+      wave.quaternion.copy(camera.quaternion);
+      wave.scale.setScalar(.3 + range(p, finale.openingEnd, finale.pulseEnd) * 18);
+      wave.material.opacity = energy * .85;
+      wave.visible = energy > .001;
     }
     renderer.toneMappingExposure=(cinematicOpening?(1.01+openingPose*.06):1.13)+(integrated?energy*.10:range(p,.80,.96)*.24);
   }

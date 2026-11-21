@@ -132,13 +132,13 @@
     const evidence=entry.evidence;
     if(!evidence?.url)return '';
     const url=external(evidence.url)||(evidence.type==='certificate'&&/^assets\/evidence\/certificates\/[a-z0-9-]+\.pdf$/.test(evidence.url)?evidence.url:null);
-    return url?`<a href="${escape(url)}" target="_blank" rel="noopener noreferrer" class="evidence-link" aria-label="${escape(evidence.label+' — '+entry.name)}">${escape(evidence.label)}</a>`:'';
+    return url?`<a href="${escape(url)}" target="_blank" rel="noopener noreferrer" class="evidence-link" aria-label="${escape(evidence.label+' — '+entry.name+(evidence.type==='certificate'?' (PDF, opens in a new tab)':''))}">${escape(evidence.label)}</a>`:'';
   }
   data.credentials.forEach(c=>{
     const el=document.createElement('article');el.className='credential-card reveal';
     const issuerUrl=external(c.url);
     const status=c.evidence?.type==='certificate'?'CERTIFICATE PDF':issuerUrl?'ISSUER RECORD':'EVIDENCE PENDING';
-    el.innerHTML=`<div class="credential-meta"><span>${escape(c.code)}</span><p class="evidence-status">${status}</p></div><div class="credential-copy"><span>${escape(c.issuer)}</span><h3>${escape(c.name)}</h3><p class="credential-date">${escape(c.date)}</p></div><div class="credential-evidence">${issuerUrl?`<a href="${escape(issuerUrl)}" target="_blank" rel="noopener noreferrer" class="credential-link" aria-label="Open issuer record — ${escape(c.name)}">OPEN ISSUER RECORD</a>`:''}${evidenceLink(c)}${!issuerUrl&&!c.evidence?.url?`<span class="credential-unlinked">${escape(c.recordNote||'Evidence pending')}</span>`:''}</div>`;
+    el.innerHTML=`<div class="credential-meta"><span>${escape(c.code)}</span><p class="evidence-status">${status}</p></div><div class="credential-copy"><span>${escape(c.issuer)}</span><h3>${escape(c.name)}</h3>${c.recipient?`<p class="credential-recipient">Issued to ${escape(c.recipient)}</p>`:''}<p class="credential-date">${escape(c.date)}</p></div><div class="credential-evidence">${issuerUrl?`<a href="${escape(issuerUrl)}" target="_blank" rel="noopener noreferrer" class="credential-link" aria-label="Open issuer record — ${escape(c.name)}">OPEN ISSUER RECORD</a>`:''}${evidenceLink(c)}${!issuerUrl&&!c.evidence?.url?`<span class="credential-unlinked">${escape(c.recordNote||'Evidence pending')}</span>`:''}</div>`;
     credentials.appendChild(el);
   });
   const challenges=$('#challengeGrid');

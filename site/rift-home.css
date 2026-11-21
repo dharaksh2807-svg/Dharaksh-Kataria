@@ -386,3 +386,97 @@ html.motion-off .rift-home .project-visual::after { background: none; }
   .motion-ready .rift-home .project-card[data-motion] .project-media { opacity: 1; transform: none; }
   .rift-home .project-visual::after { background: none; }
 }
+
+/* Aperture release. Every layer scrubs with scroll, so reversal is exact. */
+.rift-home .rift-exit-veil{background:#eee8dc}
+.rift-home #work::after{display:none}
+.rift-impact{position:fixed;inset:0;z-index:35;pointer-events:none;overflow:hidden;opacity:var(--exit-energy,0);visibility:hidden;contain:strict}
+.rift-home:has(.rift-ending) .rift-impact{visibility:visible}
+.rift-impact::before{content:'';position:absolute;inset:-60%;background:repeating-conic-gradient(from 12deg at 50% 50%,transparent 0deg 16deg,#edc18b45 17deg,#f8deaf88 18deg,transparent 20deg 36deg);mask-image:radial-gradient(circle,transparent 5%,#000 16%,transparent 52%);transform:scale(calc(.6 + var(--exit-wave,0) * .8));mix-blend-mode:screen}
+.rift-impact::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,#f2d4a94d,transparent 58%)}
+.rift-impact i,.rift-impact b{position:absolute;left:50%;top:50%;width:72vmin;aspect-ratio:1;border-radius:50%;border:2px solid #ffe0b6;box-shadow:0 0 18px #e8ae77,0 0 70px #c8875366,inset 0 0 28px #e8ae7766;transform:translate(-50%,-50%) scale(var(--exit-release,.18))}
+.rift-impact b{width:61vmin;border-width:1px;box-shadow:0 0 32px #efc49380}
+
+/* Warm editorial destination, with the portal's copper carried into its details. */
+.rift-home #work{background:#eee8dc;color:#292722;border-top:0;padding-bottom:120px}
+.rift-home #work::before{height:850px;background:radial-gradient(ellipse at 85% 10%,#d5b58f55,transparent 62%),linear-gradient(180deg,#f9f3e8,transparent)}
+.rift-home #work>.wrap{position:relative;z-index:1}
+.rift-home .work-heading{padding:26px 0 34px;margin-bottom:0;border-bottom:1px solid #b7ac984d;align-items:end}
+.rift-home .work-edition{font:500 11px/1.7 var(--font-mono);letter-spacing:.12em;color:#805639;margin:0 0 24px}
+.rift-home .work-heading h2{font:500 clamp(52px,7.8vw,112px)/.95 var(--font-sans);letter-spacing:-.065em;color:#292722}
+.rift-home .work-heading h2 em{font-family:var(--font-serif);font-weight:400;color:#925f3d}
+.rift-home .work-heading .work-intro{color:#62594e;max-width:31ch;font-size:16px;padding-bottom:4px}
+.rift-home .filter-row{padding-block:20px;margin-bottom:40px;border-color:#b7ac9866}
+.rift-home .filter-button{color:#5c5348;border-radius:5px}
+.rift-home .filter-button:is(:hover,:focus-visible){color:#292722;background:#dcd0bd}
+.rift-home .filter-button.is-active{background:#302d27;color:#fff3df;border-color:#302d27;box-shadow:none}
+.rift-home .filter-count{color:#6b6154}
+.rift-home .projects-grid{gap:56px 40px}
+.rift-home .project-card{border-color:#b8ac975e;padding-bottom:32px}
+.rift-home .project-card[data-project=srmedu]{--project-accent:#557967}
+.rift-home .project-card[data-project=kv]{--project-accent:#80654e}
+.rift-home .project-card[data-project=projectmatch]{--project-accent:#68618d}
+.rift-home .project-card[data-project=metro]{--project-accent:#977345}
+.rift-home .project-card[data-project=oodp]{--project-accent:#567989}
+.rift-home .project-card[data-project=fairshift]{--project-accent:#876456}
+.rift-home .project-card.is-featured{background:#252925;color:#f4ebdb;border:1px solid #444a40;border-radius:14px;padding:30px;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:0 36px;box-shadow:0 24px 56px -32px #29261c80}
+.rift-home .project-card.is-featured .project-media{align-self:center;padding:20px;background:radial-gradient(ellipse at 50% 0,#59736550,transparent 80%),#1b201c;border:1px solid #74846d40;border-radius:10px}
+.rift-home .project-card .project-visual{border-radius:6px;background:#252925;box-shadow:0 10px 25px -18px #171710aa}
+.rift-home .project-card .project-screenshot{height:auto;width:100%;object-fit:contain}
+.rift-home .project-card .project-visual-tag{color:#726454;font-size:10px;letter-spacing:.035em}
+.rift-home .project-card .project-info{color:#292722;padding-bottom:20px}
+.rift-home .project-card .project-num{color:#875b3f;letter-spacing:.07em;font-size:11px}
+.rift-home .project-card .project-title{color:#292722;font-weight:500;margin-top:14px}
+.rift-home .project-summary{color:#5f574c;max-width:46ch}
+.rift-home .project-stack span{color:#625547;border-color:#baac9566;background:#f8f3e94d}
+.rift-home .project-role{color:#776a5b}
+.rift-home .project-decisions{border-color:#b8ac975e}
+.rift-home .project-decisions summary{color:#6e4932}
+.rift-home .project-decisions p,.rift-home .project-decisions .project-scope{color:#5f574c}
+.rift-home .project-decisions h4,.rift-home .project-result h4{color:#8c5d3d}
+.rift-home .project-decisions a{color:#77492d}
+.rift-home .project-case-open{background:#302d27;border-color:#302d27;color:#fff0dc;border-radius:5px;font-size:14px;gap:20px}
+.rift-home .project-case-open::after{content:'↗';font-size:18px}
+.rift-home .project-case-open:is(:hover,:focus-visible){background:#80563c;border-color:#80563c;color:#fff6e7}
+.rift-home .project-card .project-linkbar :is(.project-live,.project-source),.rift-home .private-pill{color:#645342}
+.rift-home .project-linkbar .project-direct:is(:hover,:focus-visible){color:#8a5030}
+.rift-home .project-card.is-featured :is(.project-title,.project-summary,.project-info,.project-highlights dd){color:#f1e8d9}
+.rift-home .project-card.is-featured :is(.project-num,.project-highlights dt,.project-result h4){color:#d8b58f}
+.rift-home .project-card.is-featured :is(.project-visual-tag,.project-role,.project-result p,.project-decisions p,.project-decisions .project-scope){color:#bfc6b9}
+.rift-home .project-card.is-featured :is(.project-decisions summary,.project-decisions a,.project-linkbar .project-direct){color:#e8c39e}
+.rift-home .project-card.is-featured .project-title{font-size:clamp(34px,3.4vw,52px)}
+.rift-home .project-card.is-featured .project-case-open{background:#e7c59e;color:#292722;border-color:#e7c59e}
+.rift-home .project-card.is-featured .project-case-open:is(:hover,:focus-visible){background:#f8dfbc}
+.rift-home .project-card.is-featured .project-result{border-color:#7d8c7066}
+.rift-home .project-card.is-compact{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);padding:30px 0;gap:0 40px;border-top:1px solid #b8ac975e}
+.rift-home .project-card:not(.is-featured) .project-media{border-top:3px solid var(--project-accent,#8a6648);padding-top:12px}
+.rift-home .project-card:focus-within{border-color:var(--project-accent,#8a6648)}
+.rift-home .work-footnote,.rift-home .work-footer{color:#6c5e4e}
+.rift-home .text-link-button{color:#80563c}
+.rift-home #work :is(a,button,summary):focus-visible,.rift-home #workTitle:focus-visible{outline-color:#a2673c}
+/* Destination media is complete from its first revealed pixel. */
+.motion-ready .rift-home #work .project-card[data-motion] .project-media{opacity:1;transform:none}
+@media(max-width:1100px) and (min-width:761px){
+ .rift-home .project-card.is-featured{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);padding:22px;gap:0 24px}
+ .rift-home .project-card.is-featured .project-media{padding:10px}
+}
+@media(max-width:760px){
+ .rift-home .work-heading{padding-top:14px;padding-bottom:26px}
+ .rift-home .work-heading h2{font-size:clamp(48px,12vw,76px)}
+ .rift-home .work-edition{font-size:9px;letter-spacing:.06em;margin-bottom:18px}
+ .rift-home .work-heading .work-intro{font-size:15px;max-width:35ch}
+ .rift-home .filter-row{gap:10px;margin-bottom:24px}
+ .rift-home .project-card.is-featured{display:flex;padding:16px;gap:0;border-radius:10px}
+ .rift-home .project-card.is-featured .project-media{padding:10px}
+ .rift-home .project-card.is-featured .project-title{font-size:34px}
+ .rift-home .project-card.is-compact{display:flex;padding-top:24px;gap:0}
+ .rift-home .project-card .project-linkbar{gap:8px 18px}
+ .rift-home .projects-grid{gap:32px}
+}
+html:is(.motion-off,.rift-static) .rift-impact{display:none}
+@media(prefers-reduced-motion:reduce),(max-height:500px),(orientation:landscape) and (max-height:650px){.rift-impact{display:none}}
+/* Hold a defined open aperture between the camera arrival and its release. */
+.rift-home .rift-aperture-rim{position:absolute;z-index:20;left:50%;top:50%;width:72vmin;aspect-ratio:1;border-radius:50%;pointer-events:none;border:2px solid #eac69b;box-shadow:0 0 5px #ffdfaf,inset 0 0 34px #c8915955,0 0 54px #dca66b55;opacity:var(--aperture-rim,0);transform:translate(-50%,-50%) scale(var(--aperture-radius,.56))}
+.rift-home .rift-aperture-rim::before{content:'';position:absolute;inset:-2.5%;border:1px solid #b5804b66;border-radius:inherit}
+html:is(.motion-off,.rift-static) .rift-home .rift-aperture-rim{display:none}
+@media(prefers-reduced-motion:reduce),(max-height:500px),(orientation:landscape) and (max-height:650px){.rift-home .rift-aperture-rim{display:none}}

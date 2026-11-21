@@ -174,11 +174,13 @@ html.motion-off .hero-line>span{opacity:1!important;transform:none!important;fil
 .credential-copy { width: 100%; }
 .credential-copy > span { font: 13px/1.6 var(--font-sans); color: #52634f; }
 .credential-copy h3 { font-size: clamp(23px, 2.1vw, 30px); line-height: 1.2; max-width: none; overflow-wrap: anywhere; }
+.credential-recipient { margin-top: 12px; font-size: 13px; line-height: 1.6; color: #52634f; }
 .credential-date { margin-top: 12px; font-size: 14px; color: #52634f; }
 .credential-evidence { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; width: 100%; margin-top: auto; padding-top: 26px; }
 .credential-evidence .credential-link { margin: 0; padding: 10px 0; min-height: 44px; font: 11px/1.6 var(--font-mono); color: #624630; }
 .evidence-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 11px 14px; border: 1px solid #75836d; border-radius: 6px; background: #263c2d; color: #fff5e6; font: 11px/1.6 var(--font-mono); letter-spacing: .025em; text-align: center; overflow-wrap: anywhere; }
-.evidence-link:hover { background: #3c5640; }
+.evidence-link:is(:hover, :focus-visible) { background: #3c5640; }
+.evidence-link:active { background: #1d3023; }
 .evidence-link:focus-visible, .credential-link:focus-visible { outline: 3px solid #a65b40; outline-offset: 4px; }
 .challenge-grid { gap: 0 34px; align-items: stretch; }
 .challenge-card { grid-template-rows: auto auto 1fr; gap: 12px 14px; padding-block: 28px; }
