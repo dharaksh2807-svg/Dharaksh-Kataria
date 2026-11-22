@@ -93,8 +93,8 @@
       const key=button.dataset.dimension,m=modes[key];if(!m)return;
       frame.dataset.dimensionMode=key;
       if(number)number.textContent=m.number;
-      if(heading){heading.innerHTML=m.heading;if(!paused)heading.animate?.([{opacity:.35,transform:'translateY(13px)',filter:'blur(8px)'},{opacity:1,transform:'translateY(0)',filter:'blur(0)'}],{duration:480,easing:'cubic-bezier(.19,1,.22,1)'})}
-      if(description){description.textContent=m.description;if(!paused)description.animate?.([{opacity:.2},{opacity:1}],{duration:390})}
+      if(heading){heading.innerHTML=m.heading;if(!paused)heading.animate?.([{opacity:.35,transform:'translateY(6px)'},{opacity:1,transform:'translateY(0)'}],{duration:280,easing:'cubic-bezier(.19,1,.22,1)'})}
+      if(description){description.textContent=m.description;if(!paused)description.animate?.([{opacity:.2},{opacity:1}],{duration:220})}
       actions.forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
       targetYaw=key==='product'?-22:key==='intelligence'?24:-40;
       targetPitch=key==='product'?14:key==='intelligence'?-10:31;
@@ -122,25 +122,69 @@
   };
   addEventListener('scroll',onScroll,{passive:true});onScroll();
 
-  // Tap / click feedback. Avoid hijacking navigation or focus; visual only.
-  document.addEventListener('pointerdown',e=>{
-    if(paused || reduced.matches)return;
-    const el=e.target.closest('a,button');
-    if(!el || el.matches('.search-trigger,.menu-toggle') || el.closest('.palette-dialog'))return;
-    const rect=el.getBoundingClientRect();if(!rect.width||!rect.height)return;
-    const css=getComputedStyle(el);
-    if(css.position==='static')el.style.position='relative';
-    // Only add ripple inside modest-sized buttons; never span a whole project card.
-    if(rect.width>350||rect.height>120)return;
-    const circle=document.createElement('span');circle.className='v4-ripple';
-    circle.style.left=`${e.clientX-rect.left}px`;circle.style.top=`${e.clientY-rect.top}px`;
-    el.appendChild(circle);circle.addEventListener('animationend',()=>circle.remove(),{once:true});
+  // Finite feedback on deliberate actions, with one pulse per control.
+  const feedbackControls='.hero-action,.rift-mode,.filter-button,.project-case-open,.nav-availability,.copy-button';
+  document.addEventListener('click',event=>{
+    const control=event.target.closest(feedbackControls);
+    if(!control||paused||reduced.matches||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+    const previous=control.querySelector('.interaction-pulse');
+    previous?.getAnimations().forEach(animation=>animation.cancel());
+    previous?.remove();
+    const rect=control.getBoundingClientRect();
+    if(rect.bottom<=0||rect.top>=innerHeight||getComputedStyle(control).visibility==='hidden')return;
+    const diameter=Math.hypot(rect.width,rect.height)*2;
+    const pulse=document.createElement('span');
+    pulse.className='interaction-pulse';pulse.setAttribute('aria-hidden','true');
+    pulse.style.width=pulse.style.height=diameter+'px';
+    pulse.style.left=(event.detail?event.clientX-rect.left:rect.width/2)+'px';
+    pulse.style.top=(event.detail?event.clientY-rect.top:rect.height/2)+'px';
+    control.append(pulse);
+    const animation=pulse.animate([
+      {opacity:.16,transform:'translate(-50%,-50%) scale(0)'},
+      {opacity:0,transform:'translate(-50%,-50%) scale(1)'}
+    ],{duration:440,easing:'cubic-bezier(.22,.7,.2,1)'});
+    animation.finished.then(()=>pulse.remove(),()=>pulse.remove());
+  });
+
+  // A light follows the pointer on project artwork, without moving the media.
+  const projectGrid=$('#projectsGrid');
+  let lightFrame=0, litVisual=null, lightX=0, lightY=0;
+  projectGrid?.addEventListener('pointermove',event=>{
+    if(paused||reduced.matches||coarse.matches||event.pointerType==='touch')return;
+    const visual=event.target.closest('.project-visual');
+    if(!visual){resetProjectLight();return;}
+    if(litVisual!==visual)resetProjectLight();
+    litVisual=visual;
+    lightX=event.clientX;lightY=event.clientY;
+    if(lightFrame)return;
+    lightFrame=requestAnimationFrame(()=>{
+      lightFrame=0;
+      if(!litVisual)return;
+      const rect=litVisual.getBoundingClientRect();
+      if(!rect.width||!rect.height)return;
+      litVisual.style.setProperty('--light-x',((lightX-rect.left)/rect.width*100)+'%');
+      litVisual.style.setProperty('--light-y',((lightY-rect.top)/rect.height*100)+'%');
+    });
   },{passive:true});
+  function resetProjectLight(){
+    cancelAnimationFrame(lightFrame);lightFrame=0;
+    litVisual?.style.removeProperty('--light-x');litVisual?.style.removeProperty('--light-y');
+    litVisual=null;
+  }
+  projectGrid?.addEventListener('pointerleave',resetProjectLight);
+  projectGrid?.addEventListener('focusin',resetProjectLight);
 
   document.addEventListener('portfolio:motion',e=>{
     paused=reduced.matches||Boolean(e.detail?.muted);
-    if(paused){stop();targetPitch=14;targetYaw=-22;updateSpatial()}
+    if(paused){stop();resetProjectLight();targetPitch=14;targetYaw=-22;updateSpatial()}
     else play();
   });
-  document.addEventListener('visibilitychange',()=>{visible=document.visibilityState==='visible';if(visible)play();else stop()});
+  document.addEventListener('visibilitychange',()=>{
+    visible=document.visibilityState==='visible';
+    if(visible)play();
+    else{
+      stop();resetProjectLight();
+      document.querySelectorAll('.interaction-pulse').forEach(pulse=>pulse.getAnimations().forEach(animation=>animation.cancel()));
+    }
+  });
 })();

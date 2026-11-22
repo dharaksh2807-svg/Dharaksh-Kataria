@@ -59,8 +59,8 @@ html.v4-ready [data-v4="blur"]:not(.v4-visible){transform:translateY(12px);filte
 .dimension-orbit-trace svg path{stroke:#e4a077;stroke-width:.25;fill:none;stroke-dasharray:220;stroke-dashoffset:220;transition:stroke-dashoffset 2.6s var(--v4-ease)}
 .dimension-frame.v4-inview .dimension-orbit-trace svg path{stroke-dashoffset:0}
 /* Transparent interactive ripple, never blocks links. */
-.v4-ripple{position:absolute;z-index:20;pointer-events:none;transform:translate(-50%,-50%) scale(.1);background:rgba(255,245,215,.35);border:1px solid rgba(255,255,255,.20);border-radius:50%;width:12px;height:12px;animation:v4-tap-wave .57s ease-out forwards}
-@keyframes v4-tap-wave{to{transform:translate(-50%,-50%) scale(17);opacity:0}}
+
+
 /* Section-level copper tracing */
 .dimension-section{padding:clamp(95px,10vw,168px) 0 clamp(125px,11vw,180px);background:#131d1a;color:#f1f0e8;position:relative;overflow:hidden;isolation:isolate}
 .dimension-section::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(14.285% - 1px),rgba(255,255,255,.025) 14.285%);opacity:.7}
@@ -153,7 +153,7 @@ html.v4-ready [data-v4="blur"]:not(.v4-visible){transform:translateY(12px);filte
   .dimension-crosshair{font-size:18px}
 }
 @media(max-width:400px){.hero h1{font-size:clamp(46px,10.2vw,58px)}.hero-line-second{letter-spacing:-.078em}.dimension-frame{height:815px}.dimension-object{top:40%;transform:translate3d(50%,-50%,0) rotateX(var(--rotate-x)) rotateY(var(--rotate-y)) scale(.63)}.dimension-switcher button{padding:11px 10px}.dimension-panel h3{font-size:47px}.dimension-panel p{font-size:12px}.dimension-frame-footer span:first-child{max-width:140px;line-height:1.5}}
-@media(prefers-reduced-motion:reduce){.hero-line>span,.hero-eyebrow,.hero-lead,.hero-cta-row,.hero-coordinates{animation:none;opacity:1;filter:none;transform:none}.dimension-cube,.dimension-orbit-ring,.dimension-satellite,.dimension-perspective-grid,.dimension-glow,.dimension-live i{animation:none}.v4-ripple{display:none}html.v4-ready [data-v4]{opacity:1!important;filter:none!important;transform:none!important;transition:none!important}}
+@media(prefers-reduced-motion:reduce){.hero-line>span,.hero-eyebrow,.hero-lead,.hero-cta-row,.hero-coordinates{animation:none;opacity:1;filter:none;transform:none}.dimension-cube,.dimension-orbit-ring,.dimension-satellite,.dimension-perspective-grid,.dimension-glow,.dimension-live i{animation:none}html.v4-ready [data-v4]{opacity:1!important;filter:none!important;transform:none!important;transition:none!important}}
 html.motion-off .hero-line>span,html.motion-off .hero-eyebrow,html.motion-off .hero-lead,html.motion-off .hero-cta-row,html.motion-off .hero-coordinates,html.motion-off .dimension-cube,html.motion-off .dimension-orbit-ring,html.motion-off .dimension-satellite,html.motion-off .dimension-perspective-grid,html.motion-off .dimension-glow,html.motion-off .dimension-live i{animation:none!important;opacity:1;transform:none}
 /* Preserve 3D static geometry in motion-off, not flattened frontal faces. */
 html.motion-off .dimension-cube{transform:rotateX(-11deg) rotateY(-22deg)!important}

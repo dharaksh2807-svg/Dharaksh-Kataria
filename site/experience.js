@@ -22,6 +22,13 @@
     if(!muted)requestFrame();else if(ctx)draw(performance.now());
   };
   if(toggle)toggle.addEventListener('click',()=>setMotion(!muted));
+  function openLinkedStudy(){
+    const target=document.getElementById(location.hash.slice(1));
+    const study=target?.closest('details.render-study')||target?.querySelector('details.render-study');
+    if(study)study.open=true;
+  }
+  addEventListener('hashchange',openLinkedStudy);
+  openLinkedStudy();
   if(!stage||!ctx)return;
   const $=(s)=>document.querySelector(s);
   const tabs=[...stage.querySelectorAll('.signal-tab')];
@@ -135,7 +142,7 @@
   function requestFrame(){if(!raf&&visible&&!document.hidden&&!muted)raf=requestAnimationFrame(render)}
   function setScene(next){
     if(!scenes[next])return;
-    current=next;fade=.05;
+    current=next;fade=muted?1:.05;
     tabs.forEach(b=>{let active=b.dataset.scene===next;b.classList.toggle('is-active',active);b.setAttribute('aria-pressed',String(active))});
     $('#signalNumber').textContent=scenes[next].number;
     $('#signalTitle').textContent=scenes[next].title;

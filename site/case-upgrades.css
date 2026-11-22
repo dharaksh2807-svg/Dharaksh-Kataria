@@ -7,7 +7,7 @@
 .cp-chapters-link:hover,.cp-chapters-link.is-current{background:#17372c;color:#fff}
 .cp-chapters-track{height:2px;background:#d6dcd2}
 .cp-chapters-progress{display:block;height:100%;width:0;background:var(--copper,#c97f5c)}
-.cp-hero,.cp-section,.cp-media{scroll-margin-top:72px}
+.cp-hero,.cp-section,.cp-media{scroll-margin-top:calc(var(--cp-chapters-height,110px) + 24px)}
 .cp-live-explorer,.cp-benchmark,.cp-process{color:#172b21;background:#e5e9df;border:1px solid #bdc8bc;border-radius:18px;padding:clamp(18px,3vw,30px);margin:32px 0}
 .cp-explorer-kicker{display:block;font:500 10px 'DM Mono',monospace;letter-spacing:.16em;color:#647a68;margin-bottom:14px}
 .cp-live-explorer h3,.cp-benchmark h3{font-family:'Instrument Serif',Georgia,serif;font-size:clamp(24px,3vw,37px);font-weight:400;line-height:1.15;margin:0 0 10px}
@@ -44,4 +44,17 @@
 @media(max-width:760px){.cp-chapters-inner{display:block;padding:8px 15px}.cp-chapters-kicker{display:block;padding:3px 0 6px}.cp-chapters-link{padding:8px 10px}.cp-live-explorer,.cp-benchmark{margin:24px 0}.cp-explorer-nodes{grid-template-columns:repeat(2,minmax(0,1fr))}.cp-explorer-node{min-height:106px;padding:11px}.cp-explorer-inspector{padding:16px}}
 @media(max-width:370px){.cp-explorer-nodes{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.cp-explorer-node,.cp-chapters-link,.cp-benchmark-bar{transition:none!important}.cp-chapters{backdrop-filter:none}}
-html.motion-off .cp-explorer-node,html.motion-off .cp-benchmark-bar{transition:none!important}
+html.motion-off .cp-explorer-node,html.motion-off .cp-benchmark-bar{transition:none!important}.cp-hero .cp-evidence-open{border-color:#b99b78;color:#f1d1af}
+.cp-hero .cp-evidence-open:hover{background:#304d39}
+.cp-metrics strong{overflow-wrap:anywhere}
+
+/* Bound section entrances without creating a nested scroll container. */
+body[data-case-id="srmedu"] #cpMain{overflow-x:clip}
+
+/* Public captures retain their complete recorded frame. */
+body[data-case-id="srmedu"] .cp-gallery{grid-template-columns:minmax(0,1fr);gap:40px;max-width:1280px}
+body[data-case-id="srmedu"] .cp-gallery-open{overflow:clip}
+body[data-case-id="srmedu"] .cp-gallery-open img{width:100%;height:auto;aspect-ratio:auto;object-fit:contain;filter:none;transform:none}
+body[data-case-id="srmedu"] .cp-enlarge-label{position:static;display:block;text-align:right;border-top:1px solid #577363;padding:12px 16px}
+body[data-case-id="srmedu"] .cp-captures{margin-top:0}
+body[data-case-id="srmedu"] .cp-media-head{margin-bottom:30px}

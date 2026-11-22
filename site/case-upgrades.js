@@ -53,10 +53,16 @@
     const progress = add(track, "span", "cp-chapters-progress");
     track.setAttribute("aria-hidden","true");
     main.querySelector(".cp-hero").insertAdjacentElement("afterend",nav);
+    function measureNav() {
+      main.style.setProperty('--cp-chapters-height', `${nav.getBoundingClientRect().height}px`);
+    }
+    measureNav();
+    if ('ResizeObserver' in window) new ResizeObserver(measureNav).observe(nav);
+    else addEventListener('resize', measureNav);
     let frame = 0;
     function update() {
       frame = 0;
-      const y = 122;
+      const y = nav.getBoundingClientRect().height + 24;
       let active = 0;
       sections.forEach((part, index) => {
         if (part.node.getBoundingClientRect().top <= y) active = index;

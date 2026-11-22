@@ -25,10 +25,51 @@
   const projects = data.projects;
   const detailUrl=(p)=>`projects/${encodeURIComponent(p.id)}.html`;
   const navigateToDetail = project => { if (project) window.portfolioMotion.navigate(detailUrl(project), project.id); };
+  function engineeringInspector(p) {
+    const lenses = [
+      ['challenge', 'Challenge', p.problem],
+      ['architecture', 'Architecture', p.architecture],
+      ['tradeoff', 'Trade-off', p.decision || p.solution],
+      ['evidence', 'Evidence', p.proof]
+    ];
+    return `<details class="project-decisions project-xray" data-project-xray="${escape(p.id)}" ${p.size === 'wide' ? 'open' : ''}>
+      <summary>
+        <span class="project-xray-symbol" aria-hidden="true">⌖</span>
+        <span class="project-xray-label">Engineering X-Ray<small>Explore the system behind the interface</small></span>
+        <span class="project-xray-hint">INTERACTIVE INSPECTOR</span>
+        <span class="project-xray-chevron" aria-hidden="true">＋</span>
+      </summary>
+      <div class="project-xray-content" data-lens="architecture">
+        <div class="xray-toolbar" role="tablist" aria-label="Inspect ${escape(p.title)}">
+          ${lenses.map(([id, label]) => `<button type="button" role="tab" id="xray-${p.id}-${id}" aria-controls="xray-${p.id}-${id}-panel" aria-selected="${id === 'architecture'}" tabindex="${id === 'architecture' ? 0 : -1}" data-lens="${id}">${label}</button>`).join('')}
+        </div>
+        <div class="xray-workbench">
+          <div class="xray-system">
+            <p class="xray-map-label">${escape(p.categories[0])} <span>COMPONENT MAP</span></p>
+            <div class="xray-map is-${p.systemFlow.layout}" role="group" aria-label="${escape(p.title)} documented components">
+              <svg class="xray-connectors" aria-hidden="true"></svg>
+              ${p.systemFlow.nodes.map((node, i) => `<button type="button" class="xray-node" data-node="${i}" aria-pressed="${i === 0}" aria-controls="xray-${p.id}-component"><span class="xray-node-layer">${escape(node.layer)}</span><strong>${escape(node.name)}</strong><span class="xray-node-indicator" aria-hidden="true"></span></button>`).join('')}
+            </div>
+            <p class="xray-map-caption">Select a component to inspect its role. ${p.systemFlow.nodes.some(node => node.validation) ? 'Dashed paths mark validation.' : 'Simplified relationships from project documentation.'}</p>
+          </div>
+          <div class="xray-inspection">
+            ${lenses.map(([id, label, body]) => `<div class="xray-pane" role="tabpanel" id="xray-${p.id}-${id}-panel" aria-labelledby="xray-${p.id}-${id}" tabindex="0" ${id !== 'architecture' ? 'hidden' : ''}>
+              <span class="xray-pane-label">${escape(p.status)} / ${label.toUpperCase()}</span>
+              <h4>${{challenge:'The problem to solve', architecture:'How the system fits', tradeoff:'The engineering choice', evidence:'What the record shows'}[id]}</h4>
+              <p>${escape(body)}</p>
+              ${id === 'architecture' ? `<div class="xray-component" id="xray-${p.id}-component" aria-live="polite"><h5>${escape(p.systemFlow.nodes[0].name)}</h5><p>${escape(p.systemFlow.nodes[0].detail)}</p></div>` : ''}
+              ${id === 'evidence' ? `<p class="project-scope">${escape(p.note)}</p>` : ''}
+            </div>`).join('')}
+          </div>
+        </div>
+        <div class="xray-footer"><span>DOCUMENTED SYSTEM / ${escape(p.year)}</span><a class="project-evidence-link" href="${detailUrl(p)}#cp-chapter-cp-results">Read evidence and limitations</a></div>
+      </div>
+    </details>`;
+  }
   const grid = $('#projectsGrid');
   const cards = projects.map((p) => {
     const card = document.createElement('article');
-    card.className = `project-card ${p.size === 'wide' ? 'is-wide' : ''} reveal`;
+    card.className = `project-card ${p.size === 'wide' ? 'is-wide is-featured' : p.size === 'compact' ? 'is-compact' : ''} reveal`;
     card.dataset.category = p.category;
     card.dataset.project = p.id;
     const live = external(p.link);
@@ -38,22 +79,147 @@
     const sourceHtml = source && !same ? `<a class="project-direct project-source" href="${escape(source)}" target="_blank" rel="noopener noreferrer" aria-label="View ${escape(p.title)} source code">GITHUB <span>↗</span></a>` : '';
     card.style.setProperty('--v8-vt-name',`project-${p.id}`);
     card.style.setProperty('--project-title-name',`project-title-${p.id}`);
-    card.innerHTML = `<div class="project-visual visual-${escape(p.theme)}"><span class="project-kicker">${escape(p.categories.join(' / '))}</span>${artFor(p.theme)}<span class="project-visual-tag">ORIGINAL SYSTEM VISUAL / ${escape(p.num)}</span></div><div class="project-info"><div class="project-info-left"><div class="project-num">${escape(p.num)} — ${escape(p.status)}</div><h3 class="project-title">${escape(p.title)}</h3><p class="project-summary">${escape(p.short)}</p></div><div class="project-arrow-wrap"><span class="project-open" aria-hidden="true">↗</span></div></div><div class="project-linkbar"><button type="button" class="project-case-open" aria-label="Read ${escape(p.title)} case study">CASE STUDY <span>→</span></button>${linkHtml}${sourceHtml}${!live&&!source?'<span class="private-pill">NO PUBLIC DEMO</span>':''}</div>`;
-    $('.project-case-open',card).addEventListener('click', () => navigateToDetail(p));
-    $('.project-visual',card).addEventListener('click', () => navigateToDetail(p));
-    $('.project-visual',card).setAttribute('role','button');
-    $('.project-visual',card).setAttribute('tabindex','0');
-    $('.project-visual',card).setAttribute('aria-label',`Open ${p.title} case study`);
-    $('.project-visual',card).addEventListener('keydown',(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();navigateToDetail(p)}});
+    const preview = p.preview;
+    const visual = preview ? `<img class="project-screenshot" src="${escape(preview.src)}" alt="${escape(preview.alt)}" width="${preview.width}" height="${preview.height}" loading="${p.id === 'srmedu' ? 'eager' : 'lazy'}" decoding="async">` : artFor(p.theme);
+    const visualLabel = preview ? preview.label : p.id === 'metro' ? 'ORIGINAL CONCEPT ART · IN DEVELOPMENT' : 'ORIGINAL SYSTEM VISUAL';
+    card.innerHTML = `
+      ${p.size === 'wide' ? `<header class="project-editorial-heading"><div class="project-num">FEATURED BUILD <span>${escape(p.status)} · ${escape(p.year)}</span></div><h3 class="project-title">${escape(p.title)}</h3><p>${escape(p.lead)}</p></header>` : ''}
+      <figure class="project-media">
+        <a class="project-visual visual-${escape(p.theme)}" href="${detailUrl(p)}" aria-label="Read ${escape(p.title)} case study">
+          ${visual}
+          <span class="project-preview-hint" aria-hidden="true">View case study</span>
+        </a>
+        <figcaption class="project-visual-tag">${escape(visualLabel)}</figcaption>
+      </figure>
+      <div class="project-info">
+        <div class="project-info-left">
+          ${p.size === 'wide' ? '' : `<div class="project-num">${escape(p.num)} — ${escape(p.status)}</div><h3 class="project-title">${escape(p.title)}</h3>`}
+          <p class="project-summary">${escape(p.short)}</p>
+          ${p.size === 'wide' ? `<p class="project-role">${escape(p.role)}</p>` : ''}
+          ${p.highlights ? `<dl class="project-highlights">${p.highlights.map(([label, value]) => `<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl>` : `<div class="project-stack">${p.technologies.slice(0, 4).map(technology => `<span>${escape(technology)}</span>`).join('')}</div>`}
+          ${p.size === 'wide' ? `<div class="project-result"><h4>Evidence</h4><p>${escape(p.proof)}</p></div>` : ''}
+        </div>
+        <div class="project-arrow-wrap"><span class="project-open" aria-hidden="true">↗</span></div>
+      </div>
+      ${engineeringInspector(p)}
+      <div class="project-linkbar">
+        <a class="project-case-open" href="${detailUrl(p)}" aria-label="Read ${escape(p.title)} case study">Read case study</a>
+        ${linkHtml}${sourceHtml}${!live&&!source?'<span class="private-pill">NO PUBLIC DEMO</span>':''}
+      </div>`;
+    card.addEventListener('click', event => {
+      const link=event.target.closest('.project-case-open,.project-evidence-link,.project-visual');
+      if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      window.portfolioMotion.navigate(link.getAttribute('href'),p.id,
+        link.classList.contains('project-evidence-link')?'project-evidence-link':link.classList.contains('project-visual')?'project-visual':'project-case-open');
+    });
+    const xray=$('.project-xray',card);
+    const map=$('.xray-map',xray);
+    const wires=$('.xray-connectors',map);
+    const nodes=$$('.xray-node',map);
+    const tabs=$$('[role="tab"]',xray);
+    let selectedNode=0;
+    function notifyInspection() {
+      document.dispatchEvent(new CustomEvent('portfolio:xray-open',{
+        detail:{id:p.id,title:p.title,lens:$('.project-xray-content',xray).dataset.lens,node:selectedNode}
+      }));
+    }
+    function drawConnections() {
+      if (!xray.open || card.hidden) return;
+      const bounds=map.getBoundingClientRect();
+      wires.setAttribute('viewBox',`0 0 ${bounds.width} ${bounds.height}`);
+      wires.replaceChildren();
+      p.systemFlow.nodes.forEach((node,from)=>node.connects.forEach(to=>{
+        const first=nodes[from].getBoundingClientRect();
+        const second=nodes[to].getBoundingClientRect();
+        const horizontal=Math.abs(first.x-second.x)>first.width/2;
+        const forward=horizontal ? second.x>first.x : second.y>first.y;
+        let x1=first.x+first.width/2-bounds.x;
+        let y1=first.y+first.height/2-bounds.y;
+        let x2=second.x+second.width/2-bounds.x;
+        let y2=second.y+second.height/2-bounds.y;
+        if (horizontal) {
+          x1=(forward?first.right:first.left)-bounds.x;
+          x2=(forward?second.left:second.right)-bounds.x;
+        } else {
+          y1=(forward?first.bottom:first.top)-bounds.y;
+          y2=(forward?second.top:second.bottom)-bounds.y;
+        }
+        const middle=(x1+x2)/2;
+        const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+        path.setAttribute('d',horizontal?`M${x1},${y1} H${middle} V${y2} H${x2}`:`M${x1},${y1} V${y2}`);
+        path.classList.toggle('is-active',from===selectedNode||to===selectedNode);
+        path.classList.toggle('is-validation',!!p.systemFlow.nodes[to].validation);
+        wires.append(path);
+        const endpoint=document.createElementNS('http://www.w3.org/2000/svg','circle');
+        endpoint.setAttribute('cx',x2);endpoint.setAttribute('cy',y2);endpoint.setAttribute('r','3');
+        endpoint.classList.toggle('is-active',from===selectedNode||to===selectedNode);
+        wires.append(endpoint);
+      }));
+    }
+    function selectLens(id) {
+      $('.project-xray-content',xray).dataset.lens=id;
+      tabs.forEach(tab=>{
+        const active=tab.dataset.lens===id;
+        tab.setAttribute('aria-selected',String(active));
+        tab.tabIndex=active?0:-1;
+        document.getElementById(tab.getAttribute('aria-controls')).hidden=!active;
+      });
+      notifyInspection();
+    }
+    tabs.forEach((tab,index)=>{
+      tab.addEventListener('click',()=>selectLens(tab.dataset.lens));
+      tab.addEventListener('keydown',event=>{
+        const keys={ArrowRight:(index+1)%tabs.length,ArrowLeft:(index+tabs.length-1)%tabs.length,Home:0,End:tabs.length-1};
+        if(!(event.key in keys))return;
+        event.preventDefault();
+        const next=tabs[keys[event.key]];
+        selectLens(next.dataset.lens);next.focus();
+      });
+    });
+    nodes.forEach((node,index)=>node.addEventListener('click',()=>{
+      selectedNode=index;
+      nodes.forEach((button,i)=>button.setAttribute('aria-pressed',String(i===index)));
+      $('.xray-component h5',xray).textContent=p.systemFlow.nodes[index].name;
+      $('.xray-component p',xray).textContent=p.systemFlow.nodes[index].detail;
+      selectLens('architecture');
+      drawConnections();
+    }));
+    const mapObserver=new ResizeObserver(drawConnections);
+    mapObserver.observe(map);
+    xray.addEventListener('toggle',()=>{
+      if (!xray.open) return;
+      drawConnections();notifyInspection();
+    });
+    const screenshot=$('.project-screenshot',card);
+    screenshot?.addEventListener('error',()=>{
+      const fallback=document.createElement('p');
+      fallback.className='project-media-unavailable';
+      fallback.textContent='Interface capture unavailable. Open the case study for project documentation.';
+      $('.project-visual',card).replaceChildren(fallback);
+    },{once:true});
     grid.appendChild(card);
     return card;
   });
 
   function applyFilter(filter) {
     let visible = 0;
-    cards.forEach((card) => { const show = filter === 'all' || card.dataset.category === filter; card.hidden = !show; if (show) { visible++; card.classList.add('in-view'); } });
+    cards.forEach((card) => {
+      const show = filter === 'all' || card.dataset.category === filter;
+      card.hidden = !show;
+      const media = $('.project-media',card);
+      media.getAnimations().forEach(animation=>animation.cancel());
+      if(show){
+        visible++;
+        card.classList.add('in-view');
+        if(!window.portfolioMotion.disabled)media.animate([
+          {opacity:.55,transform:'translateY(8px)'},
+          {opacity:1,transform:'translateY(0)'}
+        ],{duration:280,easing:'cubic-bezier(.22,.7,.2,1)'});
+      }
+    });
     $$('.filter-button').forEach((b) => { const active = b.dataset.filter === filter; b.classList.toggle('is-active', active); b.setAttribute('aria-pressed', String(active)); });
-    $('#filterCount').textContent = `SHOWING ${String(visible).padStart(2,'0')} / 06`;
+    $('#filterCount').textContent = `SHOWING ${String(visible).padStart(2,'0')} / ${String(projects.length).padStart(2,'0')}`;
   }
   $$('.filter-button').forEach((btn) => btn.addEventListener('click', () => applyFilter(btn.dataset.filter)));
   $('#allProjectsButton').addEventListener('click', () => $('#archive').scrollIntoView({behavior: reduceMotion ? 'instant' : 'smooth'}));
@@ -73,9 +239,25 @@
   $('#archiveSearch').addEventListener('input',e=>filterArchive(e.target.value));
   filterArchive('');
   const credentials=$('#credentialGrid');
-  data.credentials.forEach((c,i)=>{const el=document.createElement('article');el.className='credential-card reveal';el.innerHTML=`<span class="credential-motif" aria-hidden="true"><span>${escape(c.code)}</span><i>✳</i></span><div class="credential-copy"><span>${escape(c.issuer)} · ${escape(c.date)}</span><h3>${escape(c.name)}</h3></div>${external(c.url)?`<a href="${escape(c.url)}" target="_blank" rel="noopener noreferrer" class="credential-link">VERIFY CREDENTIAL ↗</a>`:'<span class="credential-unlinked">CERTIFICATE LINK NOT AVAILABLE</span>'}`;credentials.appendChild(el)});
+  function evidenceLink(entry){
+    const evidence=entry.evidence;
+    if(!evidence?.url)return '';
+    const url=external(evidence.url)||(evidence.type==='certificate'&&/^assets\/evidence\/certificates\/[a-z0-9-]+\.pdf$/.test(evidence.url)?evidence.url:null);
+    return url?`<a href="${escape(url)}" target="_blank" rel="noopener noreferrer" class="evidence-link" aria-label="${escape(evidence.label+' — '+entry.name+(evidence.type==='certificate'?' (PDF, opens in a new tab)':''))}">${escape(evidence.label)}</a>`:'';
+  }
+  data.credentials.forEach(c=>{
+    const el=document.createElement('article');el.className='credential-card reveal';
+    const issuerUrl=external(c.url);
+    const status=c.evidence?.type==='certificate'?'CERTIFICATE PDF':issuerUrl?'ISSUER RECORD':'EVIDENCE PENDING';
+    el.innerHTML=`<div class="credential-meta"><span>${escape(c.code)}</span><p class="evidence-status">${status}</p></div><div class="credential-copy"><span>${escape(c.issuer)}</span><h3>${escape(c.name)}</h3>${c.recipient?`<p class="credential-recipient">Issued to ${escape(c.recipient)}</p>`:''}<p class="credential-date">${escape(c.date)}</p></div><div class="credential-evidence">${issuerUrl?`<a href="${escape(issuerUrl)}" target="_blank" rel="noopener noreferrer" class="credential-link" aria-label="Open issuer record — ${escape(c.name)}">OPEN ISSUER RECORD</a>`:''}${evidenceLink(c)}${!issuerUrl&&!c.evidence?.url?`<span class="credential-unlinked">${escape(c.recordNote||'Evidence pending')}</span>`:''}</div>`;
+    credentials.appendChild(el);
+  });
   const challenges=$('#challengeGrid');
-  data.hackathons.forEach((c,i)=>{const el=document.createElement('article');el.className='challenge-card reveal';el.innerHTML=`<span class="challenge-index mono">${escape(c.num||String(i+1).padStart(2,'0'))}</span><div><strong>${escape(c.name)}</strong><p>${escape(c.detail)}</p></div><span class="challenge-status">${escape(c.status)}</span>`;challenges.appendChild(el)});
+  data.hackathons.forEach((c,i)=>{
+    const el=document.createElement('article');el.className='challenge-card reveal';
+    el.innerHTML=`<span class="challenge-index mono">${escape(c.num||String(i+1).padStart(2,'0'))}</span><div class="challenge-copy"><h3>${escape(c.name)}</h3><p>${escape(c.detail)}</p>${c.recipient?`<p class="challenge-recipient">${escape(c.recipient)} · ${escape(c.date)}</p>`:''}</div><span class="challenge-status">${escape(c.status)}</span><div class="challenge-evidence">${c.recordNote?`<p>${escape(c.recordNote)}</p>`:''}${evidenceLink(c)}</div>`;
+    challenges.appendChild(el);
+  });
   const research=$('#researchGrid');
   data.research.forEach((c,i)=>{const el=document.createElement('article');el.className='research-card reveal';el.innerHTML=`<span class="mono">RESEARCH / ${String(i+1).padStart(2,'0')}</span><h3>${escape(c.name)}</h3><p>${escape(c.detail)}</p>${external(c.url)?`<a href="${escape(c.url)}" target="_blank" rel="noopener noreferrer">VIEW RESEARCH ↗</a>`:'<span class="research-private">ACADEMIC WORK / NO PUBLIC LINK</span>'}`;research.appendChild(el)});
   const atlasTabs=$('#atlasTabs'),atlasDetail=$('#atlasDetail');
@@ -90,12 +272,47 @@
   const timelineRail=$('#timelineRail');
   data.timeline.forEach((e,i)=>{
     const el=document.createElement('article');el.className='timeline-event';
+    el.id='timeline-'+e.id;
     el.innerHTML=`<span class="timeline-dot" aria-hidden="true"></span><span class="timeline-date mono">${escape(e.date)}</span><div class="timeline-feature"><span>${escape(e.tag)}</span><h3>${escape(e.title)}</h3><p>${escape(e.detail)}</p><button type="button">OPEN THE CASE STUDY ↗</button></div>`;
     $('button',el).addEventListener('click',()=>navigateToDetail(projects.find(p=>p.id===e.id)));
     timelineRail.appendChild(el);
   });
-  $('#timelinePrev').addEventListener('click',()=>timelineRail.scrollBy({left:-340,behavior:reduceMotion?'instant':'smooth'}));
-  $('#timelineNext').addEventListener('click',()=>timelineRail.scrollBy({left:340,behavior:reduceMotion?'instant':'smooth'}));
+  function moveTimeline(direction){
+    const gutter=parseFloat(getComputedStyle(timelineRail).paddingLeft);
+    const end=timelineRail.scrollWidth-timelineRail.clientWidth;
+    const stops=[...timelineRail.children].map(event=>Math.min(end,Math.max(0,event.offsetLeft-gutter)));
+    const destination=direction>0?stops.find(stop=>stop>timelineRail.scrollLeft+2)??end:stops.reverse().find(stop=>stop<timelineRail.scrollLeft-2)??0;
+    timelineRail.scrollTo({left:destination,behavior:window.portfolioMotion.disabled?'instant':'smooth'});
+  }
+  $('#timelinePrev').addEventListener('click',()=>moveTimeline(-1));
+  $('#timelineNext').addEventListener('click',()=>moveTimeline(1));
+  timelineRail.addEventListener('keydown',event=>{
+    if(event.target!==timelineRail)return;
+    if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+    event.preventDefault();
+    if(event.key==='Home'||event.key==='End')timelineRail.scrollTo({left:event.key==='Home'?0:timelineRail.scrollWidth,behavior:'instant'});
+    else moveTimeline(event.key==='ArrowRight'?1:-1);
+  });
+  // Touch retains native panning. Mouse dragging starts after a small threshold.
+  let timelineDrag=null;
+  timelineRail.addEventListener('pointerdown',event=>{
+    if(event.pointerType!=='mouse'||event.button!==0||event.target.closest('button,a'))return;
+    timelineDrag={id:event.pointerId,x:event.clientX,scroll:timelineRail.scrollLeft,active:false};
+  });
+  timelineRail.addEventListener('pointermove',event=>{
+    if(!timelineDrag||event.pointerId!==timelineDrag.id)return;
+    const distance=event.clientX-timelineDrag.x;
+    if(!timelineDrag.active&&Math.abs(distance)<5)return;
+    timelineDrag.active=true;
+    timelineRail.setPointerCapture(event.pointerId);
+    timelineRail.classList.add('is-dragging');
+    timelineRail.scrollLeft=timelineDrag.scroll-distance;
+  });
+  function finishTimelineDrag(){timelineDrag=null;timelineRail.classList.remove('is-dragging');}
+  timelineRail.addEventListener('pointerup',finishTimelineDrag);
+  timelineRail.addEventListener('pointercancel',finishTimelineDrag);
+  timelineRail.addEventListener('lostpointercapture',finishTimelineDrag);
+  timelineRail.addEventListener('pointerleave',()=>{if(!timelineDrag?.active)finishTimelineDrag();});
   const overlay = $('#caseOverlay');
   const caseDialog = $('.case-dialog');
   function openCase(p, { updateUrl = true } = {}) {
@@ -146,7 +363,7 @@
     {label:'All projects',description:'JUMP TO SELECTED WORK',run:()=>$('#work').scrollIntoView()},
     {label:'Technical approach',description:'JUMP TO CAPABILITIES',run:()=>$('#lab').scrollIntoView()},
     {label:'Project archive',description:'JUMP TO MORE WORK',run:()=>$('#archive').scrollIntoView()},
-    {label:'Live visualization',description:'INTERACTIVE SYSTEM EXPLORER',run:()=>$('#motion-lab').scrollIntoView()},
+    {label:'Live visualization',description:'INTERACTIVE SYSTEM EXPLORER',run:()=>{const section=$('#motion-lab');$('details',section).open=true;section.scrollIntoView()}},
     {label:'Project timeline',description:'2026 BUILD CHRONOLOGY',run:()=>$('#timeline').scrollIntoView()},
     {label:'Engineering atlas',description:'INTERACTIVE SKILLS MAP',run:()=>$('#capabilities').scrollIntoView()},
     {label:'Recognition & credentials',description:'JUMP TO HACKATHONS AND COURSES',run:()=>$('#recognition').scrollIntoView()},
@@ -159,11 +376,35 @@
     const q = paletteInput.value.trim().toLowerCase();
     filteredItems = paletteItems.filter((item) => `${item.label} ${item.description}`.toLowerCase().includes(q)).slice(0,9);
     selected = Math.min(selected, Math.max(0,filteredItems.length - 1));
-    $('#paletteResults').innerHTML = filteredItems.length ? filteredItems.map((x,i)=>`<button class="palette-result" type="button" role="option" aria-selected="${i === selected}" data-index="${i}"><span><strong>${escape(x.label)}</strong><br><small>${escape(x.description)}</small></span><span aria-hidden="true">↗</span></button>`).join('') : '<div class="palette-empty">No matching projects or sections.</div>';
+    $('#paletteResults').innerHTML = filteredItems.length ? filteredItems.map((x,i)=>`<button class="palette-result" id="palette-result-${i}" type="button" role="option" tabindex="-1" aria-selected="${i === selected}" data-index="${i}"><span><strong>${escape(x.label)}</strong><br><small>${escape(x.description)}</small></span><span aria-hidden="true">↗</span></button>`).join('') : '<div class="palette-empty" role="status">No matching projects or sections.</div>';
+    if(filteredItems.length)paletteInput.setAttribute('aria-activedescendant',`palette-result-${selected}`);
+    else paletteInput.removeAttribute('aria-activedescendant');
+    $(`#palette-result-${selected}`)?.scrollIntoView({block:'nearest'});
     $$('.palette-result').forEach((el)=>el.addEventListener('click',()=>activatePalette(Number(el.dataset.index))));
   }
-  function openPalette() { if(openUI==='case') closeCase(); lastFocus = document.activeElement; openUI='palette'; palette.hidden=false; document.body.style.overflow='hidden'; document.querySelector('main').inert = true; document.querySelector('header').inert = true; paletteInput.value=''; selected=0; drawPalette(); setTimeout(()=>paletteInput.focus(),0); }
-  function closePalette() { palette.hidden=true; openUI=null; document.body.style.overflow=''; document.querySelector('main').inert = false; document.querySelector('header').inert = false; lastFocus?.focus?.(); }
+  function openPalette() {
+    if(openUI==='case') closeCase();
+    lastFocus = document.activeElement;
+    openUI = 'palette';
+    palette.hidden = false;
+    paletteInput.setAttribute('aria-expanded','true');
+    document.body.style.overflow = 'hidden';
+    document.querySelector('main').inert = true;
+    document.querySelector('header').inert = true;
+    paletteInput.value = '';
+    selected = 0;
+    drawPalette();
+    setTimeout(()=>paletteInput.focus(),0);
+  }
+  function closePalette() {
+    palette.hidden = true;
+    paletteInput.setAttribute('aria-expanded','false');
+    openUI = null;
+    document.body.style.overflow = '';
+    document.querySelector('main').inert = false;
+    document.querySelector('header').inert = false;
+    lastFocus?.focus?.();
+  }
   function activatePalette(i) { const item=filteredItems[i]; if(!item)return; closePalette(); item.run(); }
   $('#searchTrigger').addEventListener('click',openPalette);
   $('#paletteBackdrop').addEventListener('click',closePalette);
@@ -174,7 +415,19 @@
     if(event.key==='ArrowUp'){event.preventDefault();selected=(selected+Math.max(1,filteredItems.length)-1)%Math.max(1,filteredItems.length);drawPalette()}
     if(event.key==='Enter'){event.preventDefault();activatePalette(selected)}
   });
-  function focusTrap(e, element) { const focusables=$$('a[href],button:not([disabled]),input:not([disabled]),[tabindex="0"]',element).filter(x=>getComputedStyle(x).display!=='none'); if(!focusables.length)return; const first=focusables[0],last=focusables[focusables.length-1]; if(e.shiftKey && document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()} }
+  function focusTrap(event, element) {
+    const focusables = $$('a[href],button:not([disabled]),input:not([disabled]),[tabindex="0"]',element)
+      .filter(node=>node.tabIndex>=0 && node.getClientRects().length);
+    if(!focusables.length) return;
+    const first = focusables[0], last = focusables[focusables.length-1];
+    if(event.shiftKey && document.activeElement===first){
+      event.preventDefault();
+      last.focus();
+    }else if(!event.shiftKey && document.activeElement===last){
+      event.preventDefault();
+      first.focus();
+    }
+  }
   document.addEventListener('keydown',(e)=>{
     if ((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault(); if(openUI==='palette')closePalette();else openPalette();return}
     if(e.key==='Escape'){if(openUI==='palette')closePalette();else if(openUI==='case')closeCase();else closeMobile();return}
@@ -184,7 +437,13 @@
 
   // Mobile menu
   const menuToggle=$('#menuToggle'), mobileMenu=$('#mobileMenu');
-  const closeMobile=()=>{mobileMenu.hidden=true;menuToggle.setAttribute('aria-expanded','false');menuToggle.setAttribute('aria-label','Open navigation menu')};
+  const closeMobile = () => {
+    const restoreFocus = mobileMenu.contains(document.activeElement);
+    mobileMenu.hidden = true;
+    menuToggle.setAttribute('aria-expanded','false');
+    menuToggle.setAttribute('aria-label','Open navigation menu');
+    if(restoreFocus) menuToggle.focus({preventScroll:true});
+  };
   menuToggle.addEventListener('click',()=>{const shouldOpen=mobileMenu.hidden;mobileMenu.hidden=!shouldOpen;menuToggle.setAttribute('aria-expanded',String(shouldOpen));menuToggle.setAttribute('aria-label',shouldOpen?'Close navigation menu':'Open navigation menu')});
   $$('#mobileMenu a').forEach((a)=>a.addEventListener('click',closeMobile));
 
@@ -197,7 +456,7 @@
 
   // Scroll states, low-cost rAF updates.
   const header=$('#siteHeader'),indicator=$('#scrollIndicator');let ticking=false;
-  function renderScroll(){const scroll=Math.max(0,window.scrollY),total=Math.max(1,document.documentElement.scrollHeight-innerHeight);indicator.style.width=`${Math.min(100,scroll/total*100)}%`;header.classList.toggle('scrolled',scroll>40);ticking=false}
+  function renderScroll(){const scroll=Math.max(0,window.scrollY),total=Math.max(1,document.documentElement.scrollHeight-innerHeight);if(indicator)indicator.style.width=`${Math.min(100,scroll/total*100)}%`;header.classList.toggle('scrolled',scroll>40);ticking=false}
   window.addEventListener('scroll',()=>{if(!ticking){requestAnimationFrame(renderScroll);ticking=true}},{passive:true});renderScroll();
   function updateIST(){const clock=$('#liveTime');if(!clock)return;try{clock.textContent=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date())+' IST'}catch{clock.textContent='INDIA / IST'}}
   updateIST();setInterval(updateIST,60000);

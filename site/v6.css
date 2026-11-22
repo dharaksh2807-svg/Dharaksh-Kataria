@@ -1,21 +1,6 @@
 /* V6 — evidence-first motion and interactive proof studies. Preserves the V5 visual system. */
 .v6-guide-toggle{border:1px solid #75847a70;background:transparent;color:#d9e5dd;min-height:36px;padding:0 12px;font:10px var(--font-mono);letter-spacing:.11em;transition:background .2s,border-color .2s}
 .v6-guide-toggle span{color:#e79c7c;margin-left:6px}.v6-guide-toggle:hover,.v6-guide-toggle[aria-pressed=true]{border-color:#a7bfaa;background:#ffffff12}
-/* Optional companion; text areas and actions must not be hidden behind the avatar. */
-.kio-shell.kio-compact{width:93px;height:117px;right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));z-index:83}
-.kio-shell.kio-suppressed{display:none!important}
-.kio-compact .kio-launch{width:92px;height:116px}
-.kio-compact .kio-person{width:87px;height:100px}
-.kio-compact .kio-aura{left:1px;right:2px;top:0;height:91px}
-.kio-compact .kio-launch-label{min-height:24px;left:4px;right:2px;border-radius:6px}
-.kio-compact .kio-launch-label strong{font-size:8px;line-height:1.5}
-.kio-compact .kio-launch-label small{display:none}
-.kio-compact .kio-online-dot{right:0;top:6px;width:7px;height:7px}
-.kio-compact .kio-hint{display:none!important}
-.kio-compact .kio-panel{bottom:0;right:105px;width:min(348px,calc(100vw - 139px));max-height:min(680px,calc(100dvh - 24px))}
-.kio-preference-row{display:flex;align-items:center;gap:7px;margin:16px 21px 0}
-.kio-preference-row button{flex:1;border:1px solid #cbd2c5;background:#eef0e8;color:#46594b;padding:10px 7px;font:9px var(--font-mono);border-radius:5px;letter-spacing:.02em}
-.kio-preference-row button:hover,.kio-preference-row button:focus-visible{background:#e1e6dc;border-color:#89a194}
 .case-share-action{display:inline-flex;align-items:center;justify-content:center;min-height:41px;padding:10px 15px;border:1px solid #c6b49a;background:#eee9da;color:#294034;font:11px var(--font-mono);letter-spacing:.04em;transition:background .22s,transform .22s}
 .case-share-action:hover{background:#e0d3bd;transform:translateY(-2px)}
 /* Proof lab: one cinematic composed stage with real-time, deterministic controls. */
@@ -91,9 +76,7 @@
 @keyframes proof-trace{from{transform:scaleX(.05);opacity:0}to{transform:scaleX(1);opacity:1}}
 @media (max-width:1100px){.v6-guide-toggle{padding-inline:8px;font-size:9px}}
 @media (max-width:860px){.proof-layout{grid-template-columns:1fr}.proof-insight{padding:35px 30px 28px}.proof-artboard{min-height:340px;padding:30px}.proof-headline-row{grid-template-columns:1fr;gap:15px}.proof-headline-row>p{max-width:670px}.proof-match-score strong{font-size:68px}.proof-frame{overflow:hidden}.proof-tab{min-height:58px}}
-@media (max-width:760px){.kio-shell.kio-compact{width:65px;height:82px;right:7px;bottom:max(8px,env(safe-area-inset-bottom))}.kio-compact .kio-launch{width:64px;height:81px}.kio-compact .kio-person{width:62px;height:68px}.kio-compact .kio-aura{height:65px}.kio-compact .kio-launch-label{min-height:19px}.kio-compact .kio-launch-label strong{font-size:7px}.kio-compact .kio-panel{position:fixed;right:9px;bottom:calc(max(8px,env(safe-area-inset-bottom)) + 89px);width:min(360px,calc(100vw - 18px));max-height:calc(100dvh - 110px)}.v6-guide-toggle{font-size:0;padding:6px 8px;min-width:36px}.v6-guide-toggle span{font-size:17px;margin:0}.proof-section{padding-block:80px}.proof-intro{margin-bottom:32px}.proof-headline-row h2{font-size:clamp(48px,11.3vw,74px)}.proof-tab{font-size:9px;letter-spacing:0;padding:12px 8px}.proof-tab span{display:block;margin:0 0 5px;font-size:9px}.proof-artboard{min-height:305px}.proof-visual-decor{opacity:.1}.proof-footer{flex-direction:column;gap:8px;padding:14px 17px}}
+@media (max-width:760px){.v6-guide-toggle{font-size:0;padding:6px 8px;min-width:36px}.v6-guide-toggle span{font-size:17px;margin:0}.proof-section{padding-block:80px}.proof-intro{margin-bottom:32px}.proof-headline-row h2{font-size:clamp(48px,11.3vw,74px)}.proof-tab{font-size:9px;letter-spacing:0;padding:12px 8px}.proof-tab span{display:block;margin:0 0 5px;font-size:9px}.proof-artboard{min-height:305px}.proof-visual-decor{opacity:.1}.proof-footer{flex-direction:column;gap:8px;padding:14px 17px}}
 @media (max-width:390px){.proof-insight{padding:27px 20px}.proof-artboard{padding:23px 18px}.proof-match-score span{font-size:9px}.proof-subject-grid{gap:4px}.proof-artboard-head{font-size:8px}.proof-tab{line-height:1.3}}
 @media (prefers-reduced-motion:reduce){.proof-view,.proof-intro::after{animation:none!important}.proof-subject-grid i,.proof-cache-cells i,.proof-memory-comparison i{transition:none!important}}
 html.motion-off .proof-view,html.motion-off .proof-intro::after{animation:none!important}
-
-.kio-shell.kio-compact.kio-content-active:not(.kio-open){opacity:0;visibility:hidden;pointer-events:none;transform:translateY(10px)}

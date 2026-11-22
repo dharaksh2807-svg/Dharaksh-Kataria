@@ -36,6 +36,7 @@ const server = http.createServer((request, response) => {
     return page;
   }
   async function test(name, run) {
+    if (process.env.PORTFOLIO_TEST_FILTER && !new RegExp(process.env.PORTFOLIO_TEST_FILTER).test(name)) return;
     try { await run(); results.push({ name, status: 'passed' }); console.log('PASS', name); }
     catch (error) { results.push({ name, status: 'failed', error: error.message }); console.error('FAIL', name, error.message); }
   }
@@ -59,6 +60,12 @@ const server = http.createServer((request, response) => {
             await image.evaluate(image => image.decode());
             assert.ok(await image.getAttribute('alt'));
             assert.equal(await image.getAttribute('loading'), 'lazy');
+            const frame=await image.evaluate(node=>{
+              const bounds=node.getBoundingClientRect();
+              return {ratio:bounds.width/bounds.height,natural:node.naturalWidth/node.naturalHeight,fit:getComputedStyle(node).objectFit};
+            });
+            assert.ok(Math.abs(frame.ratio-frame.natural)<.01,'Screenshot aspect ratio changed');
+            assert.equal(frame.fit,'contain');
           }
           assert.equal(await page.evaluate(() => Math.max(0, document.documentElement.scrollWidth - innerWidth)), 0);
           assert.deepEqual(errors, []);
@@ -66,7 +73,7 @@ const server = http.createServer((request, response) => {
             assert.equal(await page.locator('a[href^="https://github.com"], .cp-load-video, video').count(), 0);
             assert.match(await page.locator('#cpMediaStatus').innerText(), /private paths, credentials and source details/);
           }
-          if (['srmedu', 'metro'].includes(slug) && [390, 1440].includes(width)) {
+          if (process.env.PORTFOLIO_SCREENSHOTS !== '0' && ['srmedu', 'metro'].includes(slug) && [390, 1440].includes(width)) {
             await page.locator('.cp-hero').screenshot({ path: path.join(output, `${slug}-hero-${width}.png`) });
             await page.locator('#cpCaptures').screenshot({ path: path.join(output, `${slug}-gallery-${width}.png`) });
           }
@@ -98,7 +105,7 @@ const server = http.createServer((request, response) => {
           assert.match(await page.locator('.cp-lightbox-count').innerText(), new RegExp(`Screenshot ${count}`));
           await page.keyboard.press('ArrowLeft');
         }
-        if (slug === 'srmedu') await dialog.screenshot({ path: path.join(output, 'lightbox-390.png') });
+        if (process.env.PORTFOLIO_SCREENSHOTS !== '0' && slug === 'srmedu') await dialog.screenshot({ path: path.join(output, 'lightbox-390.png') });
         await page.keyboard.press('Escape');
         await dialog.waitFor({ state: 'hidden' });
         assert.ok(await opener.evaluate(node => node === document.activeElement));
