@@ -480,3 +480,7 @@ html:is(.motion-off,.rift-static) .rift-impact{display:none}
 .rift-home .rift-aperture-rim::before{content:'';position:absolute;inset:-2.5%;border:1px solid #b5804b66;border-radius:inherit}
 html:is(.motion-off,.rift-static) .rift-home .rift-aperture-rim{display:none}
 @media(prefers-reduced-motion:reduce),(max-height:500px),(orientation:landscape) and (max-height:650px){.rift-home .rift-aperture-rim{display:none}}
+
+/* Reuse the original centered aperture for the current destination hero. */
+html.name-hero-pending .name-opening{visibility:var(--name-aperture-visibility,hidden);clip-path:var(--name-aperture-clip,circle(0px at 50% 50svh))}
+html.name-hero-pending:not(.rift-work-active) .name-opening{transform:translateY(var(--name-aperture-offset,0px))}
