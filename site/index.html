@@ -34,16 +34,19 @@
   <link rel="stylesheet" href="v8.css?v=production-review-20261121-2">
   <link rel="stylesheet" href="motion-system.css?v=production-review-20261121-2">
   <link rel="stylesheet" href="visual-polish.css?v=certificate-links-20261122-8">
-  <link rel="stylesheet" href="rift-home.css?v=rift-atelier-20261121-7">
-  <link rel="stylesheet" href="guide.css?v=rift-atelier-20261121-7">
-  <script defer src="projects.js?v=homepage-polish-20261121-2"></script>
+  <link rel="stylesheet" href="rift-home.css?v=p0-quality-20261122-1">
+  <script src="opening.js?v=p0-quality-20261122-1"></script>
+  <link rel="stylesheet" href="signature-chapters.css?v=signature-chapters-20261122-1">
+  <link rel="stylesheet" href="guide.css?v=engineering-inspector-20261122-3">
+  <link rel="stylesheet" href="homepage-polish.css?v=engineering-inspector-20261122-3">
+  <script defer src="projects.js?v=engineering-inspector-20261122-3"></script>
   <script defer src="content-extra.js?v=certificate-links-20261122-8"></script>
-  <script defer src="main.js?v=certificate-links-20261122-8"></script>
+  <script defer src="main.js?v=engineering-inspector-20261122-3"></script>
   <script defer src="experience.js?v=production-review-20261121-2"></script>
-  <script defer src="immersive.js?v=production-review-20261121-2"></script>
+  <script defer src="immersive.js?v=signature-chapters-20261122-1"></script>
   <script defer src="v4-motion.js?v=rift-atelier-20261121-7"></script>
-  <script defer src="guide.js?v=rift-atelier-20261121-7"></script>
-  <script type="module" src="labs/rift-directors-cut.js?v=rift-atelier-20261121-7"></script>
+  <script defer src="guide.js?v=engineering-inspector-20261122-3"></script>
+  <script type="module" src="labs/rift-directors-cut.js?v=p0-quality-20261122-1"></script>
   <script defer src="v6.js?v=production-review-20261121-2"></script>
   <script defer src="world.js?v=production-review-20261121-2"></script>
   <script defer src="world-continuity.js?v=production-review-20261121-2"></script>
@@ -62,8 +65,10 @@
 }
   </script>
 </head>
-<body>
-  <a class="skip-link" href="#main">Skip to content</a>
+<body class="portfolio-home">
+  <a class="skip-link" href="#work">Skip to content</a>
+  <button type="button" class="name-opening-skip" id="nameOpeningSkip" hidden>Skip to work</button>
+  <button type="button" class="rift-forward-control" id="riftReturnToHero" hidden>Return to Name Hero</button>
   <div class="intro-curtain" id="introCurtain" hidden aria-hidden="true"><div class="intro-curtain-panel intro-curtain-top"></div><div class="intro-curtain-panel intro-curtain-bottom"></div><div class="intro-inner"><span class="intro-code">DK / PORTFOLIO — MMXXVI</span><div class="intro-monogram">D<span>/</span>K</div><p>ENGINEERING × IMAGINATION</p><div class="intro-meter"><i id="introMeter"></i></div></div></div>
   <div class="scene-transition" id="sceneTransition" aria-hidden="true"><span>OPENING / SELECTED WORK</span></div>
 
@@ -139,6 +144,15 @@
         </section>
       </div>
       <div class="rift-impact" aria-hidden="true"><i></i><b></b></div>
+      <section class="name-opening" id="nameOpening" aria-labelledby="nameHeroTitle">
+        <div class="name-opening-light" aria-hidden="true"></div>
+        <h1 class="name-opening-title" id="nameHeroTitle" tabindex="-1"><span class="name-opening-line"><span>Dharaksh</span></span><span class="name-opening-line"><span>Kataria<span class="name-opening-period">.</span></span></span></h1>
+        <div class="name-opening-caption"><span>INDEPENDENT DEVELOPER</span><span>ENGINEERING × IMAGINATION</span></div>
+        <div class="name-opening-actions">
+          <a class="name-opening-action" href="#work">Explore Work <span aria-hidden="true">SELECTED BUILDS / 2026</span></a>
+          <button type="button" class="name-rift-back" id="nameBackToRift" aria-controls="riftCanvas">BACK TO THE RIFT</button>
+        </div>
+      </section>
       <section class="work-section section-light" id="work" aria-labelledby="workTitle">
         <span id="riftProjects" class="work-anchor" aria-hidden="true"></span>
         <div class="wrap">
@@ -157,12 +171,12 @@
       <div class="journey-narrative wrap">
         <div class="journey-narrative-top"><span class="eyebrow eyebrow-dark">ENGINEERING STUDIES</span><span class="journey-audio mono">SCROLL-DRIVEN / REAL-TIME CANVAS</span></div>
         <h2 id="journeyTitle">From structure <em>to motion.</em></h2>
-        <p>Three conceptual Canvas studies explain learning structures, memory retention and procedural movement. Scroll through the chapters or select one directly.</p>
+        <p>A field of connections. A chamber for context. A world built in motion. Three interactive studies explore the systems behind the work. Scroll through the chapters or select one directly.</p>
         <a href="#journeyScroll" class="journey-discover" aria-label="Explore the interactive project journey"><span>VIEW THE SYSTEM STUDIES</span><span aria-hidden="true">↓</span></a>
       </div>
       <div class="journey-scroll" id="journeyScroll">
         <div class="journey-sticky" id="journeySticky">
-          <div class="journey-art" aria-hidden="true"><canvas id="journeyCanvas"></canvas></div>
+          <div class="journey-art" aria-hidden="true"><canvas id="journeyCanvas"></canvas><span class="journey-scene-caption">RESOURCES / RELATIONSHIPS / PATHWAYS</span></div>
           <div class="journey-topbar"><span class="eyebrow">CONCEPTUAL CANVAS STUDIES</span><span id="journeySystemStatus" class="journey-system-status mono">01 / LEARNING GRAPH</span></div>
           <div class="journey-panels" id="journeyPanels">
             <article class="journey-panel is-current" data-journey-panel="0" aria-hidden="false">
@@ -170,14 +184,14 @@
               <h3>Map the<br><em>learning flow.</em></h3>
               <p>An illustrative graph explores connections between learning resources. See SRMedu for the actual catalogue and study tools.</p>
               <div class="journey-tags"><span>GRAPH STRUCTURE</span><span>RELATIONSHIPS</span><span>CANVAS 2D</span></div>
-              <a href="https://www.srmedu.in/" target="_blank" rel="noopener noreferrer" class="journey-action">EXPLORE THE LIVE PLATFORM <span aria-hidden="true">↗</span></a>
+              <a href="https://www.srmedu.in/" target="_blank" rel="noopener noreferrer" class="journey-action">EXPLORE THE LIVE PLATFORM</a>
             </article>
             <article class="journey-panel" data-journey-panel="1" aria-hidden="true">
               <span class="journey-kicker">02 / RESEARCHING MEMORY</span>
               <h3>Budget the<br><em>context.</em></h3>
               <p>Scroll within this chapter to compare full and selective retention. The research case study records the measured results and limitations.</p>
               <div class="journey-tags"><span>CACHE BUDGET</span><span>SELECTION</span><span>ILLUSTRATIVE</span></div>
-              <a href="https://github.com/dharaksh2807-svg/iitB" target="_blank" rel="noopener noreferrer" class="journey-action">READ THE RESEARCH <span aria-hidden="true">↗</span></a>
+              <a href="https://github.com/dharaksh2807-svg/iitB" target="_blank" rel="noopener noreferrer" class="journey-action">READ THE RESEARCH</a>
             </article>
             <article class="journey-panel" data-journey-panel="2" aria-hidden="true">
               <span class="journey-kicker">03 / ENGINEERING PLAY</span>
@@ -391,7 +405,7 @@
 
   <div class="case-overlay" id="caseOverlay" hidden><div class="case-backdrop" data-close-case="true"></div><section class="case-dialog" role="dialog" aria-modal="true" aria-labelledby="caseTitle" tabindex="-1"><div class="case-nav"><span class="mono">PROJECT / <span id="caseNumber">01</span></span><button class="case-close" id="caseClose" type="button" aria-label="Close project case study">CLOSE <span>×</span></button></div><div class="case-content" id="caseContent"></div></section></div>
 
-  <div class="palette" id="commandPalette" hidden><div class="palette-backdrop" id="paletteBackdrop"></div><div class="palette-dialog" role="dialog" aria-modal="true" aria-label="Search projects and sections"><div class="palette-input-wrap"><span aria-hidden="true">⌕</span><input id="paletteInput" type="search" placeholder="Search a project or jump to a section..." autocomplete="off" aria-label="Search the website"><button id="paletteClose" type="button" aria-label="Close search">ESC</button></div><div class="palette-results" id="paletteResults" role="listbox" aria-label="Search results"></div><div class="palette-footer mono">ENTER TO OPEN <span>·</span> ESC TO CLOSE</div></div></div>
+  <div class="palette" id="commandPalette" hidden><div class="palette-backdrop" id="paletteBackdrop"></div><div class="palette-dialog" role="dialog" aria-modal="true" aria-label="Search projects and sections"><div class="palette-input-wrap"><span aria-hidden="true">⌕</span><input id="paletteInput" type="search" role="combobox" aria-controls="paletteResults" aria-autocomplete="list" aria-expanded="false" placeholder="Search a project or jump to a section..." autocomplete="off" aria-label="Search the website"><button id="paletteClose" type="button" aria-label="Close search">ESC</button></div><div class="palette-results" id="paletteResults" role="listbox" aria-label="Search results"></div><div class="palette-footer mono">ENTER TO OPEN <span>·</span> ESC TO CLOSE</div></div></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

@@ -183,11 +183,14 @@ html.motion-off .hero-line>span{opacity:1!important;transform:none!important;fil
 .evidence-link:active { background: #1d3023; }
 .evidence-link:focus-visible, .credential-link:focus-visible { outline: 3px solid #a65b40; outline-offset: 4px; }
 .challenge-grid { gap: 0 34px; align-items: stretch; }
-.challenge-card { grid-template-rows: auto auto 1fr; gap: 12px 14px; padding-block: 28px; }
+.challenge-card { grid-template-rows: auto auto 1fr; gap: 16px 14px; padding-block: 30px; min-width: 0; }
+.challenge-copy { min-width: 0; }
+.challenge-copy .challenge-recipient { margin-top: 12px; font-size: 12px; color: #665744; }
 .challenge-copy h3 { font-size: 20px; font-weight: 500; line-height: 1.3; letter-spacing: -.025em; }
 .challenge-card p { font-size: 14px; color: #52634f; line-height: 1.65; }
 .challenge-status { font: 11px/1.7 var(--font-mono); color: #6c503a; }
-.challenge-evidence { grid-column: 2; display: flex; flex-direction: column; align-items: start; justify-content: end; gap: 12px; }
+.challenge-evidence { grid-column: 2; display: flex; flex-direction: column; align-items: start; justify-content: start; gap: 18px; height: 100%; }
+.challenge-evidence .evidence-link { margin-top: auto; max-width: 100%; }
 .challenge-evidence p { margin: 0; font-size: 13px; }
 @media (max-width: 760px) {
   .timeline-head > p { font-size: 16px; }

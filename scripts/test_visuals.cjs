@@ -32,12 +32,15 @@ const server=http.createServer((req,res)=>{
    await page.evaluate(()=>window.portfolioGuide?.hide());
    if(chapter===undefined){
     await page.waitForFunction(()=>!!window.__riftDirector);
-    if(!forceFallback)await page.waitForFunction(()=>window.__riftDirector.getState().webglReady);
-    await page.locator('.rift-home .stage').scrollIntoViewIfNeeded();
+    const permanent=await page.evaluate(()=>window.__portfolioOpening.ready);
+    if(!forceFallback&&!permanent)await page.waitForFunction(()=>window.__riftDirector.getState().webglReady);
+    const hero=page.locator(permanent?'#nameOpening':'.rift-home .stage');
+    await hero.scrollIntoViewIfNeeded();
     await page.waitForTimeout(200);
-    await page.locator('.rift-home .stage').screenshot({path:path.join(output,name+'.png')});
+    await hero.screenshot({path:path.join(output,name+'.png')});
     const state=await page.evaluate(()=>window.__riftDirector.getState());
-    assert.equal(state.webglReady,!forceFallback);
+    assert.equal(state.webglReady,!forceFallback&&!permanent);
+    assert.equal(permanent,motion==='reduce');
     assert.equal(state.reduced,motion==='reduce');
     findings.push({name,chapter:'hero',state,errors});
    }else{
@@ -65,7 +68,7 @@ const server=http.createServer((req,res)=>{
   for(let i=0;i<3;i++)await capture('journey-'+['knowledge','memory','metro'][i],1440,'reduce',i);
   await capture('journey-metro-mobile',390,'reduce',2);
   await capture('hero-reduced-motion',1440,'reduce');
-  await capture('hero-2d-fallback',1440,'reduce',undefined,true);
+  await capture('hero-2d-fallback',1440,'no-preference',undefined,true);
   await capture('journey-knowledge-mobile',390,'reduce',0);
  }finally{
   await browser.close();await new Promise(resolve=>server.close(resolve));

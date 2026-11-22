@@ -39,7 +39,9 @@ try {
     const page=await pageFor(1440);
     try{
       await page.goto(origin+"/");
-      assert.match(await page.locator("#heroTitle").innerText(),/Dharaksh\s+Kataria\./);
+      assert.equal(await page.locator('#nameHeroTitle').isVisible(),true);
+      assert.match(await page.locator('#nameHeroTitle').innerText(),/DHARAKSH\s*KATARIA\./);
+      assert.equal(await page.locator('.intro').isVisible(),false);
       assert.equal(await page.locator("#kioLaunch").isVisible(),true);
       const layout=await page.locator("#kioGuide").evaluate(node=>({
         position:getComputedStyle(node).position,
@@ -146,12 +148,12 @@ try {
       await page.goto(origin);
       await page.waitForFunction(()=>window.__riftDirector?.getState().webglReady);
       await page.evaluate(()=>scrollTo({top:document.querySelector('.intro').offsetHeight-innerHeight,behavior:'instant'}));
-      await page.waitForFunction(()=>window.__riftDirector.getState().scroll>=.99);
-      await page.waitForTimeout(100);
+      await page.waitForFunction(()=>window.__portfolioOpening.ready && !window.__portfolioOpening.active);
       const frames=await page.evaluate(()=>__riftDirector.getState().renderedFrames);
       await page.waitForTimeout(200);
       assert.ok((await page.evaluate(()=>__riftDirector.getState().renderedFrames))<=frames+1);
-      await page.evaluate(()=>scrollTo({top:(document.querySelector('.intro').offsetHeight-innerHeight)*.75,behavior:'instant'}));
+      await page.mouse.wheel(0,-100);
+      await page.waitForFunction(()=>!window.__portfolioOpening.ready);
       await page.waitForFunction(before=>__riftDirector.getState().renderedFrames>before,frames);
       assert.deepEqual(page.errors,[]);
     }finally{await page.close()}
@@ -192,7 +194,9 @@ try {
       await page.locator('.signal-tab[data-scene="memory"]').click();
       assert.equal(await page.locator('#signalTitle').textContent(),'Selective memory.');
       await page.locator('#v6GuideToggle').click();
-      await page.locator('[data-kio-jump="dimensions"]').click();
+      await page.locator('#kioAbout').click();
+      await page.locator('#kioOptions summary').click();
+      await page.locator('#kioJump').selectOption('dimensions');
       assert.equal(await page.locator('#dimensions details').evaluate(node=>node.open),true);
       await page.keyboard.press('Escape');
       await page.locator('#dimensionFlip').click();

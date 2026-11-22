@@ -481,6 +481,205 @@ html:is(.motion-off,.rift-static) .rift-impact{display:none}
 html:is(.motion-off,.rift-static) .rift-home .rift-aperture-rim{display:none}
 @media(prefers-reduced-motion:reduce),(max-height:500px),(orientation:landscape) and (max-height:650px){.rift-home .rift-aperture-rim{display:none}}
 
+/* The existing name reveal is now the permanent, in-flow homepage hero. */
+.name-opening{display:grid;position:relative;z-index:20;min-height:100svh;margin-top:-100svh;align-content:center;padding:calc(var(--header-h,80px) + 48px) 7vw 64px;overflow:hidden;isolation:isolate;background:#050808;color:#f7efe3;visibility:var(--work-visibility,visible)}
+.name-opening::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 72% 53%,#b3764830,transparent 60%),linear-gradient(120deg,transparent 40%,#e3ad7620 50%,transparent 61%)}
+.name-opening-light{position:absolute;left:70%;top:50%;width:65vmax;height:65vmax;border:1px solid #ddb78c30;border-radius:50%;background:radial-gradient(ellipse,#b0784024,transparent 65%);box-shadow:inset 0 0 90px #c88b5010;transform:translate(-50%,-50%) scale(1.12);opacity:.3;pointer-events:none}
+.name-opening-title{position:relative;margin:0;text-transform:uppercase;font:700 clamp(64px,15.8vw,260px)/.94 var(--font-sans,'DM Sans',sans-serif);letter-spacing:-.075em}
+.name-opening-line{display:block;overflow:hidden;padding:.035em .05em .13em;margin:-.035em -.05em -.13em}
+.name-opening-line>span{display:block;text-shadow:0 1px 0 #ffe2bc44}
+.name-opening-line:nth-child(2){text-align:right;color:#e3b58e}
+.name-opening-line:nth-child(2)>span{font-family:var(--font-serif,'Instrument Serif',serif);font-size:1.12em;font-weight:400;font-style:italic;letter-spacing:-.055em}
+.name-opening-period{color:#f4debd}
+.name-opening-caption{position:relative;display:flex;justify-content:space-between;gap:20px;margin-top:48px;padding-top:18px;border-top:1px solid #c69b704d;color:#d5c1aa;font:500 .75rem/1.6 var(--font-mono,monospace);letter-spacing:.1em}
+.name-opening-action{position:relative;justify-self:start;display:flex;align-items:center;gap:36px;min-height:48px;margin-top:36px;padding:12px 0;color:#f5dfbf;border-bottom:1px solid #c7a37c99;font:500 16px/1.5 var(--font-sans);transition:color 180ms ease,border-color 180ms ease}
+.name-opening-action span{font:500 10px/1.5 var(--font-mono);letter-spacing:.08em;color:#b69b7d}
+.name-opening-action:is(:hover,:focus-visible){color:#fff6e7;border-color:#fff0d0}
+.name-opening-action:focus-visible{outline:2px solid #e0bd94;outline-offset:6px}
+html.name-hero-pending .rift-home{overflow-anchor:none}
+html.name-hero-pending .name-opening{visibility:hidden}
+html.name-hero-ready .rift-home>.intro,html.name-hero-ready .rift-impact{display:none}
+html.name-hero-ready .name-opening{margin-top:0;visibility:visible}
+html.name-intro-active .name-opening::before{animation:name-opening-atmosphere 1500ms both ease-out}
+html.name-intro-active .name-opening-light{animation:name-opening-light 1600ms both cubic-bezier(.16,1,.3,1)}
+html.name-intro-active .name-opening-line>span{animation:name-opening-type 1050ms both cubic-bezier(.16,1,.3,1)}
+html.name-intro-active .name-opening-line:nth-child(2)>span{animation-delay:110ms}
+html.name-intro-active :is(.name-opening-caption,.name-opening-action){animation:name-opening-caption 900ms 240ms both ease-out}
+@keyframes name-opening-type{0%{opacity:0;transform:translate3d(0,115%,0) rotate(3deg);letter-spacing:-.025em}65%,100%{opacity:1;transform:translate3d(0,0,0) rotate(0);letter-spacing:inherit}}
+@keyframes name-opening-caption{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes name-opening-atmosphere{from{opacity:.2;transform:translateX(-12%)}to{opacity:1;transform:translateX(0)}}
+@keyframes name-opening-light{from{opacity:0;transform:translate(-50%,-50%) scale(.65)}55%{opacity:1}to{opacity:.3;transform:translate(-50%,-50%) scale(1.12)}}
+@media(max-width:760px){
+ .name-opening{padding:calc(var(--header-h,69px) + 36px) 6vw 44px}
+ .name-opening-title{font-size:16vw}
+ .name-opening-caption{margin-top:32px;font-size:.625rem;letter-spacing:.035em;flex-direction:column;gap:4px}
+ .name-opening-action{margin-top:30px;gap:24px}
+ .name-opening-action span{font-size:9px}
+}
+/* Selected Work is a normal section below the hero, always available to anchors. */
+.rift-home #work{margin-top:0;visibility:visible;clip-path:none;pointer-events:auto;scroll-margin-top:calc(-1 * (var(--header-h,80px) + 20px))}
+html.motion-off .name-opening{display:grid!important}
+@media(prefers-reduced-motion:reduce){.name-opening{display:grid!important}.name-opening *,.name-opening::before{animation:none!important;transition:none!important}}
+
+/* Arrival expands from the same optical center as the final portal aperture. */
+.rift-home .stage.rift-complete{visibility:hidden;pointer-events:none}
+.rift-home #work>.wrap{transform:translate3d(0,var(--work-offset,0px),0) scale(var(--world-scale,1));transform-origin:50% 50svh;filter:blur(var(--world-blur,0px))}
+.rift-home .rift-exit-veil{background:radial-gradient(ellipse at 50% 50%,#dbb185 0%,#896344 46%,#161a14 100%)}
+.rift-home .rift-exit-veil::before,.rift-home .rift-exit-veil::after{display:none}
+.rift-impact{opacity:var(--exit-energy,0);mix-blend-mode:screen}
+.rift-impact::before{inset:-35%;background:repeating-conic-gradient(from 8deg,transparent 0deg 13deg,#d5995740 15deg,#f2ce9870 16deg,transparent 19deg 40deg);mask-image:radial-gradient(ellipse,transparent 9%,#0009 24%,transparent 57%);transform:scale(calc(.45 + var(--exit-wave,0) * 1.2)) rotate(calc(var(--exit-wave,0) * 5deg))}
+.rift-impact::after{background:radial-gradient(ellipse at center,#f7dab866 0%,#cf905b33 19%,#bf784719 38%,transparent 67%)}
+.rift-impact i,.rift-impact b{border-color:#edc597bd;border-width:1px;box-shadow:0 0 12px #e8ae77b3,0 0 46px #c887534d,inset 0 0 20px #e8ae7733;transform:translate(-50%,-50%) scale(var(--exit-release,.18))}
+.rift-impact b{width:66vmin;border-color:#b9855466;box-shadow:0 0 26px #efc4934d;transform:translate(-50%,-50%) scale(calc(var(--exit-release,.18) * .88))}
+html:is(.motion-off,.rift-static) .rift-home #work>.wrap{transform:none;filter:none}
+@media(prefers-reduced-motion:reduce),(max-height:500px),(orientation:landscape) and (max-height:650px){.rift-home #work>.wrap{transform:none;filter:none}}
+/* Extend the destination surface through the last few pixels of sticky travel. */
+.rift-home #work{box-shadow:0 var(--work-offset,0px) 0 #eee8dc}
+.rift-home #work::before{top:var(--work-offset,0px)}
+
+/* Skip stays available above the finite title card, including keyboard navigation. */
+.name-opening-skip{position:fixed;right:max(24px,env(safe-area-inset-right));top:max(24px,env(safe-area-inset-top));z-index:1101;min-height:44px;padding:12px 18px;border:1px solid #c7a37c80;border-radius:2px;background:#111712;color:#f5dfbf;font:500 12px var(--font-mono);letter-spacing:.04em;cursor:pointer}
+.name-opening-skip[hidden]{display:none}
+.name-opening-skip:is(:hover,:focus-visible){background:#e0bd94;color:#171d17;outline:2px solid #e0bd94;outline-offset:4px}
+html.name-intro-active .skip-link{z-index:1102}
+
+/* The persistent hero and its following section need no aperture compensation. */
+.rift-home #work{box-shadow:none}
+.rift-home #work>.wrap{transform:none;filter:none}
+.rift-home #work::before{top:0}
+.name-opening-skip{top:calc(var(--header-h,80px) + 16px)}
+html.name-hero-ready .name-opening-skip{display:none}
+
+/* Reversible navigation uses the same live canvas, alongside the approved hero. */
+.name-opening-actions{position:relative;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:0 24px}
+.name-rift-back{position:relative;min-height:48px;margin-top:36px;padding:12px 0;border:0;border-bottom:1px solid #c7a37c66;background:transparent;color:#d7b68e;font:500 11px/1.5 var(--font-mono);letter-spacing:.1em;cursor:pointer;transition:color 180ms ease,border-color 180ms ease}
+.name-rift-back:is(:hover,:focus-visible){color:#fff2dc;border-color:#fff0d0}
+.name-rift-back:focus-visible{outline:2px solid #e0bd94;outline-offset:6px}
+.name-rift-back:active{color:#bd956c}
+.rift-forward-control{position:fixed;top:calc(var(--header-h,80px) + 72px);right:max(24px,env(safe-area-inset-right));z-index:1101;min-height:44px;padding:12px 18px;border:1px solid #c7a37c66;border-radius:2px;background:#111712;color:#e0c39e;font:500 12px var(--font-mono);cursor:pointer}
+.rift-forward-control[hidden],html.name-hero-ready .rift-forward-control{display:none}
+.rift-forward-control:is(:hover,:focus-visible){background:#e0bd94;color:#171d17;outline:2px solid #e0bd94;outline-offset:4px}
+@media(max-width:760px){.name-rift-back{margin-top:8px;font-size:10px}}
+
 /* Reuse the original centered aperture for the current destination hero. */
 html.name-hero-pending .name-opening{visibility:var(--name-aperture-visibility,hidden);clip-path:var(--name-aperture-clip,circle(0px at 50% 50svh))}
 html.name-hero-pending:not(.rift-work-active) .name-opening{transform:translateY(var(--name-aperture-offset,0px))}
+
+
+/* PROJECT X-RAY / scoped enhancement (2026) */
+/* Extends existing disclosures and project media; intentionally leaves Rift untouched. */
+.rift-home #work .project-xray{
+  --xray-ink:#302c26;--xray-muted:#695e50;--xray-line:#a98d6e64;
+  --xray-panel:#f9f1e6a8;--xray-accent:#9b6a45;
+  margin-top:20px;border-top:1px solid var(--xray-line);
+}
+.rift-home #work .project-card.is-featured .project-xray{
+  --xray-ink:#f2e8d8;--xray-muted:#bfc6b9;--xray-line:#c8ae8859;
+  --xray-panel:#17201999;--xray-accent:#efc7a0;
+}
+.rift-home #work .project-xray>summary{
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap;list-style:none;
+  min-height:52px;padding:11px 0;color:var(--xray-ink);cursor:pointer;
+}
+.rift-home #work .project-xray>summary::-webkit-details-marker{display:none}
+.rift-home #work .project-xray-symbol{
+  display:grid;place-items:center;width:29px;height:29px;flex:none;
+  border:1px solid var(--xray-line);border-radius:50%;
+  font:400 19px/1 var(--font-mono);color:var(--xray-accent);
+}
+.rift-home #work .project-xray-label{
+  font:500 14px/1.3 var(--font-sans);letter-spacing:-.01em;color:var(--xray-ink);
+}
+.rift-home #work .project-xray-hint{
+  margin-left:auto;color:var(--xray-muted);font:500 9px/1.5 var(--font-mono);
+  letter-spacing:.08em;
+}
+.rift-home #work .project-xray-chevron{
+  color:var(--xray-accent);transition:rotate 250ms cubic-bezier(.2,.8,.2,1);
+}
+.rift-home #work .project-xray[open] .project-xray-chevron{rotate:90deg}
+.rift-home #work .project-xray-content{
+  margin:2px 0 15px;padding:20px 18px 17px;border:1px solid var(--xray-line);
+  border-radius:9px;background:var(--xray-panel);
+}
+.rift-home #work .project-xray-overline{
+  margin:0 0 12px!important;font:500 9px/1.5 var(--font-mono)!important;
+  letter-spacing:.13em;color:var(--xray-accent)!important;
+}
+.rift-home #work .project-xray-flow{display:grid;grid-template-columns:minmax(0,1fr);gap:0;margin:0;padding:0;list-style:none}
+.rift-home #work .project-xray-flow>li{
+  display:grid;grid-template-columns:27px minmax(0,1fr);gap:12px;
+  border-top:1px solid var(--xray-line);padding:15px 0;
+}
+.rift-home #work .project-xray-number{font:500 10px/1.7 var(--font-mono);color:var(--xray-accent)}
+.rift-home #work .project-xray-flow h4,.rift-home #work .project-xray-evidence h4{
+  margin:0 0 7px;font:500 12px/1.4 var(--font-mono);letter-spacing:.045em;
+  text-transform:uppercase;color:var(--xray-ink);
+}
+.rift-home #work .project-xray-flow p,.rift-home #work .project-xray-evidence p{
+  margin:0;color:var(--xray-muted);font:400 14px/1.62 var(--font-sans);
+  overflow-wrap:anywhere;
+}
+.rift-home #work .project-xray-evidence{
+  padding-top:15px;border-top:1px solid var(--xray-line);
+}
+.rift-home #work .project-xray-evidence p+p{margin-top:10px}
+.rift-home #work .project-xray-evidence .project-evidence-link{
+  display:inline-flex;align-items:center;gap:9px;min-height:44px;
+  margin-top:10px;color:var(--xray-accent);font-weight:500;
+}
+.rift-home #work .project-xray-evidence .project-evidence-link:focus-visible,
+.rift-home #work .project-xray>summary:focus-visible{
+  outline:2px solid var(--xray-accent);outline-offset:4px;
+}
+/* Different treatment for the featured work and smaller supporting projects.
+   Move the media container, never crop or distort the original screenshots. */
+.rift-home #work .project-card .project-media{
+  translate:0 0;transition:translate 480ms cubic-bezier(.2,.75,.2,1),filter 480ms ease;
+  will-change:auto;
+}
+.rift-home #work .project-card.is-featured .project-media{
+  transition-duration:620ms;
+  transition-timing-function:cubic-bezier(.18,.78,.15,1);
+}
+.rift-home #work .project-card:is(:hover,:focus-within) .project-media{translate:0 -3px}
+.rift-home #work .project-card.is-featured:is(:hover,:focus-within) .project-media{translate:0 -5px}
+.rift-home #work .project-title{
+  transition:color 380ms ease,translate 380ms cubic-bezier(.2,.75,.2,1);
+}
+.rift-home #work .project-card:not(.is-featured):is(:hover,:focus-within) .project-title{
+  color:var(--project-accent,#8c5d3d);translate:0 -2px;
+}
+.rift-home #work .project-card.is-featured:is(:hover,:focus-within) .project-title{
+  color:#ffe3c1;translate:0 -2px;
+}
+.rift-home #work .project-card:not(.is-featured):is(:hover,:focus-within) .project-visual{
+  box-shadow:0 15px 30px -17px #28241c88,0 0 0 1px var(--project-accent,#976f4a);
+}
+@media(max-width:760px){
+  .rift-home #work .project-xray-hint{display:none}
+  .rift-home #work .project-xray-content{padding:14px 12px}
+  .rift-home #work .project-xray-flow>li{gap:8px}
+}
+@media(hover:none),(prefers-reduced-motion:reduce){
+  .rift-home #work .project-card .project-media{translate:none!important;transition:none!important}
+  .rift-home #work .project-title{translate:none!important;transition:none!important}
+  .rift-home #work .project-xray-chevron{transition:none}
+}
+@media(prefers-reduced-motion:no-preference){
+  @keyframes project-xray-enter{
+    from{opacity:.45;translate:0 -8px}to{opacity:1;translate:0 0}
+  }
+  @keyframes project-editorial-arrival{
+    from{opacity:.75;translate:0 10px}to{opacity:1;translate:0 0}
+  }
+  .rift-home #work .project-card.is-featured:is(.motion-visible,.in-view) .project-title{
+    animation:project-editorial-arrival 650ms cubic-bezier(.2,.75,.2,1) both;
+  }
+  .rift-home #work .project-card:not(.is-featured):is(.motion-visible,.in-view) .project-title{
+    animation:project-editorial-arrival 430ms cubic-bezier(.2,.75,.2,1) both;
+  }
+  .rift-home #work .project-xray[open] .project-xray-content{
+    animation:project-xray-enter 280ms cubic-bezier(.2,.75,.2,1) both;
+  }
+}

@@ -292,3 +292,57 @@ html.motion-off #kioGuide *, #kioGuide.kio-reduced * { animation: none !importan
   #kioGuide .kio-shortcuts button:hover { transform: translateY(-2px); }
   #kioGuide .kio-primary:hover { transform: translateY(-1px); }
 }
+
+/* The closed guide occupies one quiet, predictable target. The full character
+   and guidance remain available through an explicit open action. */
+#kioGuide:not(.kio-open){--kio-idle-width:56px;--kio-idle-height:56px;width:56px;height:56px;right:max(16px,env(safe-area-inset-right));bottom:calc(max(16px,env(safe-area-inset-bottom)) + var(--kio-dock-lift,0px))}
+#kioGuide:not(.kio-open) .kio-launch{overflow:hidden;border:1px solid #b6b89e;border-radius:50%;background:#e9e7da;box-shadow:0 3px 14px #0002;transition:border-color 180ms ease,box-shadow 180ms ease}
+#kioGuide:not(.kio-open) .kio-person{--kio-avatar-height:132px;top:-8px}
+#kioGuide:not(.kio-open) .kio-launch-label{display:none}
+#kioGuide:not(.kio-open) .kio-launch:hover{border-color:#bd895c;box-shadow:0 4px 18px #0003}
+#kioGuide .kio-panel{border-radius:16px;border-color:#b4b6a0;background:radial-gradient(ellipse at 20% 16%,#e5e5d8,transparent 54%),#f7f4eb;box-shadow:0 24px 64px -20px #14201840}
+@media(max-width:760px){#kioGuide.kio-open .kio-panel{border-radius:18px 18px 10px 10px}}
+
+/* Three optional discoveries stay within the visitor-opened companion panel. */
+#kioGuide .kio-discoveries {
+  flex:none;
+  margin:0 24px;
+  padding:12px 0;
+  border-top:1px solid #a4b09a70
+}
+#kioGuide .kio-discoveries[hidden] {
+  display:none
+}
+#kioGuide .kio-discovery-label {
+  display:block;
+  margin-bottom:10px;
+  font:500 10px/1.5 var(--font-mono);
+  letter-spacing:.09em;
+  color:#53644d
+}
+#kioGuide .kio-discoveries [role=group] {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px
+}
+#kioGuide .kio-discoveries button {
+  min-height:48px;
+  padding:8px 6px;
+  background:#e9e9dc;
+  border:1px solid #a6b29d;
+  border-radius:7px;
+  color:#304831;
+  font-size:12px;
+  line-height:1.5;
+  transition:background-color 180ms,color 180ms
+}
+#kioGuide .kio-discoveries button:is(:hover,[aria-pressed=true]) {
+  background:#304831;
+  color:#fff4e3;
+  border-color:#304831
+}
+@media(prefers-reduced-motion:reduce) {
+  #kioGuide .kio-discoveries button {
+    transition:none
+  }
+}

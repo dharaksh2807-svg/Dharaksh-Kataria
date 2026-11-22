@@ -13,7 +13,7 @@ const out = path.resolve(__dirname, '../test-results/rift-home');
 fs.mkdirSync(out, { recursive: true });
 const report = { url, checks: [], sceneDifferences: [], transitionCancellations: [], errors: [], limitations: ['Viewport emulation does not replace physical device testing.'] };
 const modes = ['director', 'kinetic', 'fracture', 'infinite', 'ascension'];
-const positions = [0, .25, .5, .75, .9];
+const positions = [0, .25, .5, .75, .86];
 const captureScreenshots = process.env.PORTFOLIO_SCREENSHOTS !== '0';
 async function seek(page, progress) {
   await page.evaluate(progress => {
@@ -34,7 +34,9 @@ async function open(context, suffix = '') {
       report.errors.push(`${response.status()} ${response.url()}`);
   });
   await page.goto(new URL(suffix || '/', url).href, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => window.__riftDirector?.getState().webglReady);
+  await page.waitForFunction(() => !!window.__riftDirector);
+  if (await page.evaluate(() => !window.__portfolioOpening?.ready))
+    await page.waitForFunction(() => window.__riftDirector.getState().webglReady);
   await page.evaluate(() => document.fonts.ready);
   return page;
 }
@@ -117,27 +119,46 @@ async function layout(page, width, height) {
       report.checks.push('25 rendered mode/progress states, 40 pre-finale scene comparisons exceed 2/255; final aperture converges');
     }
     await page.evaluate(() => window.__riftDirector.setMode('director'));
-    for (const progress of [.8,.86,.9,.919,.94,.99,1,.94,.9,.8,1]) {
+    for (const progress of [.8,.86]) {
       await seek(page, progress);
-      const state = await page.locator('#work').evaluate(node => ({
-        visibility: getComputedStyle(node).visibility,
-        clip: getComputedStyle(node).clipPath,
-        inert: node.inert
-      }));
-      if (progress < .92) assert.equal(state.visibility, 'hidden', 'Premature project reveal');
-      if (progress >= .99) {
-        assert.equal(state.visibility, 'visible');
-        assert.equal(state.clip, 'none');
-        assert.equal(state.inert, false);
-        const first = await page.locator('.project-visual').first().boundingBox();
-        assert(first.y < 600, 'Real work missing at end of fly-through');
-      }
+      assert.equal(await page.evaluate(() => __portfolioOpening.ready), false, 'Hero must wait for the burst');
+      assert.equal(await page.locator('#nameOpening').getAttribute('aria-hidden'), 'true');
       if (captureScreenshots) await page.screenshot({ path: path.join(out, `handoff-${progress * 100}.png`) });
     }
+    const interrupted = await page.evaluate(() => new Promise(resolve => {
+      const span = document.querySelector('.intro').offsetHeight - innerHeight;
+      scrollTo({ top: span * .9, behavior: 'instant' });
+      requestAnimationFrame(() => {
+        const releasing = __riftDirector.getState().releasing;
+        scrollTo({ top: span * .86, behavior: 'instant' });
+        resolve(releasing);
+      });
+    }));
+    assert.equal(interrupted, true, 'Reverse must exercise an active finishing burst');
+    await page.waitForFunction(() => !__riftDirector.getState().releasing);
+    assert.equal(await page.evaluate(() => __portfolioOpening.ready), false, 'Reverse input must interrupt the burst');
+    await seek(page, 0);
+    await page.locator('.rift-mode.is-active').focus();
+    await seek(page, .9);
+    await page.waitForFunction(() => __portfolioOpening.ready, null, { timeout: 5000 });
+    assert.equal(await page.evaluate(() => document.activeElement.id), 'nameHeroTitle');
+    await page.waitForFunction(() => !__portfolioOpening.active);
+    const hero = await page.locator('#nameOpening').boundingBox();
+    assert.equal(hero.y, 0);
+    assert(hero.height >= 900, 'Permanent hero must fill the viewport');
+    assert.equal(await page.locator('.intro').isVisible(), false);
+    assert.equal(await page.locator('#nameOpening').getAttribute('aria-hidden'), null);
+    await page.waitForTimeout(300);
+    assert.equal(await page.locator('#nameOpening').isVisible(), true, 'Hero disappears after its entrance');
+    if (captureScreenshots) await page.screenshot({ path: path.join(out, 'permanent-hero.png') });
     const settledFrames = (await page.evaluate(() => __riftDirector.getState())).renderedFrames;
     await page.waitForTimeout(250);
     assert((await page.evaluate(() => __riftDirector.getState())).renderedFrames <= settledFrames + 1, 'Covered Rift keeps rendering');
-    report.checks.push('Aperture completion precedes reveal, reverse/rapid seeks stay consistent, covered renderer sleeps');
+    await page.mouse.wheel(0, -100);
+    await page.waitForFunction(() => !__portfolioOpening.ready);
+    assert((await page.evaluate(() => __riftDirector.getState())).scroll > .8);
+    assert.equal(await page.locator('#riftCanvas').count(), 1);
+    report.checks.push('Finite burst, permanent full-screen hero, focus handoff, reverse gesture and sleeping renderer');
     await seek(page, .25);
     assert(Number(await page.locator('.title-wrap').evaluate(node => getComputedStyle(node).opacity)) > .99);
     await seek(page, 0);
@@ -157,7 +178,7 @@ async function layout(page, width, height) {
     await page.keyboard.press('Enter');
     await page.waitForURL('**/projects/srmedu.html');
     await page.goBack();
-    await page.waitForFunction(() => window.__riftDirector?.getState().webglReady);
+    await page.waitForFunction(() => !!window.__riftDirector);
     assert.equal(await page.locator('.project-case-open').first().evaluate(node => node === document.activeElement), true);
     report.checks.push('Entry anchor, filtering, keyboard case link, focus restoration and browser Back');
     for (const hash of ['#work','#riftProjects']) {
@@ -172,15 +193,20 @@ async function layout(page, width, height) {
     await seek(page, 0);
     await page.locator('#kioLaunch').click();
     assert(await page.locator('#kioClose').isVisible());
+    assert.equal(await page.locator('#kioPanelTitle').innerText(), 'Meet Dharaksh.');
+    assert.match(await page.locator('#kioMessage').innerText(), /explore the projects or revisit the Rift/);
     await page.locator('#kioClose').click();
     await page.locator('#searchTrigger').click();
     assert(await page.locator('#paletteInput').isVisible());
     await page.keyboard.press('Escape');
     await page.locator('#motionSwitch').click();
     assert((await page.evaluate(() => window.__riftDirector.getState())).paused);
-    assert.equal(await page.locator('.intro').evaluate(node => node.offsetHeight), 900);
+    assert.equal(await page.locator('.intro').isVisible(), false);
+    assert((await page.locator('#nameOpening').boundingBox()).height >= 900);
     await page.locator('#motionSwitch').click();
     report.checks.push('Both work deep links, reverse scroll, Kio, search and global motion toggle');
+    await page.locator('#nameBackToRift').click();
+    await page.waitForFunction(() => __riftDirector.getState().webglReady);
     await page.evaluate(() => {
       const canvas = document.getElementById('riftCanvas');
       window.__qaContextLoss = canvas.getContext('webgl2').getExtension('WEBGL_lose_context');
@@ -209,7 +235,7 @@ async function layout(page, width, height) {
     await phone.locator('.project-case-open').first().click();
     await phone.waitForURL('**/projects/srmedu.html');
     await phone.goBack();
-    await phone.waitForFunction(() => window.__riftDirector?.getState().webglReady);
+    await phone.waitForFunction(() => !!window.__riftDirector);
     await seek(phone, 0);
     assert(!await phone.evaluate(() => document.documentElement.scrollWidth > innerWidth));
     await mobile.close();
@@ -217,16 +243,19 @@ async function layout(page, width, height) {
     const reduced = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
     const still = await open(reduced);
     assert((await still.evaluate(() => window.__riftDirector.getState())).paused);
-    assert.equal(await still.locator('.intro').evaluate(node => node.offsetHeight), 900);
-    await still.locator('.hero-action').click();
+    assert.equal(await still.locator('.intro').isVisible(), false);
+    assert((await still.locator('#nameOpening').boundingBox()).height >= 900);
+    assert.equal(await still.evaluate(() => performance.getEntriesByType('resource').some(entry => entry.name.includes('/vendor/three'))), false);
+    await still.locator('.name-opening-action').click();
     assert.equal(await still.locator('.project-card:visible').count(), 6);
     if (captureScreenshots) await still.screenshot({ path: path.join(out, 'reduced-work.png') });
     await reduced.close();
     const staticContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
     const staticPage = await open(staticContext, '/?motion=off');
     assert((await staticPage.evaluate(() => window.__riftDirector.getState())).paused);
-    assert.equal(await staticPage.locator('.intro').evaluate(node => node.offsetHeight), 844);
-    await staticPage.locator('.hero-action').click();
+    assert.equal(await staticPage.locator('.intro').isVisible(), false);
+    assert((await staticPage.locator('#nameOpening').boundingBox()).height >= 844);
+    await staticPage.locator('.name-opening-action').click();
     await staticPage.waitForTimeout(800);
     assert.equal(await staticPage.locator('#work').evaluate(node => getComputedStyle(node).opacity), '1');
     await staticContext.close();

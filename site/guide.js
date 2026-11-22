@@ -4,10 +4,10 @@
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const root = document.documentElement;
   const steps = [
-    { id:'top', label:'THE INTRODUCTION', title:'Meet the Rift.', text:'Choose a motion style, or let’s explore the projects together.', instruction:'Choose a style to change the portal. Scroll to travel through it, or use Explore the work to skip ahead.', target:'.rift-mode-switcher', pausedText:'Motion is paused. Let’s head straight to the projects.', pausedInstruction:'Motion controls are hidden while motion is paused. Choose Explore the work to reach the projects.' },
+    { id:'top', label:'THE INTRODUCTION', title:'Meet Dharaksh.', text:'Choose a motion style, or let’s explore the projects together.', instruction:'Choose a style to change the portal. Scroll to travel through it, or use Explore the work to skip ahead.', target:'.rift-mode-switcher', pausedText:'Motion is paused. Let’s head straight to the projects.', pausedInstruction:'Motion controls are hidden while motion is paused. Choose Explore the work to reach the projects.' },
     { id:'universe', label:'3D WORLD', title:'Take another way in.', text:'A spatial atlas connects the projects by discipline. You can explore it with a pointer, touch or keyboard.', instruction:'Drag to orbit, or focus the scene and press 1–4 to choose a district. Select a project object, then open its story.', target:'#worldShell' },
     { id:'journey', label:'ENGINEERING STUDIES', title:'See the idea move.', text:'Three conceptual studies explore learning, memory and procedural worlds. The case studies hold the implementation evidence.', instruction:'Scroll through the three studies, or choose a numbered chapter. Each scene explains a different engineering idea.', target:'#journeyScroll' },
-    { id:'work', label:'SELECTED WORK', title:'Look inside the work.', text:'Six projects, with the decisions and evidence behind each build. Point to one and I’ll introduce it.', instruction:'Filter by discipline, then open a case study for architecture, decisions and evidence.', target:'#projectFilters' },
+    { id:'work', label:'SELECTED WORK', title:'Look inside the work.', text:'Open an Engineering X-Ray or select a component. I’ll follow the build you’re inspecting, with optional flow, decision and evidence notes.', instruction:'Filter by discipline, then inspect Challenge, Architecture, Trade-off or Evidence in a project’s X-Ray. Select a component to see its role, or open the case study for the full record.', target:'#projectFilters' },
     { id:'prooflab', label:'PROOF LAB', title:'Try the mechanism.', text:'Change an input and inspect the response. Study and Match are illustrative models, while Memory uses recorded experiments.', instruction:'Choose Study, Match or Memory. Adjust the semester, matching sliders or cache budget to inspect the result.', target:'#proofFrame' },
     { id:'dimensions', label:'SPATIAL STUDY', title:'Give it a turn.', text:'This CSS sculpture is a small hands-on study in perspective and interaction.', instruction:'Drag the sculpture, flip its core, then compare Product, AI and Spatial modes.', target:'#dimensions' },
     { id:'archive', label:'SUPPORTING WORK', title:'Follow a side path.', text:'Supporting builds and prototypes live here, each with its own context and status.', instruction:'Search by project or technology. Open a Story for the context and status of a supporting build.', target:'#archiveSearch' },
@@ -35,10 +35,11 @@
           <div class="kio-character-slot" id="kioCharacterSlot"></div>
           <div class="kio-character-note"><p class="kio-character-title">Kio<em>.</em></p><p class="kio-character-caption">A little company.<br>A clearer way around.</p><div class="kio-play-actions"><button id="kioHello" type="button">Say hello</button><button id="kioGreet" type="button" aria-label="High five with Kio">High five <span aria-hidden="true">✦</span></button></div></div>
         </div>
-        <div class="kio-copy" aria-live="polite" aria-atomic="true"><span class="kio-overline" id="kioOverline">THE INTRODUCTION</span><h2 id="kioPanelTitle">Meet the Rift.</h2><p id="kioMessage">Choose a direction and I’ll point it out.</p></div>
+        <div class="kio-copy" aria-live="polite" aria-atomic="true"><span class="kio-overline" id="kioOverline">THE INTRODUCTION</span><h2 id="kioPanelTitle">Meet Dharaksh.</h2><p id="kioMessage">Choose a direction and I’ll point it out.</p></div>
         <nav class="kio-shortcuts" aria-label="Quick portfolio routes"><button type="button" data-kio-jump="work">See the work</button><button type="button" data-kio-jump="about">Meet Dharaksh</button><button type="button" data-kio-jump="contact">Get in touch</button></nav>
         <details class="kio-options" id="kioOptions"><summary>All tour stops <span aria-hidden="true">＋</span></summary><div class="kio-options-body"><label for="kioJump">Where would you like to go?</label><select id="kioJump">${steps.map(step=>`<option value="${step.id}">${step.label}</option>`).join('')}</select><div class="kio-route-actions"><button type="button" id="kioPrev">Previous stop</button><button type="button" id="kioReset">Restart tour</button></div><p class="kio-footer-note">A handcrafted tour. Your place stays in this browser. Reopen anytime with GUIDE.</p></div></details>
       </div>
+        <div class="kio-discoveries" id="kioDiscoveries" hidden><span class="kio-discovery-label">EXPLORE THIS BUILD</span><div role="group" aria-label="Optional project discoveries"><button type="button" data-kio-discovery="architecture" aria-pressed="false">Explain the flow</button><button type="button" data-kio-discovery="tradeoff" aria-pressed="false">Why this choice?</button><button type="button" data-kio-discovery="evidence" aria-pressed="false">Check the evidence</button></div></div>
       <div class="kio-tour-actions"><a id="kioGo" class="kio-primary" href="#top"><span id="kioActionLabel">Explore projects</span><span aria-hidden="true">✦</span></a><div class="kio-secondary-actions"><button id="kioAbout" type="button">How to explore</button><button id="kioNext" type="button">Next stop</button></div><button type="button" id="kioLater" class="kio-later">Continue later <span>Your place is saved</span></button></div>
     </section>
     <button id="kioLaunch" class="kio-launch" type="button" aria-label="Open Kio portfolio guide" aria-controls="kioPanel" aria-expanded="false" title="Open the guided tour">
@@ -156,6 +157,7 @@
   const introPaused=()=>still()||root.classList.contains('rift-static');
   function guidance(step,detailed=false){
     if(step.id==='top'&&introPaused())return detailed?step.pausedInstruction:step.pausedText;
+    if(step.id==='top'&&window.__portfolioOpening?.ready)return detailed?'Explore Work opens the selected projects. Back to the Rift lets you revisit the cinematic opening.':'Meet Dharaksh, then explore the projects or revisit the Rift.';
     return detailed?step.instruction:step.text;
   }
   // One finite gesture at a time. The SVG keeps its joints in local coordinates.
@@ -259,6 +261,8 @@
   function reply(heading,message,{view='context',action=null,project=null}={}){
     host.dataset.view=view;
     activeProject=project;
+    $('#kioDiscoveries').hidden=!project;
+    document.querySelectorAll('[data-kio-discovery]').forEach(button=>button.setAttribute('aria-pressed','false'));
     title.textContent=heading;copy.textContent=message;
     const introduction=steps[index].id==='top'&&['context','hello','highfive'].includes(view);
     const destination=view==='complete'||introduction?'work':steps[index].id;
@@ -320,7 +324,7 @@
   document.addEventListener('visibilitychange',syncCharacterMotion);
   const characterObserver=new IntersectionObserver(entries=>{inViewport=entries[0].isIntersecting;syncCharacterMotion();});
   characterObserver.observe(host);
-  function position(){
+  function position(persist=true){
     const step=steps[index];
     overline.textContent=step.label;host.dataset.section=step.id;
     jump.value=step.id;
@@ -329,7 +333,7 @@
     next.setAttribute('aria-label',index===steps.length-1?'Finish the tour':'Next stop: '+steps[index+1].title);
     const showing=host.dataset.view==='show';
     reply(step.title,guidance(step,showing),{view:showing?'show':'context'});
-    prefs.lastStep=index;prefs.lastStepId=step.id;savePrefs();
+    if(persist){prefs.lastStep=index;prefs.lastStepId=step.id;savePrefs();}
   }
   function clearPanelExit(){
     panel.classList.remove('kio-panel-exit');
@@ -397,7 +401,15 @@
     refreshPref();
     if(!opened)launcherSafety();
     syncCharacterMotion();
-    if(opened){host.classList.remove('kio-peek');host.dataset.view='context';position();panelScroll.scrollTop=0;$('#kioClose').focus({preventScroll:true});}
+    if(opened){
+      host.classList.remove('kio-peek');host.dataset.view='context';position();
+      if(steps[index].id==='work'){
+        const inspected=document.querySelector('.project-card:not([hidden]) .project-xray[open]');
+        const project=window.PORTFOLIO?.projects.find(item=>item.id===inspected?.dataset.projectXray);
+        if(project)showProjectDiscovery(project,'architecture');
+      }
+      panelScroll.scrollTop=0;$('#kioClose').focus({preventScroll:true});
+    }
     setCharacterState(opened?'wave':'idle',{duration:opened?1100:0});
     animatePanel(wasVisible,panelBox);
     moveCharacter(before);
@@ -419,7 +431,11 @@
     if(!section)return;
     section.querySelector('details.render-study')?.setAttribute('open','');
     currentSection=steps[index].id;
-    const selector=steps[index].id==='top'&&introPaused()?'.hero-action[href="#work"]':steps[index].target;
+    let selector=steps[index].target;
+    if(steps[index].id==='top'){
+      if(window.__portfolioOpening?.ready)selector='.name-opening-action';
+      else if(introPaused())selector='.hero-action[href="#work"]';
+    }
     const target=section.querySelector(selector)||section;
     clearTimeout(tourTimer);clearTimeout(highlightTimer);
     panelScroll.scrollTop=0;lock=true;
@@ -484,8 +500,8 @@
     if(e.key==='Escape'&&opened&&!host.inert){e.preventDefault();e.stopPropagation();setOpen(false);return;}
     if(e.altKey&&e.key.toLowerCase()==='g'&&!e.repeat&&!host.inert){e.preventDefault();if(prefs.hidden)setHidden(false);setOpen(!opened);}
   },true);
-  // A content collision yields to a recognizable face dock, then to the header
-  // trigger if even the smaller dock would obstruct an essential target.
+  // The compact dock yields to the header trigger when it would cover content.
+  // Canvas chapters and navigation strips count as essential content too.
   function launcherSafety(){
     if(opened){
       host.classList.remove('kio-yielding','kio-obstructed');
@@ -498,7 +514,7 @@
     const height=parseFloat(style.getPropertyValue('--kio-idle-height'));
     const bottom=box.bottom+parseFloat(host.style.getPropertyValue('--kio-dock-lift')||0);
     const obstacles=[];
-    for(const target of document.querySelectorAll('main :is(a,button,input,select,textarea,p,h1,h2,h3,h4,label,summary,figcaption,.project-visual,[tabindex="0"])')){
+    for(const target of document.querySelectorAll('main :is(a,button,input,select,textarea,p,h1,h2,h3,h4,label,summary,figcaption,.project-visual,.journey-art,.journey-footer,.journey-scene-caption,.atlas-visual,.proof-artboard,.world-toolbar,.proof-footer,.main-footer,.contact-links,.timeline-controls,[tabindex="0"])')){
       const rect=target.getBoundingClientRect();
       if(!rect.width||!rect.height||rect.top>bottom||rect.bottom<innerHeight*.45||rect.right<=box.right-width||rect.left>=box.right)continue;
       const targetStyle=getComputedStyle(target);
@@ -521,11 +537,10 @@
       }
       return edge-dockHeight>=innerHeight*.45?edge:null;
     }
-    const full=availableDock(width,height), peek=full===null?availableDock(64,72):null;
-    const dockBottom=full??peek??bottom;
-    host.style.setProperty('--kio-dock-lift',`${Math.max(0,bottom-dockBottom)}px`);
-    host.classList.toggle('kio-yielding',full===null);
-    host.classList.toggle('kio-obstructed',full===null&&peek===null);
+    const dockBottom=availableDock(width,height);
+    host.style.setProperty('--kio-dock-lift',`${Math.max(0,bottom-(dockBottom??bottom))}px`);
+    host.classList.remove('kio-yielding');
+    host.classList.toggle('kio-obstructed',dockBottom===null);
     syncCharacterMotion();
   }
   function onScroll(){
@@ -557,7 +572,7 @@
   }
   reduced.addEventListener?.('change',motionChanged);
   document.addEventListener('portfolio:motion',motionChanged);
-  position();onScroll();hideIfModal();refreshPref();
+  position(false);onScroll();hideIfModal();refreshPref();
   function gesture(heading,message,target,project=null){
     if(!opened||host.inert)return;
     reply(heading,message,{view:project?'project':'show',project,action:project?'Read case study':null});
@@ -571,6 +586,35 @@
     if(!opened||activeProject?.id===event.detail.id)return;
     const project=window.PORTFOLIO?.projects.find(item=>item.id===event.detail.id);
     if(project)gesture(project.title,project.short,document.querySelector('[data-project="'+project.id+'"]'),project);
+  });
+  function showProjectDiscovery(project,lens,node=null){
+    const views={
+      challenge:{heading:'The challenge',message:project.problem,state:'thinking'},
+      architecture:{heading:'How it connects',message:project.architecture,state:'pointing'},
+      tradeoff:{heading:'The engineering choice',message:project.decision||project.solution,state:'thinking'},
+      evidence:{heading:'Evidence & limitations',message:project.proof+' '+project.note,state:'explaining'}
+    };
+    const view=views[lens]||views.architecture;
+    const component=node===null?null:project.systemFlow?.nodes[node];
+    reply(project.title+' · '+(component&&lens==='architecture'?component.name:view.heading),component&&lens==='architecture'?component.detail:view.message,{
+      view:'project',action:lens==='evidence'?'Read evidence & limitations':'Read case study',project
+    });
+    if(lens==='evidence')go.href+='#cp-chapter-cp-results';
+    const choice=document.querySelector('[data-kio-discovery="'+lens+'"]');
+    choice?.setAttribute('aria-pressed','true');
+    setCharacterState(view.state,{duration:1100});
+  }
+  document.querySelectorAll('[data-kio-discovery]').forEach(button=>button.addEventListener('click',()=>{
+    if(activeProject)showProjectDiscovery(activeProject,button.dataset.kioDiscovery);
+  }));
+  // Inspection follows explicit interactions only while the companion is open.
+  document.addEventListener('portfolio:xray-open',event=>{
+    if(!opened||host.inert||!event.detail?.id)return;
+    const project=window.PORTFOLIO?.projects?.find(item=>item.id===event.detail.id);
+    if(!project)return;
+    const target=document.querySelector('[data-project-xray="'+project.id+'"]');
+    showProjectDiscovery(project,event.detail.lens,event.detail.lens==='architecture'?event.detail.node:null);
+    pointAt(target);
   });
   function interruptTour(event){
     if(event?.target instanceof Node&&host.contains(event.target))return;

@@ -83,6 +83,45 @@ const server = http.createServer((req, res) => {
     }
   }
   try {
+    await test("Mobile menu and search preserve keyboard focus and expose selected results", async () => {
+      const page = await pageFor(390, "reduce");
+      try {
+        await page.locator('#menuToggle').click();
+        await page.keyboard.press('Tab');
+        assert.equal(await page.evaluate(() => document.activeElement.getAttribute('href')), '#work');
+        const menu = await page.locator('#mobileMenu').boundingBox();
+        assert(menu.y + menu.height <= 1000, 'Mobile menu must fit within the viewport');
+        const resume = page.locator('#mobileMenu a').last();
+        await resume.focus();
+        const last = await resume.boundingBox();
+        assert(last.y + last.height <= 1000, 'Last mobile menu link must scroll into view');
+        await page.keyboard.press('Escape');
+        assert.equal(await page.evaluate(() => document.activeElement.id), 'menuToggle');
+        await page.locator('#searchTrigger').click();
+        const input = page.locator('#paletteInput');
+        assert.equal(await input.getAttribute('role'), 'combobox');
+        assert.equal(await input.getAttribute('aria-expanded'), 'true');
+        assert.equal(await input.getAttribute('aria-controls'), 'paletteResults');
+        await input.press('ArrowUp');
+        const selected = await input.getAttribute('aria-activedescendant');
+        assert.equal(await page.locator('#' + selected).getAttribute('aria-selected'), 'true');
+        const result = await page.locator('#' + selected).boundingBox();
+        assert(result.y >= 0 && result.y + result.height <= 1000, 'Selected search result must be visible');
+        await input.fill('no matching project 0987654321');
+        assert.equal(await input.getAttribute('aria-activedescendant'), null);
+        await input.press('Tab');
+        assert.equal(await page.evaluate(() => document.activeElement.id), 'paletteClose');
+        await page.keyboard.press('Tab');
+        assert.equal(await page.evaluate(() => document.activeElement.id), 'paletteInput');
+        await input.fill('Live visualization');
+        await input.press('Enter');
+        assert.equal(await page.locator('#motion-lab details').evaluate(node => node.open), true);
+        assert.equal(await page.evaluate(() => document.activeElement.id), 'searchTrigger');
+        assert.deepEqual(page.errors, []);
+      } finally {
+        await page.close();
+      }
+    });
     await test("Homepage finish keeps feedback finite and responsive", async () => {
       const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
       const errors = [];
@@ -331,7 +370,7 @@ const server = http.createServer((req, res) => {
       const page = await pageFor();
       try {
         // Project records predating screenshot metadata retain the system artwork.
-        await page.route("**/projects.js", async route => {
+        await page.route(/\/projects\.js(?:\?.*)?$/, async route => {
           const response = await route.fetch();
           const body = (await response.text()).replace(/preview: \{[^}]+\}, /g, "");
           await route.fulfill({ response, body });

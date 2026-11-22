@@ -3,6 +3,12 @@ window.PORTFOLIO = {
   projects: [
     {
       id: 'srmedu',
+      systemFlow: { layout: 'branches', nodes: [
+        { name: 'Study interface', layer: 'Vanilla JavaScript', detail: 'The modular academic workspace brings the subject catalogue, exam intelligence and study tools together.', connects: [1, 2, 3] },
+        { name: 'Offline access', layer: 'PWA caching', detail: 'Offline-first caching reduces network dependence for eligible study content. Online tools still require their configured services.', connects: [] },
+        { name: 'Accounts & progress', layer: 'Firebase Auth / Firestore', detail: 'Firebase modules support authentication and account-linked progress. Cloud features can vary by production rollout.', connects: [] },
+        { name: 'Documents & tutor', layer: 'Drive / BYOK providers', detail: 'Cloud document integration and a subject-aware, multi-model tutor extend the study workspace. These integrations depend on configured external services.', connects: [] }
+      ] },
       decision: "Offline content access reduces network dependence. Account, document and tutor features still depend on their configured services.",
       preview: { src: 'assets/media/srmedu-dashboard-provided-20261121.jpg', alt: 'SRM Smart Study Hub dashboard showing the semester catalogue and study tools', label: 'OWNER-SUPPLIED DASHBOARD · 21 NOV 2026', width: 1024, height: 666 }, num: '01', title: 'SRM Smart Study Hub', short: 'Course resources, exam intelligence and study tools in one academic workspace.',
       category: 'product', categories: ['EDTECH', 'PRODUCT ENGINEERING'], year: '2026', status: 'LIVE PRODUCT',
@@ -20,6 +26,12 @@ window.PORTFOLIO = {
     },
     {
       id: 'kv',
+      systemFlow: { layout: 'pipeline', nodes: [
+        { name: 'Model & context', layer: 'Qwen2.5-1.5B', detail: 'PyTorch and Hugging Face Transformers provide the model used in the documented long-context experiments.', connects: [1] },
+        { name: 'Select retained states', layer: 'Observation-guided retention', detail: 'Record-aware selection is compared against sliding-window, StreamingLLM-style and static H2O-style baselines.', connects: [2] },
+        { name: 'Decode within budget', layer: 'KV budget / absolute RoPE', detail: 'Exact post-decode KV budget enforcement and absolute RoPE positions address decoding correctness.', connects: [3] },
+        { name: 'Evaluate & compare', validation: true, layer: 'Reproducible artifacts', detail: 'Reproducible seeds and independently checked benchmark artifacts support the corrected 60-question experiment. General reliability remains unestablished.', connects: [] }
+      ] },
       decision: "Retaining fewer KV states lowers retained-cache size. The documented recall difference and unresolved consistency issues constrain the result.",
       num: '02', title: 'Less memory. More context.', short: 'Researching KV-cache compression for long-context LLMs.',
       category: 'research', categories: ['LLM SYSTEMS', 'RESEARCH'], year: '2026', status: 'EXPERIMENTAL',
@@ -36,6 +48,12 @@ window.PORTFOLIO = {
     },
     {
       id: 'projectmatch',
+      systemFlow: { layout: 'pipeline', nodes: [
+        { name: 'Collaboration UI', layer: 'Next.js / TypeScript', detail: 'Project and skill profiles, role applications and messaging form the collaboration interface.', connects: [1] },
+        { name: 'Application workflows', layer: 'NextAuth / weighted matching', detail: 'Authenticated workflows coordinate weighted compatibility, recruitment, messaging and configurable AI provider calls.', connects: [2] },
+        { name: 'Relational persistence', layer: 'Prisma / PostgreSQL', detail: 'The repository confirms 28 Prisma schema models for the project’s relational data.', connects: [3] },
+        { name: 'Test infrastructure', validation: true, layer: 'Vitest / Playwright', detail: 'The documented test stack covers application behavior. Performance and ranking claims still depend on their test or organizer evidence.', connects: [] }
+      ] },
       decision: "Weighted compatibility makes ranking explicit. Its usefulness still needs evaluation with real teams and configured provider services.",
       preview: { src: 'assets/media/projectmatch-capture-01.webp', alt: 'ProjectMatch public collaboration platform', label: 'PUBLIC INTERFACE · 19 NOV 2026', width: 1280, height: 800 }, num: '03', title: 'ProjectMatch', short: 'Skills-based team matching and project collaboration.',
       category: 'product', categories: ['FULL STACK', 'COLLABORATION'], year: '2026', status: 'LIVE DEMO',
@@ -52,6 +70,12 @@ window.PORTFOLIO = {
     },
     {
       id: 'metro',
+      systemFlow: { layout: 'pipeline', nodes: [
+        { name: 'Generated track', layer: 'Procedural generation', detail: 'Procedural tracks and obstacles create the runner’s changing environment.', connects: [1] },
+        { name: 'Movement & collision', layer: 'TypeScript / game systems', detail: 'Three-lane movement, train-roof traversal and collisions must stay synchronized as the game speeds up.', connects: [2] },
+        { name: 'World & feedback', layer: 'Three.js / WebGL / Web Audio', detail: 'Real-time rendering and audio present the dynamic world, collectibles and powers.', connects: [3] },
+        { name: 'Gameplay regression', validation: true, layer: 'Tests in development', detail: 'Automated gameplay regression tests are in development. Solvability and collision behavior need evidence across generated sequences.', connects: [] }
+      ] },
       decision: "Procedural generation creates variety. Solvability and collision behavior need gameplay regression evidence across generated sequences.",
       num: '04', title: 'Metro Runner 3D', short: 'An endless runner built from geometry, systems and timing.',
       category: 'interactive', categories: ['REAL-TIME 3D', 'GAME DEVELOPMENT'], year: '2026', status: 'IN DEVELOPMENT',
@@ -68,6 +92,12 @@ window.PORTFOLIO = {
     },
     {
       id: 'oodp',
+      systemFlow: { layout: 'branches', nodes: [
+        { name: 'Learning interface', layer: 'HTML / CSS / JavaScript', detail: 'An interactive learning site organizes five teaching units, 30+ topics and 100+ code examples.', connects: [1, 2, 3] },
+        { name: 'Runtime explanations', layer: 'Visual learning models', detail: 'Visual explanations and dry runs cover memory behavior, dispatch, exception flow, pitfalls and practice.', connects: [] },
+        { name: 'Run C++ examples', layer: 'Embedded execution', detail: 'Embedded C++ execution supports experimentation with examples. Compiler integration introduces an external service dependency.', connects: [] },
+        { name: 'Revision & assistance', layer: 'Study workflows / AI support', detail: 'Revision workflows and AI support complement the teaching material. AI integration depends on its external services.', connects: [] }
+      ] },
       decision: "Embedded execution supports experimentation. External compiler and AI integrations introduce service dependencies.",
       preview: { src: 'assets/media/oodp-capture-01.webp', alt: 'OODP Mastery public learning interface', label: 'PUBLIC INTERFACE · 19 NOV 2026', width: 1280, height: 800 }, num: '05', title: 'OODP Mastery', short: 'C++ learning through explanations, runtime models and executable examples.',
       category: 'product', categories: ['EDTECH', 'C++ LEARNING'], year: '2026', status: 'LIVE PRODUCT',
@@ -84,6 +114,12 @@ window.PORTFOLIO = {
     },
     {
       id: 'fairshift',
+      systemFlow: { layout: 'pipeline', nodes: [
+        { name: 'Worker & employer', layer: 'Next.js dashboards', detail: 'Separate dashboards expose attendance transitions, wage discrepancies and structured disputes.', connects: [1] },
+        { name: 'Authorized records', layer: 'Supabase / PostgreSQL RLS', detail: 'Row-level security centralizes access constraints around the prototype’s database records.', connects: [2] },
+        { name: 'Transactional pay rules', layer: 'SQL / integer-paise arithmetic', detail: 'Transactional SQL functions and integer-paise arithmetic support sector-specific pay calculations.', connects: [3] },
+        { name: 'Focused validation', validation: true, layer: 'App / SQL audit', detail: 'The repository pre-submission audit records 62 passing focused app/SQL tests. Production readiness remains unverified.', connects: [] }
+      ] },
       decision: "Database transactions and row-level security centralize correctness constraints. The documented local tests leave production readiness unverified.",
       num: '06', title: 'FairShift', short: 'Making work hours, wages and disputes easier to understand.',
       category: 'product', categories: ['FULL STACK', 'HACKATHON'], year: '2026', status: 'HACKATHON PROTOTYPE',

@@ -56,6 +56,31 @@
   const deg = Math.PI / 180;
   const finale = {cameraEnd:.86, openingEnd:.90, pulseStart:.90, pulsePeak:.925, pulseEnd:.985, revealStart:.92, revealEnd:.985};
   const exitEnergy = p => pulse(p,finale.pulseStart,finale.pulsePeak,finale.pulseEnd);
+  let releaseStarted = null, releaseFloor = 0, releaseEnergy = 0, releasePhase = 0, releaseArmed = true;
+  const releaseDuration = 620;
+  function cancelRelease() {
+    releaseStarted = null;
+    releaseFloor = 0;
+    releaseEnergy = 0;
+  }
+  function startRelease() {
+    releasePhase = 0;
+    releaseStarted = performance.now();
+    releaseArmed = false;
+  }
+  function resumeRelease() {
+    if (integrated && !window.__portfolioOpening?.ready && !paused && !reduced && !compactViewport.matches && progress >= finale.openingEnd) startRelease();
+  }
+  function releaseProgress(now) {
+    if (releaseStarted !== null) {
+      const time = clamp((now - releaseStarted) / releaseDuration);
+      releasePhase = time;
+      releaseFloor = finale.openingEnd + smooth(time) * (finale.revealEnd - finale.openingEnd);
+      releaseEnergy = pulse(time, 0, .18, 1);
+      if (time >= 1) { releaseStarted = null; releaseEnergy = 0; }
+    }
+    return Math.max(progress, releaseFloor);
+  }
 
   html.classList.add('js-active');
   const modeButtons=integrated?[...stage.querySelectorAll('[data-rift-mode]')]:[];
@@ -381,15 +406,27 @@
 
   function updateText(p,entry){
     if(integrated){
+      if(window.__portfolioOpening?.ready){
+        work.inert=false;
+        work.style.pointerEvents='auto';
+        return;
+      }
       const exit=range(p,.56,.77);
       stage.classList.toggle('rift-ending',exit>=1);
-      stage.querySelector('.title-wrap').inert=exit>=1;
+      const title=stage.querySelector('.title-wrap');
+      if(exit>=1&&title.contains(document.activeElement))document.getElementById('nameOpeningSkip')?.focus({preventScroll:true});
+      title.inert=exit>=1;
       css('--title-opacity',(1-exit).toFixed(3));
       css('--title-y',(-exit*40).toFixed(2)+'px');
       const cinematic=!paused&&!reduced&&!compactViewport.matches;
-      const reveal=cinematic?range(p,finale.revealStart,finale.revealEnd):1;
-      const offset=cinematic&&reveal>0?-(1-p)*scrollSpan:0;
-      const active=reveal>=.94;
+      const portalReveal=cinematic?range(p,finale.revealStart,finale.revealEnd):1;
+      // The destination waits behind the existing title card on first entry.
+      const reveal=cinematic&&window.__portfolioOpening?.pending?0:portalReveal;
+      const offset=cinematic&&reveal>0?-(1-progress)*scrollSpan:0;
+      const active=true;
+      stage.classList.toggle('rift-complete', cinematic && portalReveal >= 1);
+      css('--world-scale', (cinematic ? .965 + reveal * .035 : 1).toFixed(4));
+      css('--world-blur', (cinematic && reveal > 0 ? (1 - reveal) * 2 : 0).toFixed(2) + 'px');
       // Keep the section's anchor in normal flow. Only its content compensates
       // for the remaining sticky scroll, converging to zero at the handoff.
       css('--work-offset',offset.toFixed(2)+'px');
@@ -399,9 +436,9 @@
       css('--name-aperture-clip',apertureReveal>=1?'none':`circle(${(apertureReveal*76).toFixed(3)}vmax at 50% 50svh)`);
       css('--name-aperture-offset',(-(1-progress)*scrollSpan).toFixed(2)+'px');
       css('--name-aperture-visibility',apertureReveal>0?'visible':'hidden');
-      css('--exit-energy',cinematic?exitEnergy(p).toFixed(4):'0');
-      css('--exit-release',(.18+range(p,finale.pulseStart,finale.pulseEnd)*2.8).toFixed(4));
-      css('--exit-wave',range(p,finale.openingEnd,finale.pulseEnd).toFixed(4));
+      css('--exit-energy',cinematic?Math.max(exitEnergy(p),releaseEnergy).toFixed(4):'0');
+      css('--exit-release',(.18+(releaseStarted!==null?releasePhase:range(p,finale.pulseStart,finale.pulseEnd))*3.5).toFixed(4));
+      css('--exit-wave',(releaseStarted!==null?releasePhase:range(p,finale.openingEnd,finale.pulseEnd)).toFixed(4));
       css('--aperture-rim',cinematic?pulse(p,.82,.88,.94).toFixed(4):'0');
       css('--aperture-radius',(.56+range(p,.82,finale.openingEnd)*.56+range(p,finale.openingEnd,finale.revealEnd)*1.8).toFixed(4));
       css('--exit-veil',cinematic?range(p,finale.openingEnd,finale.revealEnd).toFixed(4):'0');
@@ -591,15 +628,16 @@
 
   function frame(now){
     raf=0;
-    if(disposed||document.hidden||!inView)return;
-    const dt=lastFrame?Math.min(60,now-lastFrame):16;
-    if(lastFrame&&dt>0&&dt<85){
-      frameIntervals.push(dt);if(frameIntervals.length>180)frameIntervals.shift();
+    if(disposed||document.hidden||!inView||(integrated&&window.__portfolioOpening?.ready))return;
+    const interval=lastFrame?now-lastFrame:0;
+    const dt=lastFrame?Math.min(60,interval):16;
+    if(interval>0){
+      frameIntervals.push(interval);if(frameIntervals.length>180)frameIntervals.shift();
       // A low-cost RAF timing heuristic, not a GPU benchmark. Degrade only
       // after sustained delivery delays, and never oscillate quality.
       if(!paused&&!reduced&&webglReady&&!adaptiveLow&&elapsed>2000){
         measuredFrameCount++;
-        if(dt>29)slowFrameCount++;
+        if(interval>29)slowFrameCount++;
         if(measuredFrameCount>=120){
           if(slowFrameCount>=48){
             adaptiveLow=true;
@@ -614,10 +652,14 @@
     if(!paused&&!reduced)elapsed+=dt;
     pointerX+=(targetX-pointerX)*.075;
     pointerY+=(targetY-pointerY)*.075;
-    const p=(reduced||paused||(integrated&&compactViewport.matches))?0:progress;
+    const p=(reduced||paused||(integrated&&compactViewport.matches))?0:integrated?releaseProgress(now):progress;
     // The name must be fully readable on the first paint. Camera/portal still animate in.
     const entry=1;
     updateText(p,entry);
+    // The burst must have fully decayed and every portal frame be retired first.
+    if(integrated && releaseStarted===null && releaseFloor>=finale.revealEnd &&
+      !paused && !reduced && !compactViewport.matches && window.__portfolioOpening?.play()) updateText(p,entry);
+    if(integrated&&window.__portfolioOpening?.ready)return;
     if(webglReady){
       animate3D(p,reduced?0:elapsed/1000);
       try{
@@ -632,22 +674,36 @@
     }
     // The real work fully covers the stage after the aperture reveal.
     // Scroll events restart rendering when the visitor reverses into the scene.
-    if(!paused&&!reduced&&(!integrated||progress<finale.revealEnd))schedule();
+    if(!paused&&!reduced&&(!integrated||p<finale.revealEnd||releaseStarted!==null))schedule();
   }
 
   function schedule(){
-    if(disposed||raf||!inView||document.hidden)return;
+    if(disposed||raf||!inView||document.hidden||(integrated&&window.__portfolioOpening?.ready))return;
     raf=requestAnimationFrame(frame);
   }
 
   function onScroll(){
+    if(integrated&&window.__portfolioOpening?.ready)return;
+    const previous = progress;
     readProgress();
+    if (integrated && !paused && !reduced && !compactViewport.matches) {
+      // Reverse input owns the camera immediately, including during a release.
+      if (progress < previous - .001) {
+        cancelRelease();
+        window.__portfolioOpening?.cancel();
+        releaseArmed = false;
+      }
+      if (progress < finale.openingEnd) releaseArmed = true;
+      if (releaseArmed && progress >= finale.openingEnd) startRelease();
+    }
+    // Fast travel beyond the arrival viewport yields directly to the website.
+    if(integrated && intro.getBoundingClientRect().bottom < innerHeight*.55) window.__portfolioOpening?.skip();
     // Keep the title-to-project handoff reliable even when the scene is no longer
     // submitting WebGL frames (visibility observer, slow device or manual pause).
-    if(!reduced&&!paused)updateText(integrated&&compactViewport.matches?0:progress,1);
+    if(!reduced&&!paused)updateText(integrated&&compactViewport.matches?0:integrated?releaseProgress(performance.now()):progress,1);
     schedule();
   }
-  function onResize(){readProgress();resize();if(!reduced&&!paused)updateText(integrated&&compactViewport.matches?0:progress,1);schedule();}
+  function onResize(){if(integrated&&window.__portfolioOpening?.ready)return;readProgress();resize();if(!reduced&&!paused)updateText(integrated&&compactViewport.matches?0:integrated?releaseProgress(performance.now()):progress,1);schedule();}
   function onPointer(e){
     if(paused||reduced||e.pointerType==='touch')return;
     targetX=clamp(e.clientX/innerWidth*2-1,-1,1);
@@ -656,20 +712,59 @@
 
   if(integrated){
     let arrival=null;
+    function skipToWork(hash='#work',smoothScroll=false){
+      window.__portfolioOpening?.skip();
+      cancelRelease();
+      releaseArmed=false;
+      arrival?.cancel();
+      if(location.hash!==hash)history.pushState(history.state,'',hash);
+      work.scrollIntoView({behavior:smoothScroll&&!paused&&!reduced?'smooth':'instant',block:'start'});
+      onScroll();
+      document.getElementById('workTitle')?.focus({preventScroll:true});
+      if(!smoothScroll&&!paused&&!reduced)arrival=work.querySelector('.wrap').animate([
+        {opacity:.55},
+        {opacity:1}
+      ],{duration:300,easing:'cubic-bezier(.22,.7,.2,1)'});
+    }
     document.querySelectorAll('a[href="#work"],a[href="#riftProjects"]').forEach(link=>{
       link.addEventListener('click',event=>{
         if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
         event.preventDefault();
-        arrival?.cancel();
-        if(location.hash!==link.hash)history.pushState(history.state,'',link.hash);
-        work.scrollIntoView({behavior:'instant',block:'start'});
-        onScroll();
-        document.getElementById('workTitle')?.focus({preventScroll:true});
-        if(!paused&&!reduced)arrival=work.querySelector('.wrap').animate([
-          {opacity:.55},
-          {opacity:1}
-        ],{duration:300,easing:'cubic-bezier(.22,.7,.2,1)'});
+        skipToWork(link.hash,link.classList.contains('name-opening-action'));
       });
+    });
+    document.getElementById('nameOpeningSkip')?.addEventListener('click',()=>skipToWork());
+    document.getElementById('riftReturnToHero')?.addEventListener('click',()=>{
+      cancelRelease();
+      releaseArmed=false;
+      window.__portfolioOpening?.skip();
+      document.getElementById('nameHeroTitle')?.focus({preventScroll:true});
+    });
+    document.addEventListener('portfolio:rift-return',event=>{
+      arrival?.cancel();
+      cancelAnimationFrame(raf);raf=0;
+      cancelRelease();
+      releaseArmed=true;
+      inView=true;lastFrame=0;
+      pointerX=pointerY=targetX=targetY=0;
+      const target=paused||reduced||compactViewport.matches?0:clamp(event.detail?.progress??0,0,finale.cameraEnd);
+      const span=Math.max(0,intro.offsetHeight-innerHeight);
+      const top=scrollY+intro.getBoundingClientRect().top;
+      history.replaceState(history.state,'',location.pathname+location.search+'#top');
+      scrollTo({top:top+span*target,behavior:'instant'});
+      readProgress();resize();
+      initializeScene();
+      // Submit a fresh pose before paint using the retained scene and renderer.
+      frame(performance.now());
+      if(event.detail?.focus){
+        const control=[stage.querySelector('.rift-mode.is-active'),mobileModeSelect,stage.querySelector('.hero-action'),document.getElementById('riftReturnToHero')]
+          .find(element=>element?.getClientRects().length&&!element.closest('[inert]')&&getComputedStyle(element).visibility!=='hidden');
+        control?.focus({preventScroll:true});
+      }
+    });
+    document.addEventListener('portfolio:name-end',()=>{
+      updateText(paused||reduced||compactViewport.matches?0:Math.max(progress,releaseFloor),1);
+      schedule();
     });
   }
 
@@ -684,13 +779,15 @@
   });
   function onMedia(e){
     reduced=e.matches;
+    cancelRelease();
     paused=reduced||motionDisabledByUrl||globalMuted;
-    syncButton();lastFrame=0;schedule();
+    syncButton();readProgress();resumeRelease();lastFrame=0;schedule();
   }
   if(integrated)document.addEventListener('portfolio:motion',e=>{
     globalMuted=Boolean(e.detail?.muted);
+    cancelRelease();
     paused=globalMuted||reduced||motionDisabledByUrl;
-    syncButton();lastFrame=0;schedule();
+    syncButton();readProgress();resumeRelease();lastFrame=0;schedule();
   });
   if(motionPref.addEventListener)motionPref.addEventListener('change',onMedia);
   else motionPref.addListener(onMedia);
@@ -730,7 +827,7 @@
   });
 
   window.__riftDirector={
-    getState:()=>({webglReady,reduced,paused,compact:integrated&&compactViewport.matches,mode,adaptiveLow,contextLost,scroll:progress,elapsedMs:elapsed,renderedFrames}),
+    getState:()=>({webglReady,reduced,paused,compact:integrated&&compactViewport.matches,mode,adaptiveLow,contextLost,scroll:progress,elapsedMs:elapsed,renderedFrames,releasing:releaseStarted!==null,revealProgress:Math.max(progress,releaseFloor)}),
     setMode:next=>selectMode(next,true),
     getFrameStats:()=>{
       const a=[...frameIntervals].sort((x,y)=>x-y),mid=a.length? a[Math.floor(a.length/2)]:null;
@@ -743,40 +840,57 @@
   prepareProjects();
   readProgress();
   updateText(reduced||paused||compactViewport.matches?0:progress,1);
-  try{
-    // Import only when a browser can render a real WebGL environment.
-    const THREE=await loadThree();
-    if(disposed)return;
-    animObjects.THREE=THREE;
-    Object.assign(animObjects,buildScene(THREE));
-    webglReady=true;
-    resize();
-    // First successful frame before retiring the approved CSS fallback.
-    animate3D(reduced||(integrated&&compactViewport.matches)?0:progress,0);
-    renderer.render(scene,camera);
-    html.classList.add('webgl-ready');
-    if(readout)readout.textContent='LIVE THREE.JS / PHYSICAL MATERIALS';
-    canvas.addEventListener('webglcontextlost',event=>{
-      event.preventDefault();
-      contextLost=true;webglReady=false;
-      html.classList.remove('webgl-ready');
-      if(readout)readout.textContent='CSS FALLBACK / CONTEXT LOST';
-      cancelAnimationFrame(raf);raf=0;
-    },{passive:false});
-    canvas.addEventListener('webglcontextrestored',()=>{
-      if(disposed)return;
-      contextLost=false;webglReady=true;
-      resize();lastFrame=0;
-      requestAnimationFrame(()=>{
-        if(!disposed&&!contextLost)html.classList.add('webgl-ready');
-        schedule();
-      });
-    });
-  }catch(error){
-    if(readout)readout.textContent='CSS FALLBACK / WEBGL UNAVAILABLE';
-    console.warn('Rift Director Cut: 3D layer unavailable; retaining approved CSS design.',error);
+  let sceneInitialization=null;
+  function initializeScene(){
+    if(sceneInitialization)return sceneInitialization;
+    sceneInitialization=initialize();
+    return sceneInitialization;
   }
-  schedule();
+  async function initialize(){
+    try{
+      // Import only when a browser can render a real WebGL environment.
+      const THREE=await loadThree();
+      if(disposed)return;
+      animObjects.THREE=THREE;
+      Object.assign(animObjects,buildScene(THREE));
+      webglReady=true;
+      resize();
+      // First successful frame before retiring the approved CSS fallback.
+      animate3D(reduced||(integrated&&compactViewport.matches)?0:progress,0);
+      renderer.render(scene,camera);
+      html.classList.add('webgl-ready');
+      if(readout)readout.textContent='LIVE THREE.JS / PHYSICAL MATERIALS';
+      canvas.addEventListener('webglcontextlost',event=>{
+        event.preventDefault();
+        contextLost=true;webglReady=false;
+        html.classList.remove('webgl-ready');
+        if(readout)readout.textContent='CSS FALLBACK / CONTEXT LOST';
+        cancelAnimationFrame(raf);raf=0;
+        schedule();
+      },{passive:false});
+      canvas.addEventListener('webglcontextrestored',()=>{
+        if(disposed)return;
+        contextLost=false;webglReady=true;
+        resize();lastFrame=0;
+        requestAnimationFrame(()=>{
+          if(disposed||contextLost)return;
+          frame(performance.now());
+          if(webglReady)html.classList.add('webgl-ready');
+        });
+      });
+    }catch(error){
+      if(readout)readout.textContent='CSS FALLBACK / WEBGL UNAVAILABLE';
+      console.warn('Rift Director Cut: 3D layer unavailable; retaining approved CSS design.',error);
+    }
+    schedule();
+  }
+  // Direct links and motion-free entries already show the permanent hero.
+  // Load the full 3D scene only if the visitor actually enters the Rift.
+  function initializeVisibleScene(){
+    if(!integrated||!window.__portfolioOpening?.ready)initializeScene();
+  }
+  if(document.readyState==='complete')initializeVisibleScene();
+  else document.addEventListener('DOMContentLoaded',initializeVisibleScene,{once:true});
 
   function dispose(){
     disposed=true;cancelAnimationFrame(raf);
