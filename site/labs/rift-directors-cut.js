@@ -395,7 +395,7 @@
       css('--work-offset',offset.toFixed(2)+'px');
       css('--work-clip',reveal>=1?'none':`circle(${(reveal*76).toFixed(3)}vmax at 50% calc(50svh + var(--work-offset)))`);
       css('--work-visibility',reveal>0?'visible':'hidden');
-      const apertureReveal=cinematic?range(p,finale.revealStart,finale.revealEnd):0;
+      const apertureReveal=cinematic?range(p,finale.cameraEnd-.04,finale.pulsePeak):0;
       css('--name-aperture-clip',apertureReveal>=1?'none':`circle(${(apertureReveal*76).toFixed(3)}vmax at 50% 50svh)`);
       css('--name-aperture-offset',(-(1-progress)*scrollSpan).toFixed(2)+'px');
       css('--name-aperture-visibility',apertureReveal>0?'visible':'hidden');
