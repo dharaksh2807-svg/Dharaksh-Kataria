@@ -1,0 +1,98 @@
+/* Signature Break. Every override exists only inside the native hero exit. */
+.hero-exit-art[hidden] {
+  display: none;
+}
+
+.hero-exit-art {
+  position: fixed;
+  inset: 0;
+  z-index: 21;
+  overflow: clip;
+  pointer-events: none !important;
+  contain: layout paint style;
+}
+
+.hero-exit-art * {
+  pointer-events: none !important;
+}
+
+.hero-exit-echo {
+  position: absolute;
+  margin: 0;
+  color: transparent;
+  -webkit-text-stroke: .65px #d2a576;
+  text-shadow: none;
+  white-space: nowrap;
+}
+
+.hero-exit-echo * {
+  color: transparent !important;
+  text-shadow: none !important;
+}
+
+.hero-exit-thread {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+  stroke: #dbb88c;
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+
+.hero-exit-blade {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: var(--exit-blade-width);
+  height: var(--exit-blade-height);
+  margin-left: calc(var(--exit-blade-width) / -2);
+  margin-top: calc(var(--exit-blade-height) / -2);
+  background: linear-gradient(90deg,
+    #301e18 0%, #69402a 9%, #b77e51 24%, #dab181 43%,
+    #98613e 61%, #bb8b5c 83%, #f0d7ac 94%, #e0bc8a 96%, #6e442c 100%);
+  box-shadow: 0 0 12px #c4915433;
+  transform: translateX(var(--exit-blade-x)) rotate(24deg);
+}
+
+.hero-exit-active #nameOpening {
+  transform: translate3d(0,var(--exit-pin),0);
+}
+
+.hero-exit-active #nameOpening .name-opening-line {
+  overflow: visible;
+  translate: var(--exit-first-x) 0;
+}
+
+.hero-exit-active #nameOpening .name-opening-line:nth-child(2) {
+  translate: var(--exit-surname-x) 0;
+}
+
+.hero-exit-active #nameOpening .name-opening-period {
+  text-shadow: var(--exit-ignition);
+}
+
+.hero-exit-active #nameOpening :is(.name-opening-caption,.name-opening-actions) {
+  opacity: var(--exit-caption-alpha);
+}
+
+.hero-exit-active #nameOpening .name-opening-actions {
+  pointer-events: var(--exit-actions-pointer);
+}
+
+.hero-exit-active .rift-home #work {
+  transform: translate3d(0,var(--exit-work-y),0);
+  clip-path: var(--exit-work-clip);
+}
+
+html:is(.motion-off,.rift-static,.name-intro-active) .hero-exit-art {
+  display: none;
+}
+
+@media(prefers-reduced-motion:reduce),(max-height:500px) {
+  .hero-exit-art {
+    display: none;
+  }
+}

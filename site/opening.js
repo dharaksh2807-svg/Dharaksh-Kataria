@@ -11,8 +11,23 @@
   try { seen = sessionStorage.getItem(sessionKey) === 'true'; } catch {}
   if (params.get('intro') === 'replay') seen = false;
   const historyEntry = performance.getEntriesByType('navigation')[0]?.type === 'back_forward';
-  const directEntry = Boolean(location.hash) || historyEntry;
+  const contentEntry = Boolean(location.hash && location.hash !== '#top');
+  const directEntry = contentEntry || historyEntry;
   const motionDisabled = () => preference.matches || root.classList.contains('motion-off') || params.get('motion') === 'off';
+  // Reload can restore a scroll position beyond the Rift and trigger its fast
+  // travel bypass. Default entries begin at the opening, while history and
+  // content entries keep the browser's restoration policy.
+  if (!directEntry && !motionDisabled()) {
+    const restoration = history.scrollRestoration;
+    history.scrollRestoration = 'manual';
+    window.addEventListener('pageshow', () => {
+      // Finish the browser's initial anchor positioning before restoring auto.
+      requestAnimationFrame(() => {
+        scrollTo({ top: 0, behavior: 'instant' });
+        history.scrollRestoration = restoration;
+      });
+    }, { once: true });
+  }
   root.classList.add('name-hero-pending');
 
   function finish() {
@@ -111,7 +126,7 @@
   // Interrupting an entrance settles the typography, never removes the hero.
   window.addEventListener('pagehide', finish);
   window.addEventListener('pageshow', async event => {
-    if (event.persisted || historyEntry || !location.hash) return;
+    if (event.persisted || historyEntry || !contentEntry) return;
     let id;
     try { id = decodeURIComponent(location.hash.slice(1)); } catch { return; }
     const target = document.getElementById(id);

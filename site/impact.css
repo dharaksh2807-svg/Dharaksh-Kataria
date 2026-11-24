@@ -1,0 +1,51 @@
+/* Source-attributed evidence within the existing project cards and quick view. */
+.impact-snapshot {
+  --impact-rule: #b4a58c80;
+  --impact-label: #815638;
+  --impact-ink: #2d2b25;
+  --impact-muted: #5f584b;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--impact-rule);
+  color: var(--impact-ink);
+}
+.project-card.is-featured .impact-snapshot,
+.quick-view .impact-snapshot {
+  --impact-rule: #dfc6a440;
+  --impact-label: #d8b58f;
+  --impact-ink: #f2eee5;
+  --impact-muted: #c7c3b9;
+}
+.impact-snapshot .impact-kind {
+  margin: 0 0 14px;
+  color: var(--impact-label);
+  font: 12px/1.6 var(--font-mono);
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+.impact-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 24px;
+  margin: 0 0 14px;
+}
+.impact-metrics > div { display: flex; flex-direction: column-reverse; align-items: start; gap: 5px; min-width: 0; }
+.impact-metrics dt { color: var(--impact-muted); font-size: 14px; line-height: 1.5; }
+.impact-metrics dd { margin: 0; color: var(--impact-ink); font: 400 30px/1.2 var(--font-serif); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.impact-snapshot .impact-period { margin: 0 0 7px; color: var(--impact-label); font: 13px/1.65 var(--font-mono); }
+.impact-snapshot :is(.impact-scope, .impact-limitation) { margin: 0; color: var(--impact-muted); font-size: 14px; line-height: 1.65; }
+.impact-snapshot .impact-limitation { margin-top: 7px; }
+.impact-source { display: inline-flex; align-items: center; min-height: 44px; max-width: 100%; margin-top: 6px; color: var(--impact-label); font-size: 14px; line-height: 1.5; text-decoration: underline; text-underline-offset: 4px; overflow-wrap: anywhere; }
+.impact-source:hover { color: var(--impact-ink); }
+.impact-source:focus-visible { outline: 2px solid var(--impact-label); outline-offset: 4px; }
+.impact-snapshot-brief { margin-top: 16px; padding-top: 14px; }
+.impact-snapshot-brief .impact-kind { margin-bottom: 8px; font-size: 12px; }
+.impact-snapshot-brief .impact-metrics { margin-bottom: 8px; gap: 10px 18px; }
+.impact-snapshot-brief .impact-metrics dd { font-size: 24px; }
+.impact-snapshot-brief .impact-metrics dt { font-size: 13px; }
+.impact-snapshot-brief .impact-period { font-size: 12px; }
+.impact-snapshot-brief :is(.impact-scope, .impact-limitation) { font-size: 13px; }
+@media (max-width: 600px) {
+  .impact-metrics { grid-template-columns: 1fr; gap: 14px; }
+  .impact-snapshot-brief .impact-metrics { grid-template-columns: 1fr; }
+}

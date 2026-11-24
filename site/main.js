@@ -25,6 +25,23 @@
   const projects = data.projects;
   const detailUrl=(p)=>`projects/${encodeURIComponent(p.id)}.html`;
   const navigateToDetail = project => { if (project) window.portfolioMotion.navigate(detailUrl(project), project.id); };
+  // Cards hold the complete snapshot. Quick View keeps a short, attributed
+  // reading with the research trade-off always visible beside retained memory.
+  function impactSnapshot(project, compact = false) {
+    const impact = project.impact;
+    if (!impact) return '';
+    const metrics = compact && impact.kind !== 'experimental' ? impact.metrics.slice(0, 1) : impact.metrics;
+    return `<div class="impact-snapshot ${compact ? 'impact-snapshot-brief' : ''}" data-evidence-kind="${escape(impact.kind)}">
+      <p class="impact-kind">${escape(impact.label)}</p>
+      <dl class="impact-metrics">
+        ${metrics.map(metric => `<div><dt>${escape(metric.label)}</dt><dd>${escape(metric.value)}</dd></div>`).join('')}
+      </dl>
+      <p class="impact-period">${escape(impact.period)}</p>
+      ${!compact || impact.kind === 'experimental' ? `<p class="impact-scope">${escape(impact.scope)}</p>` : ''}
+      <p class="impact-limitation">${escape(impact.limitation)}</p>
+      ${compact ? '' : `<a class="impact-source" href="${escape(impact.source.href)}" target="_blank" rel="noopener noreferrer" aria-label="${escape(project.title)} — ${escape(impact.source.label)}">${escape(impact.source.label)}</a>`}
+    </div>`;
+  }
   function engineeringInspector(p) {
     const lenses = [
       ['challenge', 'Challenge', p.problem],
@@ -97,7 +114,7 @@
           <p class="project-summary">${escape(p.short)}</p>
           ${p.size === 'wide' ? `<p class="project-role">${escape(p.role)}</p>` : ''}
           ${p.highlights ? `<dl class="project-highlights">${p.highlights.map(([label, value]) => `<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl>` : `<div class="project-stack">${p.technologies.slice(0, 4).map(technology => `<span>${escape(technology)}</span>`).join('')}</div>`}
-          ${p.size === 'wide' ? `<div class="project-result"><h4>Evidence</h4><p>${escape(p.proof)}</p></div>` : ''}
+          ${impactSnapshot(p)}
         </div>
         <div class="project-arrow-wrap"><span class="project-open" aria-hidden="true">↗</span></div>
       </div>
@@ -317,6 +334,9 @@
   const caseDialog = $('.case-dialog');
   function openCase(p, { updateUrl = true } = {}) {
     if (!p) return;
+    if (quickView.open) closeQuickView();
+    if (openUI === 'palette') closePalette();
+    closeMobile();
     if (!overlay.hidden) closeCase({ updateUrl: false });
     lastFocus = document.activeElement;
     openUI = 'case';
@@ -338,7 +358,7 @@
     share.addEventListener('click',async()=>{const url=new URL(location.href);url.searchParams.set('project',p.id);try{await navigator.clipboard.writeText(url.toString());share.textContent='LINK COPIED ✓';}catch{window.prompt('Copy the project link:',url.toString())}});
     $('#caseContent').querySelector('.case-quicklinks').append(share);
   }
-  function closeCase({ updateUrl = true } = {}) { overlay.hidden = true; openUI = null; document.body.style.overflow = ''; document.querySelector('main').inert = false; document.querySelector('header').inert = false; $('#caseContent').innerHTML = ''; document.dispatchEvent(new CustomEvent('portfolio:case-close')); if(updateUrl && new URL(location.href).searchParams.has('project')){const url=new URL(location.href);url.searchParams.delete('project');history.replaceState({},'',url);} lastFocus?.focus?.(); }
+  function closeCase({ updateUrl = true } = {}) { overlay.hidden = true; openUI = null; document.body.style.overflow = ''; document.querySelector('main').inert = false; document.querySelector('header').inert = false; $('#caseContent').innerHTML = ''; document.dispatchEvent(new CustomEvent('portfolio:case-close')); if(updateUrl && new URL(location.href).searchParams.has('project')){const url=new URL(location.href);url.searchParams.delete('project');history.replaceState({},'',url);} lastFocus?.focus?.({preventScroll:true}); }
   $('#caseClose').addEventListener('click', closeCase);
   $('.case-backdrop').addEventListener('click', closeCase);
   // Shareable project URLs work on static hosts: ?project=project-id.
@@ -360,6 +380,7 @@
   const paletteItems = [
     ...projects.map((p) => ({ label: p.title, description: p.categories.join(' / '), run: () => openCase(p) })),
     ...data.archive.map((a)=>({label:a.name,description:a.kind,run:()=>openCase(a)})),
+    {label:'Recruiter Quick View',description:'PROFILE, SELECTED ENGINEERING AND RÉSUMÉ',run:()=>openQuickView()},
     {label:'All projects',description:'JUMP TO SELECTED WORK',run:()=>$('#work').scrollIntoView()},
     {label:'Technical approach',description:'JUMP TO CAPABILITIES',run:()=>$('#lab').scrollIntoView()},
     {label:'Project archive',description:'JUMP TO MORE WORK',run:()=>$('#archive').scrollIntoView()},
@@ -383,6 +404,8 @@
     $$('.palette-result').forEach((el)=>el.addEventListener('click',()=>activatePalette(Number(el.dataset.index))));
   }
   function openPalette() {
+    if (quickView.open) closeQuickView();
+    closeMobile();
     if(openUI==='case') closeCase();
     lastFocus = document.activeElement;
     openUI = 'palette';
@@ -394,7 +417,7 @@
     paletteInput.value = '';
     selected = 0;
     drawPalette();
-    setTimeout(()=>paletteInput.focus(),0);
+    setTimeout(()=>{if(openUI==='palette')paletteInput.focus({preventScroll:true})},0);
   }
   function closePalette() {
     palette.hidden = true;
@@ -403,7 +426,7 @@
     document.body.style.overflow = '';
     document.querySelector('main').inert = false;
     document.querySelector('header').inert = false;
-    lastFocus?.focus?.();
+    lastFocus?.focus?.({preventScroll:true});
   }
   function activatePalette(i) { const item=filteredItems[i]; if(!item)return; closePalette(); item.run(); }
   $('#searchTrigger').addEventListener('click',openPalette);
@@ -430,6 +453,11 @@
   }
   document.addEventListener('keydown',(e)=>{
     if ((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault(); if(openUI==='palette')closePalette();else openPalette();return}
+    if (quickView.open) {
+      if (e.key === 'Escape') { e.preventDefault(); closeQuickView(); }
+      else if (e.key === 'Tab') focusTrap(e, quickView);
+      return;
+    }
     if(e.key==='Escape'){if(openUI==='palette')closePalette();else if(openUI==='case')closeCase();else closeMobile();return}
     if(e.key==='Tab'&&openUI==='palette')focusTrap(e,$('.palette-dialog'));
     else if(e.key==='Tab'&&openUI==='case')focusTrap(e,caseDialog);
@@ -446,6 +474,101 @@
   };
   menuToggle.addEventListener('click',()=>{const shouldOpen=mobileMenu.hidden;mobileMenu.hidden=!shouldOpen;menuToggle.setAttribute('aria-expanded',String(shouldOpen));menuToggle.setAttribute('aria-label',shouldOpen?'Close navigation menu':'Open navigation menu')});
   $$('#mobileMenu a').forEach((a)=>a.addEventListener('click',closeMobile));
+
+  // Native modal semantics keep all background controls out of the focus order.
+  const quickView = $('#quickView');
+  const quickViewTriggers = $$('[data-quick-view]');
+  let quickViewReturnFocus = null;
+  let quickViewOverflow = '';
+  const quickViewStories = [
+    {
+      id: 'srmedu',
+      value: 'Bringing academic resources and study tools into a modular workspace, with offline-first content access and configured cloud integrations.'
+    },
+    {
+      id: 'kv',
+      title: 'KV-cache Research',
+      value: 'Building and evaluating observation-guided cache retention, with exact decode-budget enforcement, reproducible benchmarks and failure analysis.'
+    },
+    {
+      id: 'projectmatch',
+      value: 'Connecting skills-based compatibility with authenticated project workflows, messaging and relational data modeling.'
+    }
+  ];
+  $('#quickViewProjects').innerHTML = quickViewStories.map(story => {
+    const project = projects.find(project => project.id === story.id);
+    const title = story.title || project.title;
+    return `
+      <article class="quick-view-project">
+        <div class="quick-view-project-meta">${escape(project.categories.join(' / '))}<span>${escape(project.status)}</span></div>
+        <h4><a href="${escape(detailUrl(project))}">${escape(title)}</a></h4>
+        <p class="quick-view-role">${escape(project.role)}</p>
+        <p>${escape(story.value)}</p>
+        <ul class="quick-view-tech" aria-label="${escape(title)} technologies">
+          ${project.technologies.slice(0, 4).map(technology => `<li>${escape(technology)}</li>`).join('')}
+        </ul>
+        ${impactSnapshot(project, true)}
+        <a class="quick-view-case" href="${escape(detailUrl(project))}#cp-chapter-cp-results" aria-label="Read ${escape(title)} case study">Read case study</a>
+      </article>`;
+  }).join('');
+  // Keep the same destinations as the existing about/contact actions.
+  for (const source of $$('.about-actions a')) {
+    const link = source.cloneNode(true);
+    link.removeAttribute('class');
+    $('#quickViewLinks').append(link);
+  }
+  const emailSource = $('.email-link');
+  $('#quickViewEmail').href = emailSource.getAttribute('href');
+  $('#quickViewEmail').textContent = emailSource.childNodes[0].textContent.trim();
+
+  function openQuickView(event) {
+    if (quickView.open) return;
+    if (openUI === 'case') closeCase();
+    if (openUI === 'palette') closePalette();
+    const trigger = event?.currentTarget || document.activeElement;
+    quickViewReturnFocus = mobileMenu.contains(trigger) ? menuToggle : trigger;
+    closeMobile();
+    // Stop any unfinished smooth navigation at its current position.
+    window.scrollTo({left:scrollX, top:scrollY, behavior:'instant'});
+    quickViewOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    openUI = 'quick-view';
+    document.documentElement.classList.add('quick-view-active');
+    document.dispatchEvent(new CustomEvent('portfolio:quick-view', {detail:{open:true}}));
+    quickView.showModal();
+    $('.quick-view-scroll').scrollTop = 0;
+    quickViewTriggers.forEach(button => button.setAttribute('aria-expanded', 'true'));
+    $('#quickViewClose').focus({preventScroll:true});
+  }
+  function closeQuickView() {
+    if (!quickView.open) return;
+    quickView.close();
+    finishQuickView();
+  }
+  function finishQuickView() {
+    document.documentElement.classList.remove('quick-view-active');
+    document.dispatchEvent(new CustomEvent('portfolio:quick-view', {detail:{open:false}}));
+    document.body.style.overflow = quickViewOverflow;
+    if (openUI === 'quick-view') openUI = null;
+    quickViewTriggers.forEach(button => button.setAttribute('aria-expanded', 'false'));
+    quickViewReturnFocus?.focus?.({preventScroll:true});
+    quickViewReturnFocus = null;
+  }
+  quickView.addEventListener('close', () => {
+    if (!quickView.open && openUI === 'quick-view') finishQuickView();
+  });
+  quickView.addEventListener('cancel', event => { event.preventDefault(); closeQuickView(); });
+  $('#quickViewClose').addEventListener('click', closeQuickView);
+  quickViewTriggers.forEach(button => button.addEventListener('click', openQuickView));
+  // Require both ends of a pointer gesture on the backdrop, so a text-selection
+  // drag or a touch scroll ending outside the sheet cannot dismiss it.
+  let quickViewBackdrop = false;
+  quickView.addEventListener('pointerdown', event => { quickViewBackdrop = event.target === quickView; });
+  quickView.addEventListener('click', event => {
+    if (quickViewBackdrop && event.target === quickView) closeQuickView();
+    quickViewBackdrop = false;
+  });
+  quickView.addEventListener('pointercancel', () => { quickViewBackdrop = false; });
 
   // Expanded area: one at a time, with actual content toggled.
   $$('.discipline button').forEach((button)=>button.addEventListener('click',()=>{

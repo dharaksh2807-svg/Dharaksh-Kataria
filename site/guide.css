@@ -215,7 +215,7 @@
   #kioGuide .kio-tour-actions { padding: 12px 20px 10px; }
   /* Show me frees the feature above a small, readable instruction sheet. */
   #kioGuide.kio-open.kio-peek[data-section="top"] { top: calc(var(--header-h, 69px) + 8px); bottom: auto; }
-  #kioGuide.kio-peek .kio-panel { height: min(366px, 54dvh); }
+  #kioGuide.kio-peek .kio-panel { height: min(382px, 54dvh); }
   #kioGuide.kio-peek .kio-panel-scroll { position: relative; }
   #kioGuide.kio-peek .kio-character-hero { position: absolute; left: 8px; top: 20px; width: 92px; height: 112px; padding: 0; display: block; }
   #kioGuide.kio-peek .kio-character-slot, #kioGuide.kio-open.kio-peek .kio-launch { height: 112px; }
@@ -235,7 +235,7 @@
   #kioGuide.kio-peek[data-view="project"] .kio-secondary-actions { margin-top: 4px; }
 }
 @media (min-width: 761px) and (min-height: 481px) {
-  #kioGuide.kio-peek .kio-panel { height: 400px; }
+  #kioGuide.kio-peek .kio-panel { height: 428px; }
   #kioGuide.kio-peek .kio-panel-scroll { position: relative; }
   #kioGuide.kio-peek .kio-character-hero { position: absolute; left: 8px; top: 18px; width: 104px; height: 128px; padding: 0; display: block; }
   #kioGuide.kio-peek .kio-character-slot, #kioGuide.kio-peek .kio-launch { height: 128px; }

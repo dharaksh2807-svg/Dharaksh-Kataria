@@ -366,9 +366,10 @@
     }).catch(()=>{});
   }
   const hideIfModal = ()=>{
-    const modalVisible = ['caseOverlay','commandPalette','mobileMenu'].some(id=>{
-      const el=document.getElementById(id);return el&&!el.hidden;
+    const modalVisible = ['caseOverlay','commandPalette','mobileMenu','quickView'].some(id=>{
+      const el=document.getElementById(id);return el && (el instanceof HTMLDialogElement ? el.open : !el.hidden);
     });
+    if (document.getElementById('quickView')?.open) interruptTour();
     host.classList.toggle('kio-behind-modal',modalVisible);
     host.inert=modalVisible;
     syncCharacterMotion();
@@ -403,7 +404,7 @@
     syncCharacterMotion();
     if(opened){
       host.classList.remove('kio-peek');host.dataset.view='context';position();
-      if(steps[index].id==='work'){
+      if(steps[index].id==='work' && prefs.resumeStepId!=='work'){
         const inspected=document.querySelector('.project-card:not([hidden]) .project-xray[open]');
         const project=window.PORTFOLIO?.projects.find(item=>item.id===inspected?.dataset.projectXray);
         if(project)showProjectDiscovery(project,'architecture');
@@ -563,8 +564,8 @@
   window.addEventListener('scroll',()=>{if(prefs.hidden||host.inert||scrollTimer)return;scrollTimer=requestAnimationFrame(()=>{scrollTimer=0;onScroll();});},{passive:true});
   window.addEventListener('resize',onScroll,{passive:true});
   const mo=new MutationObserver(hideIfModal);
-  for(const id of ['caseOverlay','commandPalette','mobileMenu']){
-    const node=document.getElementById(id);if(node)mo.observe(node,{attributes:true,attributeFilter:['hidden']});
+  for(const id of ['caseOverlay','commandPalette','mobileMenu','quickView']){
+    const node=document.getElementById(id);if(node)mo.observe(node,{attributes:true,attributeFilter:['hidden','open']});
   }
   function motionChanged(){
     syncCharacterMotion();

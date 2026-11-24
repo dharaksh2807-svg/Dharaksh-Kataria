@@ -42,6 +42,7 @@
   let globalMuted = integrated && html.classList.contains('motion-off');
   let paused = reduced || motionDisabledByUrl || globalMuted;
   let inView = true, raf = 0, disposed = false, lastFrame = 0, elapsed = 0;
+  let quickViewSuspendedAt = document.getElementById('quickView')?.open ? performance.now() : null;
   let progress = 0, scrollSpan = 1, pointerX = 0, pointerY = 0, targetX = 0, targetY = 0;
   let renderer = null, scene = null, camera = null, portal = null;
   let rings = [], fracturePieces = [], lights = {}, envRenderTarget = null;
@@ -72,6 +73,7 @@
     if (integrated && !window.__portfolioOpening?.ready && !paused && !reduced && !compactViewport.matches && progress >= finale.openingEnd) startRelease();
   }
   function releaseProgress(now) {
+    if (quickViewSuspendedAt !== null) now = quickViewSuspendedAt;
     if (releaseStarted !== null) {
       const time = clamp((now - releaseStarted) / releaseDuration);
       releasePhase = time;
@@ -628,7 +630,7 @@
 
   function frame(now){
     raf=0;
-    if(disposed||document.hidden||!inView||(integrated&&window.__portfolioOpening?.ready))return;
+    if(quickViewSuspendedAt !== null || disposed||document.hidden||!inView||(integrated&&window.__portfolioOpening?.ready))return;
     const interval=lastFrame?now-lastFrame:0;
     const dt=lastFrame?Math.min(60,interval):16;
     if(interval>0){
@@ -678,11 +680,12 @@
   }
 
   function schedule(){
-    if(disposed||raf||!inView||document.hidden||(integrated&&window.__portfolioOpening?.ready))return;
+    if(quickViewSuspendedAt !== null || disposed||raf||!inView||document.hidden||(integrated&&window.__portfolioOpening?.ready))return;
     raf=requestAnimationFrame(frame);
   }
 
   function onScroll(){
+    if (quickViewSuspendedAt !== null) return;
     if(integrated&&window.__portfolioOpening?.ready)return;
     const previous = progress;
     readProgress();
@@ -703,9 +706,9 @@
     if(!reduced&&!paused)updateText(integrated&&compactViewport.matches?0:integrated?releaseProgress(performance.now()):progress,1);
     schedule();
   }
-  function onResize(){if(integrated&&window.__portfolioOpening?.ready)return;readProgress();resize();if(!reduced&&!paused)updateText(integrated&&compactViewport.matches?0:integrated?releaseProgress(performance.now()):progress,1);schedule();}
+  function onResize(){if(quickViewSuspendedAt !== null)return;if(integrated&&window.__portfolioOpening?.ready)return;readProgress();resize();if(!reduced&&!paused)updateText(integrated&&compactViewport.matches?0:integrated?releaseProgress(performance.now()):progress,1);schedule();}
   function onPointer(e){
-    if(paused||reduced||e.pointerType==='touch')return;
+    if(quickViewSuspendedAt !== null || paused||reduced||e.pointerType==='touch')return;
     targetX=clamp(e.clientX/innerWidth*2-1,-1,1);
     targetY=clamp(e.clientY/innerHeight*2-1,-1,1);
   }
@@ -821,6 +824,22 @@
       else{cancelAnimationFrame(raf);raf=0;}
     },{threshold:0}).observe(stage);
   }
+  // Suspend the optional brief without changing motion preferences or the
+  // current scene. Shift an in-flight burst's clock by the time spent reading.
+  document.addEventListener('portfolio:quick-view', event => {
+    if (event.detail?.open) {
+      if (quickViewSuspendedAt !== null) return;
+      quickViewSuspendedAt = performance.now();
+      cancelAnimationFrame(raf);
+      raf = 0;
+    } else if (quickViewSuspendedAt !== null) {
+      if (releaseStarted !== null) releaseStarted += performance.now() - quickViewSuspendedAt;
+      quickViewSuspendedAt = null;
+      lastFrame = 0;
+      resize();
+      schedule();
+    }
+  });
   document.addEventListener('visibilitychange',()=>{
     if(document.hidden){cancelAnimationFrame(raf);raf=0;}
     else {lastFrame=0;schedule();}

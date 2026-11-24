@@ -19,7 +19,20 @@ window.PORTFOLIO = {
       problem: 'Notes, slides, exam papers and study tools often live in disconnected folders and apps. Finding the right material — and figuring out what matters — takes time students do not have.',
       solution: 'An independent academic workspace organizing 67 listed subjects across six semesters, with previous-year question analysis, topic heatmaps, an embedded compiler, formula tools, active recall and subject-aware AI support.',
       architecture: 'Modular vanilla JavaScript, offline-first PWA caching, Firebase Auth / Firestore modules, cloud document integration and a BYOK multi-model tutor. Some cloud features may vary by production rollout.',
-      proof: 'Reported 802 active users and 7,853 events during 2 Oct–10 Nov 2026. Analytics figures are owner-reported.',
+      impact: {
+        kind: 'owner-analytics', label: 'Owner-reported analytics',
+        period: '2 Oct–10 Nov 2026', scope: 'GA4 figures reported in the résumé.',
+        metrics: [
+          { value: '802', label: 'active users' },
+          { value: '7,853', label: 'events' }
+        ],
+        limitation: 'Owner-reported figures. Raw analytics exports are unavailable in this portfolio.',
+        source: { label: 'Résumé · analytics record', href: 'assets/Dharaksh_Kataria_Resume.pdf#page=1' }
+      },
+      get proof() {
+        const [users, events] = this.impact.metrics;
+        return `Reported ${users.value} active users and ${events.value} events during ${this.impact.period}. Analytics figures are owner-reported.`;
+      },
       note: 'Student-built, independent and not officially affiliated with SRMIST. Usage figures are from project analytics as reported in the CV.',
       technologies: ['JavaScript', 'Firebase', 'PWA', 'Google Drive API', 'Gemini / Claude', 'HTML / CSS'],
       concepts: ['Exam-intelligence architecture', 'Offline-first content access', 'Study workflows', 'Multi-model learning assistance']
@@ -41,7 +54,21 @@ window.PORTFOLIO = {
       problem: 'Autoregressive inference retains key/value states that grow with context length. Reducing retained states without collapsing recall requires careful selection and correct decoding.',
       solution: 'Built and evaluated an observation-guided cache retention pipeline, comparing record-aware selection against sliding-window, StreamingLLM-style and static H2O-style baselines on synthetic long-context questions.',
       architecture: 'PyTorch + Hugging Face Transformers on Qwen2.5-1.5B. Exact post-decode KV budget enforcement, absolute RoPE positions, reproducible seeds and independently checked benchmark artifacts.',
-      proof: 'One corrected 60-question experiment: 42.53 MiB → 7.11 MiB mean retained KV; 83.3% full-cache recall versus 80.0% compressed recall.',
+      impact: {
+        kind: 'experimental', label: 'Experimental research measurement',
+        period: 'Report dated 31 Oct 2026',
+        scope: 'V2 · 60 synthetic held-out questions · Qwen2.5-1.5B-Instruct · 1K/2K contexts · B=260.',
+        metrics: [
+          { value: '42.53 → 7.11 MiB', label: 'mean retained KV · full → compressed' },
+          { value: '83.3% → 80.0%', label: 'all-facts recall · full → compressed' }
+        ],
+        limitation: 'The predeclared query-type consistency criterion failed. Peak-memory savings and general long-context reliability remain unestablished.',
+        source: { label: 'Phase 3 report · V2 results', href: 'https://github.com/dharaksh2807-svg/iitB/blob/f12dea89688bd021b75adefa8d549819b30db531/PHASE3_RESEARCH_REPORT.md#v2-independent-held-out-results-reservation-correct-consistency-still-fails' }
+      },
+      get proof() {
+        const [memory, recall] = this.impact.metrics;
+        return `One corrected 60-question experiment: ${memory.value} mean retained KV; ${recall.value} all-facts recall (full-cache → compressed).`;
+      },
       note: 'Experimental result only. Peak-memory savings and general long-context reliability have not been established. The repository documents unresolved consistency limitations.',
       technologies: ['Python', 'PyTorch', 'Transformers', 'Qwen2.5', 'MPS', 'Benchmarking'],
       concepts: ['Memory-efficient inference', 'Retention policies', 'Reproducible evaluation', 'Failure analysis']
@@ -63,7 +90,16 @@ window.PORTFOLIO = {
       problem: 'Student teams commonly form through existing networks rather than aligning around complementary skills, time availability and project needs.',
       solution: 'A skills-based collaboration and hackathon-discovery platform with weighted compatibility, role applications, project workflows, messaging and multi-model AI tooling.',
       architecture: 'Next.js + TypeScript, PostgreSQL with 28 Prisma models, NextAuth, provider SDKs, test infrastructure with Vitest and Playwright.',
-      proof: '28 Prisma schema models confirmed in repository. Hackathon ranking and performance metrics remain organizer / test-evidence dependent.',
+      impact: {
+        kind: 'repository-structure', label: 'Repository-supported engineering',
+        period: 'Repository revision · 24 Oct 2026 UTC', scope: 'Model declarations counted in prisma/schema.prisma.',
+        metrics: [{ value: '28', label: 'Prisma model declarations' }],
+        limitation: 'Schema scope is documented. Ranking quality and performance claims require separate evidence.',
+        source: { label: 'Prisma schema · pinned revision', href: 'https://github.com/dharaksh2807-svg/projectmatch/blob/5aef8e85f786382ca7dbf42311092e6d4c7eb9c3/prisma/schema.prisma' }
+      },
+      get proof() {
+        return `${this.impact.metrics[0].value} Prisma schema models confirmed in repository. Hackathon ranking and performance metrics remain organizer / test-evidence dependent.`;
+      },
       note: 'Development is ongoing. Features depend on application configuration and external service availability.',
       technologies: ['Next.js', 'React', 'TypeScript', 'PostgreSQL', 'Prisma', 'Playwright'],
       concepts: ['Weighted ranking', 'Relational data modeling', 'Authentication', 'Project collaboration']
@@ -107,7 +143,20 @@ window.PORTFOLIO = {
       problem: 'Many students study object-oriented programming as vocabulary, without grasping memory behavior, dispatch, exception flow or why a design works.',
       solution: 'Five teaching units, 30+ topics, 100+ code examples and a 12-layer learning method covering intuition, internal behavior, dry runs, pitfalls and practice.',
       architecture: 'An interactive HTML, CSS and JavaScript learning site with embedded C++ execution, visual explanations, revision workflows and AI support.',
-      proof: 'Reported 2,765 active users, 71,726 events during 1–28 May 2026; analytics source documented in the master CV.',
+      impact: {
+        kind: 'owner-analytics', label: 'Owner-reported analytics',
+        period: '1–28 May 2026', scope: 'GA4 figures reported in the résumé.',
+        metrics: [
+          { value: '2,765', label: 'active users' },
+          { value: '71,726', label: 'events' }
+        ],
+        limitation: 'Owner-reported figures. Raw analytics exports are unavailable in this portfolio.',
+        source: { label: 'Résumé · analytics record', href: 'assets/Dharaksh_Kataria_Resume.pdf#page=1' }
+      },
+      get proof() {
+        const [users, events] = this.impact.metrics;
+        return `Reported ${users.value} active users, ${events.value} events during ${this.impact.period}; analytics source documented in the résumé.`;
+      },
       note: 'Analytics figures are self-reported in provided career records. They are not independent third-party certification.',
       technologies: ['C++', 'JavaScript', 'HTML / CSS', 'Compiler integration', 'Netlify'],
       concepts: ['Learning design', 'Runtime reasoning', 'Exam workflows', 'Interactive examples']
@@ -129,7 +178,16 @@ window.PORTFOLIO = {
       problem: 'Workers and employers need understandable records of shifts, overtime, breaks and disagreements over calculated wages.',
       solution: 'Separate worker and employer dashboards, attendance state transitions, sector-specific pay rules, discrepancy detection and structured dispute resolution.',
       architecture: 'Next.js and Supabase/PostgreSQL with row-level security, transactional SQL functions and integer-paise financial arithmetic.',
-      proof: 'Repository pre-submission audit records 62 passing focused app/SQL tests. Live deployment readiness was not established.',
+      impact: {
+        kind: 'repository-audit', label: 'Repository audit · prototype',
+        period: 'Audit dated 27 Oct 2026', scope: 'Focused local app/SQL suite · PGlite Auth shim · 0 failed.',
+        metrics: [{ value: '62 passed · 1 skipped', label: 'local app/SQL tests' }],
+        limitation: 'Repository-reported run. Real Supabase preflight failed. Production readiness remains unverified.',
+        source: { label: 'Pre-submission audit · exact checks', href: 'https://github.com/dharaksh2807-svg/hackathon/blob/7b0cceb2b361af7b69f494ba9b473546ca41de1d/docs/AUDIT_REPORT.md' }
+      },
+      get proof() {
+        return `Repository pre-submission audit records ${this.impact.metrics[0].value} in the focused local app/SQL suite. Live deployment readiness was not established.`;
+      },
       note: 'This is a hackathon prototype; not a live payroll or payment-processing service.',
       technologies: ['Next.js', 'TypeScript', 'PostgreSQL', 'Supabase', 'RLS', 'SQL testing'],
       concepts: ['Financial correctness', 'Authorization', 'Transactional workflows', 'Accessible UI']
