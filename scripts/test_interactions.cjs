@@ -1,0 +1,198 @@
+/* Signature input acceptance against the production HTTP entry point. */
+'use strict';
+const { chromium } = require('playwright');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const out = 'test-results/interactions';
+fs.mkdirSync(out, { recursive: true });
+(async () => {
+  const browser = await chromium.launch();
+  const checks = [];
+  const errors = [];
+  const latency = [];
+  async function open(options = {}, hash = '#work') {
+    const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, ...options });
+    page.on('pageerror', error => errors.push(error.message));
+    await page.goto('http://127.0.0.1:4173/' + hash);
+    await page.evaluate(() => document.fonts.ready);
+    await page.waitForFunction(() => window.__portfolioInteractions);
+    return page;
+  }
+  const state = page => page.evaluate(() => window.__portfolioInteractions.getState());
+  try {
+    const page = await open();
+    const preview = page.locator('.project-visual').first();
+    async function hoverPreview() {
+      await preview.hover();
+      await page.waitForTimeout(150);
+      const box = await preview.boundingBox();
+      await page.mouse.move(box.x + box.width / 2 + 2, box.y + box.height / 2 + 2);
+    }
+    await hoverPreview();
+    await page.waitForFunction(() => __portfolioInteractions.getState().mode === 'view' && __portfolioInteractions.getState().visible);
+    await page.screenshot({ path: `${out}/desktop-view.png` });
+    await page.evaluate(() => {
+      window.signatureInputSamples = [];
+      document.addEventListener('pointermove', event => {
+        const start = performance.now();
+        requestAnimationFrame(() => {
+          const marker = document.querySelector('.signature-pointer-position');
+          if (!window.__portfolioInteractions.getState().visible) return;
+          const position = new DOMMatrixReadOnly(getComputedStyle(marker).transform);
+          window.signatureInputSamples.push({ delay: performance.now() - start, error: Math.hypot(position.m41 - event.clientX, position.m42 - event.clientY) });
+        });
+      }, { passive: true });
+    });
+    const previewBox = await preview.boundingBox();
+    for (let offset = 0; offset < 6; offset++) await page.mouse.move(previewBox.x + previewBox.width / 2 + offset, previewBox.y + previewBox.height / 2);
+    await page.waitForTimeout(150);
+    latency.push(...await page.evaluate(() => window.signatureInputSamples));
+    assert(latency.length > 0);
+    assert(latency.every(sample => sample.error < 1), 'Cursor reaches pointer position in the scheduled frame');
+    const before = (await state(page)).renders;
+    await page.waitForTimeout(250);
+    assert.equal((await state(page)).renders, before, 'No idle frame loop');
+    assert.equal(await page.locator('.signature-pointer').evaluate(node => getComputedStyle(node).pointerEvents), 'none');
+    await page.locator('[data-filter="research"]').hover();
+    await page.waitForFunction(() => __portfolioInteractions.getState().mode === 'control');
+    await page.mouse.down();
+    await page.mouse.up();
+    assert.equal(await page.locator('.project-card:visible').count(), 1);
+    await page.locator('[data-filter="all"]').click();
+    await page.locator('#quickViewTrigger').click();
+    assert.equal((await state(page)).visible, false);
+    await page.keyboard.press('Escape');
+    await page.locator('#searchTrigger').click();
+    assert.equal((await state(page)).visible, false);
+    await page.keyboard.press('Escape');
+    await page.locator('.project-xray summary').first().hover();
+    assert.equal((await state(page)).visible, false);
+    checks.push('VIEW, controls, native clicks, X-Ray and modal exclusions, idle scheduling');
+
+    const button = page.locator('#about .button-light');
+    await button.scrollIntoViewIfNeeded();
+    const hitbox = await button.boundingBox();
+    await button.hover({ position: { x: 12, y: 12 } });
+    await page.waitForTimeout(200);
+    // Existing hover styles may transform the button. Our layer only moves its inset.
+    const hovered = await button.boundingBox();
+    assert.equal(await button.evaluate(node => node.style.transform), '');
+    assert.equal(await button.evaluate(node => node.style.translate), '');
+    assert.equal(hovered.width, hitbox.width);
+    assert.equal(await button.locator('.signature-accent').count(), 1);
+    assert.notEqual(await button.evaluate(node => node.style.getPropertyValue('--signature-x')), '');
+    await page.screenshot({ path: `${out}/desktop-magnetic.png` });
+    await page.locator('#about .about-visual').scrollIntoViewIfNeeded();
+    await page.locator('#about .about-visual').hover();
+    await page.waitForTimeout(150);
+    await page.evaluate(() => {
+      window.signatureDriftSamples = [];
+      const circle = document.querySelector('.signature-scroll-accent');
+      new MutationObserver(() => {
+        const value = circle.style.getPropertyValue('--signature-drift');
+        if (value) window.signatureDriftSamples.push(parseFloat(value));
+      }).observe(circle, { attributes: true, attributeFilter: ['style'] });
+    });
+    const nativeScroll = await page.evaluate(() => scrollY);
+    await page.mouse.wheel(0, 80);
+    await page.waitForTimeout(300);
+    assert((await page.evaluate(() => scrollY)) > nativeScroll);
+    const drift = await page.evaluate(() => window.signatureDriftSamples);
+    assert(drift.length > 0 && drift.every(value => Math.abs(value) <= 3));
+    assert.equal(await page.locator('.signature-scroll-accent').evaluate(node => node.style.getPropertyValue('--signature-drift')), '');
+    await button.focus();
+    await page.keyboard.press('Tab');
+    assert.equal((await state(page)).visible, false);
+    await page.locator('#about .about-copy > p').first().evaluate(node => {
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      getSelection().removeAllRanges();
+      getSelection().addRange(range);
+    });
+    await page.locator('#about .about-copy > p').first().hover();
+    assert.equal((await state(page)).visible, false);
+    assert((await page.evaluate(() => getSelection().toString())).length > 20);
+    await page.evaluate(() => getSelection().removeAllRanges());
+    checks.push('Magnetic decorative inset preserves hitbox, keyboard focus and text selection');
+
+    const rail = page.locator('#timelineRail');
+    await rail.scrollIntoViewIfNeeded();
+    const box = await rail.boundingBox();
+    await page.mouse.move(box.x + box.width * .7, box.y + 10);
+    await page.waitForFunction(() => __portfolioInteractions.getState().mode === 'drag' && __portfolioInteractions.getState().visible);
+    const scrollBefore = await rail.evaluate(node => node.scrollLeft);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * .7 - 420, box.y + 10, { steps: 10 });
+    assert.equal(await rail.evaluate(node => node.classList.contains('is-dragging')), true);
+    await page.mouse.up();
+    assert((await rail.evaluate(node => node.scrollLeft)) > scrollBefore);
+    await page.screenshot({ path: `${out}/desktop-drag.png` });
+    await page.locator('#archiveSearch').hover();
+    assert.equal((await state(page)).visible, false);
+    await page.locator('#motionSwitch').click();
+    await hoverPreview();
+    assert.equal((await state(page)).visible, false);
+    await page.locator('#motionSwitch').click();
+    await hoverPreview();
+    await page.waitForFunction(() => __portfolioInteractions.getState().visible);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.waitForFunction(() => !__portfolioInteractions.getState().visible);
+    assert.equal((await state(page)).visible, false);
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    checks.push('Real timeline drag, input exclusion, Motion OFF and live reduced motion');
+    const scenes = await open({}, '');
+    await scenes.waitForFunction(() => window.__riftDirector);
+    await scenes.locator('.rift-stage').hover();
+    assert.equal((await state(scenes)).visible, false);
+    await scenes.close();
+    const hero = await open({}, '#nameOpening');
+    await hero.locator('#nameHeroTitle').hover();
+    assert.equal((await state(hero)).visible, false);
+    await hero.locator('#worldCanvas').scrollIntoViewIfNeeded();
+    await hero.locator('#worldCanvas').hover();
+    assert.equal((await state(hero)).visible, false);
+    await hero.close();
+    checks.push('Rift, name hero and WebGL remain native input regions');
+    await page.close();
+
+    const phone = await open({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+    const link = phone.locator('#allProjectsButton');
+    await link.scrollIntoViewIfNeeded();
+    await phone.waitForTimeout(250);
+    const touchBox = await link.boundingBox();
+    const point = { x: touchBox.x + 30, y: touchBox.y + 15 };
+    const client = await phone.context().newCDPSession(phone);
+    await client.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
+    await phone.waitForFunction(() => __portfolioInteractions.getState().tap);
+    assert.equal((await state(phone)).visible, false);
+    await phone.screenshot({ path: `${out}/mobile-press.png` });
+    await client.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: point.x, y: point.y - 35 }] });
+    await phone.waitForFunction(() => !__portfolioInteractions.getState().tap);
+    await client.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await phone.waitForTimeout(200);
+    await link.scrollIntoViewIfNeeded();
+    await link.tap();
+    await phone.waitForTimeout(500);
+    assert.equal((await state(phone)).tap, false);
+    assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    await client.send('Input.synthesizePinchGesture', { x: 195, y: 400, scaleFactor: 1.2, gestureSourceType: 'touch' });
+    assert((await phone.evaluate(() => visualViewport.scale)) > 1);
+    checks.push('Native touch press, scroll cancellation, release cleanup and no mobile overflow');
+    await phone.close();
+    const hybrid = await open({ hasTouch: true });
+    const hybridPreview = hybrid.locator('.project-visual').first();
+    await hybridPreview.hover();
+    await hybrid.waitForFunction(() => __portfolioInteractions.getState().visible);
+    const hybridBox = await hybridPreview.boundingBox();
+    const hybridClient = await hybrid.context().newCDPSession(hybrid);
+    await hybridClient.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: hybridBox.x + hybridBox.width / 2, y: hybridBox.y + hybridBox.height / 2 }] });
+    assert.equal((await state(hybrid)).visible, false);
+    await hybridClient.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] });
+    assert.equal((await state(hybrid)).tap, false);
+    await hybrid.close();
+    checks.push('Pinch zoom and hybrid mouse-to-touch cancellation preserve native behavior');
+    assert.deepEqual(errors, []);
+    fs.writeFileSync(`${out}/report.json`, JSON.stringify({ checks, errors, latency }, null, 2));
+    console.log(JSON.stringify({ checks, errors, latency }, null, 2));
+  } finally { await browser.close(); }
+})().catch(error => { console.error(error); process.exitCode = 1; });

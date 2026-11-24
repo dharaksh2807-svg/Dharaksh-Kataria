@@ -1,0 +1,105 @@
+/* Input accents never replace the native cursor or receive pointer input. */
+.signature-pointer,
+.signature-tap,
+.signature-accent {
+  pointer-events: none !important;
+  user-select: none;
+}
+.signature-pointer[hidden] { display: none; }
+.signature-pointer {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  overflow: clip;
+}
+.signature-pointer-position {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+}
+.signature-pointer-ring {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  left: -10px;
+  top: -10px;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ddc29a;
+  border-radius: 50%;
+  background: #34271c0a;
+  box-shadow: 0 0 0 1px #24231ec0;
+  transition: width 140ms ease, height 140ms ease, left 140ms ease, top 140ms ease, background 140ms ease;
+}
+.signature-pointer-ring::before {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #e6cba5;
+  box-shadow: 0 0 0 1px #34271c;
+}
+.signature-pointer[data-mode="control"] .signature-pointer-ring {
+  width: 30px;
+  height: 30px;
+  left: -15px;
+  top: -15px;
+}
+.signature-pointer:is([data-mode="view"],[data-mode="drag"]) .signature-pointer-ring {
+  width: 54px;
+  height: 54px;
+  left: -27px;
+  top: -27px;
+  background: #242820e8;
+}
+.signature-pointer:is([data-mode="view"],[data-mode="drag"]) .signature-pointer-ring::before { display: none; }
+.signature-pointer-label {
+  color: #f1dbc0;
+  font: 500 9px/1 var(--font-mono);
+  letter-spacing: .06em;
+}
+.signature-surface { position: relative; }
+.signature-accent {
+  position: absolute;
+  inset: 2px;
+  border: 1px solid #c79b674d;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at center, #d6b38020, transparent 75%);
+  opacity: 0;
+  transform: translate(var(--signature-x, 0px), var(--signature-y, 0px));
+  transition: opacity var(--motion-fast, 160ms) ease, transform var(--motion-enter, 360ms) var(--motion-ease, ease);
+}
+.signature-hover > .signature-accent { opacity: 1; }
+.signature-directional > .signature-accent {
+  inset: auto auto 0 0;
+  height: 1px;
+  width: 24px;
+  border: 0;
+  background: #c79867;
+}
+.signature-scroll-accent {
+  translate: 0 var(--signature-drift, 0px);
+  transition: translate var(--motion-enter, 360ms) var(--motion-ease, ease);
+}
+.signature-tap {
+  position: fixed;
+  z-index: 1050;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border: 1px solid #d3aa77;
+  border-radius: 50%;
+  background: #bc824526;
+  box-shadow: 0 0 0 1px #30291f66;
+  opacity: .5;
+  scale: .8;
+}
+html.motion-off :is(.signature-pointer,.signature-accent,.signature-tap) { display: none; }
+html.motion-off .signature-scroll-accent { translate: none; }
+@media (prefers-reduced-motion: reduce) {
+  .signature-pointer,.signature-accent,.signature-tap { display: none; }
+  .signature-scroll-accent { translate: none; }
+}
